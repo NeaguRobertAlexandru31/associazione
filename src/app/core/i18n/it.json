@@ -1,6 +1,6 @@
 {
   "nav": {
-    "home": "Home",
+    "home": "A.C.R.",
     "about-us": "Chi siamo",
     "projects": "Progetti",
     "news": "Notizie",
@@ -13,11 +13,24 @@
   },
   "home": {
     "title": "Benvenuti",
-    "subtitle": "La nostra associazione"
+    "subtitle": "La nostra associazione",
+    "hero_badge": "Identità e Futuro",
+    "hero_title": "Associazione Culturale Rumena",
+    "hero_subtitle": "Păstrăm tradiția, construim viitorul. Un legame vivo tra radici storiche e visione contemporanea.",
+    "hero_cta_projects": "Scopri i Progetti",
+    "hero_cta_about": "Chi Siamo",
+    "hero_next_event_label": "Prossimo Evento",
+    "hero_next_event_title": "Festival delle Tradizioni 2024",
+    "hero_next_event_date": "15 Settembre, Roma"
   },
   "about-us": {
     "title": "Chi siamo",
-    "description": "Scopri la nostra storia e la nostra missione"
+    "description": "Scopri la nostra storia e la nostra missione",
+    "hero_badge": "Custodi della Tradizione",
+    "hero_title": "La Nostra Storia",
+    "hero_est": "Est. 2004",
+    "hero_subtitle": "Tessiamo i fili della cultura rumena nel cuore dell'Italia, celebrando le nostre radici attraverso l'arte, la lingua e la solidarietà comunitaria.",
+    "hero_img_caption": "L'arte del ricamo digitale: preservare il passato, connettere il futuro."
   },
   "projects": {
     "title": "Progetti",

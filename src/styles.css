@@ -9,7 +9,54 @@
   font-display: swap;
 }
 
+:root {
+  --navbar-height: 64px;
+}
+
 @theme {
   --font-romania: 'Romania', serif;
   --font-inter: 'Inter', sans-serif;
+
+  --color-primary:                   #002068;
+  --color-primary-container:         #003399;
+  --color-on-primary:                #ffffff;
+  --color-secondary:                 #b6171e;
+  --color-secondary-fixed:           #ffdad6;
+  --color-surface:                   #faf8ff;
+  --color-surface-container-lowest:  #ffffff;
+  --color-surface-container-low:     #f4f3fc;
+  --color-surface-container:         #eeedf6;
+  --color-surface-container-high:    #e8e7f0;
+  --color-surface-container-highest: #e2e1eb;
+  --color-on-surface:                #1a1b22;
+  --color-on-surface-variant:        #444653;
+  --color-outline-variant:           #c4c5d5;
+}
+
+.material-symbols-outlined {
+  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(28px); }
+  to   { opacity: 1; transform: translateY(0);    }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.animate-fade-in-up {
+  opacity: 0;
+  animation: fadeInUp 0.7s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.animate-fade-in {
+  opacity: 0;
+  animation: fadeIn 0.9s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }

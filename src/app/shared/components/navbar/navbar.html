@@ -1,36 +1,49 @@
 <nav class="sticky top-0 w-full z-50 bg-[#faf8ff]/80 backdrop-blur-xl shadow-sm">
-  <div class="flex justify-between items-center px-8 py-4 max-w-full mx-auto">
+	<div class="flex justify-between items-center px-8 py-4 max-w-full mx-auto">
 
-    <div class="flex items-center gap-8">
-      <!-- Logo -->
-      <a routerLink="/home"
-         class="text-2xl font-black tracking-tighter text-[#002068] font-romania hover:opacity-80 transition-opacity duration-300">
-        {{ 'nav.home' | translate }}
-      </a>
+		<div class="flex items-center gap-8">
+			<!-- Logo -->
+			<a routerLink="/home"
+				class="text-2xl font-black tracking-tighter text-[#002068] font-romania hover:opacity-80 transition-opacity duration-300">
+				{{ 'nav.home' | translate }}
+			</a>
 
-      <!-- Desktop nav links -->
-      <div class="hidden md:flex gap-6 items-center">
-        @for (item of navItems; track item.route) {
-          <a [routerLink]="item.route"
-             routerLinkActive="text-[#002068]"
-             class="font-inter font-bold tracking-tight text-sm uppercase text-slate-600 hover:text-[#002068] transition-colors duration-300">
-            {{ item.labelKey | translate }}
-          </a>
-        }
-      </div>
-    </div>
+			<!-- Desktop nav links -->
+			<div class="hidden md:flex gap-6 items-center">
+				@for (item of navItems; track item.route) {
+				<a [routerLink]="item.route" routerLinkActive="text-[#002068]"
+					class="font-inter font-bold tracking-tight text-sm uppercase text-slate-600 hover:text-[#002068] transition-colors duration-300">
+					{{ item.labelKey | translate }}
+				</a>
+				}
+			</div>
+		</div>
 
-    <!-- CTA buttons -->
-    <div class="flex gap-4 items-center">
-      <a routerLink="/donations"
-         class="px-5 py-2 text-sm font-inter font-semibold uppercase tracking-wide text-[#002068] transition-all hover:bg-[#eeedf6] rounded-lg active:scale-90">
-        {{ 'nav.donate' | translate }}
-      </a>
-      <a routerLink="/about-us"
-         class="px-6 py-2 text-sm font-inter font-semibold uppercase tracking-wide bg-gradient-to-br from-[#002068] to-[#003399] text-white rounded-lg shadow-sm active:scale-90 hover:opacity-90 transition-all">
-        {{ 'nav.join_us' | translate }}
-      </a>
-    </div>
+		<!-- CTA buttons + lang switcher -->
+		<div class="flex gap-4 items-center">
 
-  </div>
+			<!-- Language switcher -->
+			<div class="flex items-center gap-1 border border-outline-variant rounded-lg overflow-hidden">
+				@for (lang of langs; track lang) {
+					<button (click)="setLang(lang)"
+						class="px-3 py-1.5 text-xs font-inter font-semibold uppercase tracking-wide transition-all"
+						[class]="currentLang === lang
+							? 'bg-primary text-on-primary'
+							: 'text-on-surface-variant hover:bg-surface-container'">
+						{{ lang }}
+					</button>
+				}
+			</div>
+
+			<a routerLink="/donations"
+				class="px-5 py-2 text-sm font-inter font-semibold uppercase tracking-wide text-[#002068] transition-all hover:bg-[#eeedf6] rounded-lg active:scale-90">
+				{{ 'nav.donate' | translate }}
+			</a>
+			<a routerLink="/about-us"
+				class="px-6 py-2 text-sm font-inter font-semibold uppercase tracking-wide bg-gradient-to-br from-[#002068] to-[#003399] text-white rounded-lg shadow-sm active:scale-90 hover:opacity-90 transition-all">
+				{{ 'nav.join_us' | translate }}
+			</a>
+		</div>
+
+	</div>
 </nav>

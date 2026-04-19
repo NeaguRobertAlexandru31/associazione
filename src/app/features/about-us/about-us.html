@@ -1,1 +1,51 @@
-<p>about-us works!</p>
+<section class="relative flex items-center overflow-hidden bg-surface" style="min-height: calc(100svh - var(--navbar-height))">
+
+  <!-- Background dot pattern -->
+  <div class="absolute inset-0 z-0 pointer-events-none opacity-[0.04]"
+       style="background-image: radial-gradient(circle at 2px 2px, #b6171e 1px, transparent 0); background-size: 28px 28px;">
+  </div>
+
+  <div class="container mx-auto px-8 relative z-10 grid md:grid-cols-2 gap-16 items-center">
+
+    <!-- Left: text -->
+    <div class="max-w-xl">
+
+      <!-- Badge -->
+      <span class="animate-fade-in-up hero-badge inline-block py-1 px-3 mb-8 text-secondary font-inter font-bold text-xs tracking-widest uppercase bg-secondary-fixed rounded-full">
+        {{ 'about-us.hero_badge' | translate }}
+      </span>
+
+      <!-- Title + Est -->
+      <h1 class="animate-fade-in-up hero-title font-romania font-extrabold tracking-tighter text-primary leading-[0.9] mb-8" style="font-size: clamp(4rem, 9vw, 7rem)">
+        {{ 'about-us.hero_title' | translate }}
+        <span class="text-secondary" style="font-size: 0.38em; vertical-align: middle;">
+          {{ 'about-us.hero_est' | translate }}
+        </span>
+      </h1>
+
+      <!-- Subtitle -->
+      <p class="animate-fade-in-up hero-sub text-xl text-on-surface-variant font-inter font-light leading-relaxed max-w-md">
+        {{ 'about-us.hero_subtitle' | translate }}
+      </p>
+
+    </div>
+
+    <!-- Right: image -->
+    <div class="animate-fade-in hero-image relative hidden md:flex justify-center">
+      <div class="relative rounded-3xl overflow-hidden shadow-2xl w-full max-w-lg aspect-[3/4] bg-surface-container">
+        <img src="/img/about-hero.jpg"
+             alt="Ie românească brodată"
+             class="parallax-img w-full h-full object-cover scale-110"
+             [style.transform]="'translateY(' + parallaxOffset + 'px) scale(1.1)'" />
+
+        <!-- Caption overlay -->
+        <div class="absolute bottom-0 left-0 right-0 px-6 py-5 bg-gradient-to-t from-primary/80 to-transparent">
+          <p class="text-on-primary font-inter text-sm leading-snug">
+            {{ 'about-us.hero_img_caption' | translate }}
+          </p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>

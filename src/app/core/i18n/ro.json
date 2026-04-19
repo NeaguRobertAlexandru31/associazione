@@ -1,6 +1,6 @@
 {
   "nav": {
-    "home": "Acasă",
+    "home": "A.C.R.",
     "about-us": "Despre noi",
     "projects": "Proiecte",
     "news": "Știri",
@@ -13,11 +13,24 @@
   },
   "home": {
     "title": "Bine ați venit",
-    "subtitle": "Asociația noastră"
+    "subtitle": "Asociația noastră",
+    "hero_badge": "Identitate și Viitor",
+    "hero_title": "Asociația Culturală Română",
+    "hero_subtitle": "Păstrăm tradiția, construim viitorul. O legătură vie între rădăcini istorice și viziune contemporană.",
+    "hero_cta_projects": "Descoperă Proiectele",
+    "hero_cta_about": "Despre Noi",
+    "hero_next_event_label": "Evenimentul Următor",
+    "hero_next_event_title": "Festivalul Tradițiilor 2024",
+    "hero_next_event_date": "15 Septembrie, Roma"
   },
   "about-us": {
     "title": "Despre noi",
-    "description": "Descoperă istoria și misiunea noastră"
+    "description": "Descoperă istoria și misiunea noastră",
+    "hero_badge": "Păstrătorii Tradiției",
+    "hero_title": "Povestea Noastră",
+    "hero_est": "Înf. 2004",
+    "hero_subtitle": "Țesem firele culturii române în inima Italiei, celebrând rădăcinile noastre prin artă, limbă și solidaritate comunitară.",
+    "hero_img_caption": "Arta broderiei digitale: să păstrăm trecutul, să conectăm viitorul."
   },
   "projects": {
     "title": "Proiecte",
