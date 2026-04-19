@@ -1,0 +1,38 @@
+/* ── Desktop language dropdown ─────────────────────────────────────────── */
+.lang-dropdown {
+  animation: dropdownIn 0.2s cubic-bezier(0.22, 1, 0.36, 1) both;
+  transform-origin: top right;
+}
+
+@keyframes dropdownIn {
+  from { opacity: 0; transform: translateY(-6px) scale(0.96); }
+  to   { opacity: 1; transform: translateY(0)    scale(1);    }
+}
+
+/* ── Mobile fullscreen overlay ─────────────────────────────────────────── */
+/* Expands from the top-right corner where the hamburger lives */
+.menu-overlay {
+  animation: menuOverlayIn 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes menuOverlayIn {
+  from { clip-path: circle(0%   at calc(100% - 3rem) 3.5rem); }
+  to   { clip-path: circle(150% at calc(100% - 3rem) 3.5rem); }
+}
+
+/* Staggered nav items slide up */
+.menu-item {
+  opacity: 0;
+  animation: menuItemIn 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes menuItemIn {
+  from { opacity: 0; transform: translateY(18px); }
+  to   { opacity: 1; transform: translateY(0);    }
+}
+
+/* Bottom section (lang + CTAs) fades in last */
+.menu-ctas {
+  opacity: 0;
+  animation: menuItemIn 0.4s cubic-bezier(0.22, 1, 0.36, 1) 0.3s both;
+}

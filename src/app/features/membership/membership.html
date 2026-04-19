@@ -1,6 +1,12 @@
 <!-- ── HERO ────────────────────────────────────────────────────────────── -->
 <section class="relative flex items-center overflow-hidden bg-surface" style="min-height: calc(100svh - var(--navbar-height)); scroll-snap-align: start">
 
+  <!-- Mobile hero background -->
+  <div class="absolute inset-0 md:hidden z-0">
+    <img src="/img/hero.jpg" class="w-full h-full object-cover" alt="" aria-hidden="true" />
+    <div class="absolute inset-0 bg-gradient-to-b from-surface/20 via-surface/60 to-surface"></div>
+  </div>
+
   <!-- Background folk pattern -->
   <div class="absolute inset-0 z-0 pointer-events-none opacity-[0.06]"
        style="background-image: radial-gradient(circle at 2px 2px, #b6171e 1px, transparent 0); background-size: 28px 28px;"></div>
