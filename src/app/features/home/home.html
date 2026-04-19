@@ -1,31 +1,22 @@
-<section class="relative flex items-center overflow-hidden bg-surface" style="min-height: calc(100svh - var(--navbar-height))">
+<!-- ── HERO ─────────────────────────────────────────────────────────────── -->
+<section class="relative flex items-center overflow-hidden bg-surface" style="min-height: calc(100svh - var(--navbar-height)); scroll-snap-align: start">
 
-  <!-- Background pattern -->
   <div class="absolute inset-0 z-0 pointer-events-none opacity-[0.04]"
        style="background-image: radial-gradient(circle at 2px 2px, #b6171e 1px, transparent 0); background-size: 28px 28px;">
   </div>
 
   <div class="container mx-auto px-8 relative z-10 grid md:grid-cols-2 gap-12 items-center">
 
-    <!-- Left: text content -->
     <div class="max-w-2xl">
-
-      <!-- Badge -->
       <span class="animate-fade-in-up hero-badge inline-block py-1 px-3 mb-6 text-secondary font-inter font-bold text-xs tracking-widest uppercase bg-secondary-fixed rounded-full">
         {{ 'home.hero_badge' | translate }}
       </span>
-
-      <!-- Title -->
       <h1 class="animate-fade-in-up hero-title text-6xl md:text-8xl font-romania font-extrabold tracking-tighter text-primary leading-[0.9] mb-6">
         {{ 'home.hero_title' | translate }}
       </h1>
-
-      <!-- Subtitle -->
       <p class="animate-fade-in-up hero-sub text-xl md:text-2xl text-on-surface-variant font-inter font-light leading-relaxed mb-10 max-w-lg">
         {{ 'home.hero_subtitle' | translate }}
       </p>
-
-      <!-- CTA buttons -->
       <div class="animate-fade-in-up hero-cta flex flex-wrap gap-4">
         <a routerLink="/projects"
            class="px-8 py-4 bg-gradient-to-br from-primary to-primary-container text-on-primary rounded-xl font-romania font-bold text-lg shadow-xl hover:opacity-90 transition-all flex items-center gap-2">
@@ -37,10 +28,8 @@
           {{ 'home.hero_cta_about' | translate }}
         </a>
       </div>
-
     </div>
 
-    <!-- Right: image + event card -->
     <div class="relative hidden md:block">
       <div class="animate-fade-in hero-image aspect-[4/5] rounded-[2rem] overflow-hidden shadow-2xl relative bg-surface-container">
         <img src="/img/hero.jpg"
@@ -49,8 +38,6 @@
              [style.transform]="'translateY(' + parallaxOffset + 'px) scale(1.1)'" />
         <div class="absolute inset-0 bg-gradient-to-t from-primary/40 to-transparent"></div>
       </div>
-
-      <!-- Event card -->
       <div class="animate-fade-in-up hero-card absolute -bottom-8 -left-8 p-8 bg-surface-container-lowest rounded-3xl shadow-2xl max-w-xs border border-outline-variant/20">
         <p class="text-secondary font-inter font-bold text-sm uppercase tracking-widest mb-2">
           {{ 'home.hero_next_event_label' | translate }}
@@ -65,5 +52,172 @@
       </div>
     </div>
 
+  </div>
+</section>
+
+<!-- ── NEWS ───────────────────────────────────────────────────────────────── -->
+<section class="py-20 bg-surface-container-low" style="scroll-snap-align: start">
+  <div class="container mx-auto px-8">
+
+    <!-- Header -->
+    <div class="mb-10">
+      <h2 class="font-romania font-extrabold text-primary text-4xl tracking-tight mb-1">
+        {{ 'home.section_news_title' | translate }}
+      </h2>
+      <div class="flex items-center justify-between">
+        <p class="font-inter text-on-surface-variant">
+          {{ 'home.section_news_subtitle' | translate }}
+        </p>
+        <a routerLink="/news"
+           class="font-inter font-semibold text-sm text-secondary hover:underline underline-offset-4 transition-all whitespace-nowrap">
+          {{ 'home.section_news_all' | translate }} →
+        </a>
+      </div>
+    </div>
+
+    <!-- Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      @for (item of news; track item.titleKey) {
+        <article class="bg-surface-container-lowest rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-shadow flex flex-col">
+          <div class="aspect-[16/10] overflow-hidden bg-surface-container">
+            <img [src]="item.img"
+                 [alt]="item.titleKey | translate"
+                 class="w-full h-full object-cover hover:scale-105 transition-transform duration-500" />
+          </div>
+          <div class="p-6 flex flex-col flex-1">
+            <div class="flex items-center gap-3 mb-3">
+              <span class="font-inter font-bold text-xs px-2 py-0.5 rounded-full" [class]="item.categoryColor">
+                {{ item.categoryKey | translate }}
+              </span>
+              <span class="font-inter text-xs text-on-surface-variant">
+                {{ item.dateKey | translate }}
+              </span>
+            </div>
+            <h3 class="font-romania font-bold text-primary text-lg leading-snug mb-2">
+              {{ item.titleKey | translate }}
+            </h3>
+            <p class="font-inter text-sm text-on-surface-variant leading-relaxed flex-1">
+              {{ item.descKey | translate }}
+            </p>
+            <a routerLink="/news"
+               class="mt-4 inline-flex items-center gap-1 font-inter font-semibold text-sm text-secondary hover:gap-2 transition-all">
+              {{ 'home.read_more' | translate }}
+              <span class="material-symbols-outlined text-base">chevron_right</span>
+            </a>
+          </div>
+        </article>
+      }
+    </div>
+
+  </div>
+</section>
+
+<!-- ── EVENTI ─────────────────────────────────────────────────────────────── -->
+<section class="py-20 bg-surface" style="scroll-snap-align: start">
+  <div class="container mx-auto px-8">
+
+    <div class="mb-10">
+      <h2 class="font-romania font-extrabold text-primary text-4xl tracking-tight mb-1">
+        {{ 'home.section_events_title' | translate }}
+      </h2>
+      <div class="flex items-center justify-between">
+        <p class="font-inter text-on-surface-variant">
+          {{ 'home.section_events_subtitle' | translate }}
+        </p>
+        <a routerLink="/events"
+           class="font-inter font-semibold text-sm text-secondary hover:underline underline-offset-4 transition-all whitespace-nowrap">
+          {{ 'home.section_events_all' | translate }} →
+        </a>
+      </div>
+    </div>
+
+    <div class="flex flex-col gap-4">
+      @for (ev of events; track ev.titleKey) {
+        <div class="flex items-center gap-6 bg-surface-container-lowest rounded-2xl px-6 py-5 shadow-sm border-l-4" [class]="ev.accentClass">
+          <!-- Date -->
+          <div class="text-center min-w-[3rem]">
+            <div class="font-romania font-extrabold text-primary text-3xl leading-none">
+              {{ ev.dayKey | translate }}
+            </div>
+            <div class="font-inter font-semibold text-on-surface-variant text-xs uppercase tracking-wider mt-0.5">
+              {{ ev.monthKey | translate }}
+            </div>
+          </div>
+          <!-- Info -->
+          <div class="flex-1">
+            <h3 class="font-romania font-bold text-primary text-lg">
+              {{ ev.titleKey | translate }}
+            </h3>
+            <div class="flex items-center gap-4 mt-1 text-on-surface-variant font-inter text-sm">
+              <span class="flex items-center gap-1">
+                <span class="material-symbols-outlined text-sm">location_on</span>
+                {{ ev.locationKey | translate }}
+              </span>
+              <span class="flex items-center gap-1">
+                <span class="material-symbols-outlined text-sm">schedule</span>
+                {{ ev.timeKey | translate }}
+              </span>
+            </div>
+          </div>
+          <!-- Button -->
+          <a [routerLink]="ev.route"
+             class="whitespace-nowrap font-inter font-semibold text-sm px-5 py-2 rounded-lg border border-outline-variant text-primary hover:bg-surface-container transition-all">
+            {{ ev.btnKey | translate }}
+          </a>
+        </div>
+      }
+    </div>
+
+  </div>
+</section>
+
+<!-- ── DONAZIONI ──────────────────────────────────────────────────────────── -->
+<section class="py-20 bg-surface-container-low" style="scroll-snap-align: start">
+  <div class="container mx-auto px-8">
+    <div class="mb-10">
+      <h2 class="font-romania font-extrabold text-primary text-4xl tracking-tight mb-1">
+        {{ 'home.section_donation_title' | translate }}
+      </h2>
+      <div class="flex items-center justify-between">
+        <p class="font-inter text-on-surface-variant">
+          {{ 'home.section_donation_subtitle_short' | translate }}
+        </p>
+        <a routerLink="/donations"
+           class="font-inter font-semibold text-sm text-secondary hover:underline underline-offset-4 transition-all whitespace-nowrap">
+          {{ 'home.section_donation_all' | translate }} →
+        </a>
+      </div>
+    </div>
+
+    <div class="bg-primary rounded-3xl px-10 py-12 flex flex-col md:flex-row items-center gap-8">
+
+      <!-- Text -->
+      <div class="flex-1">
+        <span class="inline-block mb-4 px-3 py-1 bg-[#f8bd2a] text-[#261a00] font-inter font-bold text-xs tracking-widest uppercase rounded-full">
+          {{ 'home.section_donation_badge' | translate }}
+        </span>
+        <h2 class="font-romania font-extrabold text-on-primary text-3xl mb-3">
+          {{ 'home.section_donation_title' | translate }}
+        </h2>
+        <p class="font-inter text-on-primary/70 text-sm leading-relaxed mb-6">
+          {{ 'home.section_donation_subtitle' | translate }}
+        </p>
+        <div class="inline-block bg-primary-container/60 rounded-xl px-4 py-3">
+          <p class="font-inter text-on-primary/60 text-xs mb-1">
+            {{ 'home.section_donation_cf_label' | translate }}
+          </p>
+          <p class="font-romania font-bold text-on-primary text-xl tracking-widest">
+            {{ 'home.section_donation_cf' | translate }}
+          </p>
+        </div>
+      </div>
+
+      <!-- CTA -->
+      <a routerLink="/donations"
+         class="whitespace-nowrap px-10 py-4 bg-[#f8bd2a] text-[#261a00] font-romania font-bold text-lg rounded-full shadow-lg hover:brightness-105 transition-all">
+        {{ 'home.section_donation_btn' | translate }}
+      </a>
+
+    </div>
   </div>
 </section>
