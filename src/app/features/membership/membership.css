@@ -1,0 +1,9 @@
+.hero-badge  { animation-delay: 0.1s; }
+.hero-title  { animation-delay: 0.3s; }
+.hero-sub    { animation-delay: 0.5s; }
+.hero-image  { animation-delay: 0.35s; }
+
+.parallax-img {
+  will-change: transform;
+  transition: transform 0.05s linear;
+}

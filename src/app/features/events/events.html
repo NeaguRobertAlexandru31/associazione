@@ -1,1 +1,186 @@
-<p>events works!</p>
+<!-- ── HERO ────────────────────────────────────────────────────────────── -->
+<section class="relative pt-20 pb-10 overflow-hidden bg-surface" style="scroll-snap-align: start">
+  <div class="absolute inset-0 z-0 pointer-events-none opacity-[0.04]"
+       style="background-image: radial-gradient(circle at 2px 2px, #b6171e 1px, transparent 0); background-size: 28px 28px;"></div>
+
+  <div class="container mx-auto px-8 relative z-10">
+    <span class="animate-fade-in-up hero-badge inline-block py-1 px-3 mb-5 text-secondary font-inter font-bold text-xs tracking-widest uppercase bg-secondary-fixed rounded-full">
+      {{ 'events.hero_badge' | translate }}
+    </span>
+
+    <div class="flex items-end justify-between gap-6 mb-4">
+      <h1 class="animate-fade-in-up hero-title font-romania font-extrabold tracking-tighter text-primary leading-none"
+          style="font-size: clamp(3rem, 8vw, 5.5rem)">
+        {{ 'events.hero_title_1' | translate }}
+        <span class="text-on-surface-variant font-light"> {{ 'events.hero_title_amp' | translate }} </span>
+        {{ 'events.hero_title_2' | translate }}
+      </h1>
+      <button class="hidden md:flex items-center gap-2 font-inter font-semibold text-sm text-on-surface-variant border border-outline-variant px-4 py-2 rounded-full hover:bg-surface-container transition-all whitespace-nowrap flex-shrink-0 mb-2">
+        <span class="material-symbols-outlined text-base">filter_list</span>
+        {{ 'events.filter_month' | translate }}
+      </button>
+    </div>
+
+    <p class="animate-fade-in-up hero-sub font-inter text-on-surface-variant leading-relaxed max-w-md">
+      {{ 'events.hero_subtitle' | translate }}
+    </p>
+  </div>
+</section>
+
+<!-- ── UPCOMING + SIDEBAR ─────────────────────────────────────────────── -->
+<section class="py-10 bg-surface" style="scroll-snap-align: start">
+  <div class="container mx-auto px-8 grid md:grid-cols-[1fr_280px] gap-6 items-start">
+
+    <!-- Left: featured + upcoming -->
+    <div class="flex flex-col gap-5">
+
+      <!-- Featured event -->
+      <div class="bg-surface-container-lowest rounded-3xl overflow-hidden shadow-sm flex flex-col md:flex-row">
+        <div class="relative w-full md:w-56 flex-shrink-0 aspect-[4/3] md:aspect-auto overflow-hidden bg-surface-container">
+          <img src="/img/hero.jpg" alt="featured event"
+               class="w-full h-full object-cover" />
+          <div class="absolute top-3 left-3 bg-secondary text-on-primary font-romania font-bold text-sm px-3 py-1 rounded-full">
+            {{ 'events.featured_day' | translate }} {{ 'events.featured_month' | translate }}
+          </div>
+        </div>
+        <div class="p-7 flex flex-col flex-1">
+          <p class="font-inter font-bold text-on-surface-variant text-[10px] uppercase tracking-widest mb-3">
+            {{ 'events.featured_label' | translate }}
+          </p>
+          <h2 class="font-romania font-extrabold text-primary text-2xl mb-3">
+            {{ 'events.featured_title' | translate }}
+          </h2>
+          <div class="flex flex-wrap gap-4 mb-4 font-inter text-sm text-on-surface-variant">
+            <span class="flex items-center gap-1">
+              <span class="material-symbols-outlined text-base" style="font-variation-settings:'FILL' 1">location_on</span>
+              {{ 'events.featured_location' | translate }}
+            </span>
+            <span class="flex items-center gap-1">
+              <span class="material-symbols-outlined text-base">schedule</span>
+              {{ 'events.featured_time' | translate }}
+            </span>
+          </div>
+          <p class="font-inter text-on-surface-variant text-sm leading-relaxed flex-1 mb-5">
+            {{ 'events.featured_desc' | translate }}
+          </p>
+          <div class="flex items-center justify-between">
+            <span class="font-romania font-extrabold text-primary text-2xl">
+              {{ 'events.featured_price' | translate }}
+            </span>
+            <button class="px-6 py-2 bg-primary text-on-primary font-inter font-semibold text-sm rounded-xl hover:opacity-90 transition-all">
+              {{ 'events.register' | translate }}
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Upcoming cards -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        @for (ev of upcoming; track ev.titleKey) {
+          <div class="bg-surface-container-lowest rounded-2xl p-6 shadow-sm flex flex-col gap-3">
+            <div class="flex items-start justify-between">
+              <div>
+                <div class="font-romania font-extrabold text-primary text-3xl leading-none">
+                  {{ ev.dayKey | translate }}
+                </div>
+                <div class="font-inter text-on-surface-variant text-xs uppercase tracking-wider">
+                  {{ ev.monthKey | translate }}
+                </div>
+              </div>
+              <div class="w-8 h-8 rounded-full border border-outline-variant flex items-center justify-center text-primary">
+                <span class="material-symbols-outlined text-base">arrow_forward</span>
+              </div>
+            </div>
+            <h3 class="font-romania font-bold text-primary text-lg">
+              {{ ev.titleKey | translate }}
+            </h3>
+            <p class="font-inter text-on-surface-variant text-sm leading-relaxed flex-1">
+              {{ ev.descKey | translate }}
+            </p>
+            <div class="flex items-center justify-between pt-2 border-t border-outline-variant/20">
+              <span class="font-inter text-xs text-on-surface-variant">{{ ev.locationKey | translate }}</span>
+              <button class="font-inter font-bold text-secondary text-xs hover:underline underline-offset-4">
+                {{ 'events.register' | translate }}
+              </button>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+
+    <!-- Right: sidebar -->
+    <div class="flex flex-col gap-4">
+
+      <!-- Membership card -->
+      <div class="bg-primary rounded-3xl p-6">
+        <h3 class="font-romania font-bold text-on-primary text-xl mb-2">
+          {{ 'events.membership_card_title' | translate }}
+        </h3>
+        <p class="font-inter text-on-primary/70 text-sm leading-relaxed mb-5">
+          {{ 'events.membership_card_desc' | translate }}
+        </p>
+        <a routerLink="/membership"
+           class="block w-full py-3 bg-[#f8bd2a] text-[#261a00] font-inter font-bold text-sm text-center rounded-xl hover:brightness-105 transition-all uppercase tracking-wide">
+          {{ 'events.membership_card_cta' | translate }}
+        </a>
+      </div>
+
+      <!-- Venues -->
+      <div class="bg-surface-container-lowest rounded-3xl p-6 shadow-sm">
+        <h3 class="font-inter font-bold text-primary text-sm mb-4">
+          {{ 'events.venues_title' | translate }}
+        </h3>
+        <div class="flex flex-col gap-3">
+          <div class="flex items-start gap-3">
+            <span class="material-symbols-outlined text-secondary text-lg mt-0.5" style="font-variation-settings:'FILL' 1">location_on</span>
+            <div>
+              <p class="font-inter font-semibold text-on-surface text-sm">{{ 'events.venue_1_name' | translate }}</p>
+              <p class="font-inter text-on-surface-variant text-xs">{{ 'events.venue_1_address' | translate }}</p>
+            </div>
+          </div>
+          <div class="flex items-start gap-3">
+            <span class="material-symbols-outlined text-on-surface-variant text-lg mt-0.5">location_on</span>
+            <div>
+              <p class="font-inter font-semibold text-on-surface text-sm">{{ 'events.venue_2_name' | translate }}</p>
+              <p class="font-inter text-on-surface-variant text-xs">{{ 'events.venue_2_address' | translate }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ── ARCHIVIO ───────────────────────────────────────────────────────── -->
+<section class="py-20 bg-surface-container-low" style="scroll-snap-align: start">
+  <div class="container mx-auto px-8">
+
+    <h2 class="font-romania font-extrabold text-primary text-2xl uppercase tracking-widest text-center mb-10">
+      {{ 'events.archive_title' | translate }}
+    </h2>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+      @for (a of archived; track a.titleKey) {
+        <article class="flex flex-col">
+          <div class="aspect-[4/3] rounded-2xl overflow-hidden bg-surface-container mb-4 grayscale hover:grayscale-0 transition-all duration-500">
+            <img [src]="a.img" [alt]="a.titleKey | translate"
+                 class="w-full h-full object-cover hover:scale-105 transition-transform duration-500" />
+          </div>
+          <p class="font-inter text-on-surface-variant text-xs mb-1">{{ a.dateKey | translate }}</p>
+          <h3 class="font-romania font-bold text-primary text-lg mb-2">{{ a.titleKey | translate }}</h3>
+          <p class="font-inter text-on-surface-variant text-sm leading-relaxed">{{ a.descKey | translate }}</p>
+        </article>
+      }
+    </div>
+
+    <div class="text-center">
+      <a routerLink="/events"
+         class="inline-flex flex-col items-center gap-1 font-inter font-semibold text-sm text-primary hover:text-secondary transition-colors">
+        {{ 'events.archive_cta' | translate }}
+        <span class="w-full h-px bg-primary/30"></span>
+      </a>
+    </div>
+
+  </div>
+</section>

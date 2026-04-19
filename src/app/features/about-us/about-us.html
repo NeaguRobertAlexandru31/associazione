@@ -1,51 +1,173 @@
-<section class="relative flex items-center overflow-hidden bg-surface" style="min-height: calc(100svh - var(--navbar-height))">
-
-  <!-- Background dot pattern -->
+<!-- ── HERO ────────────────────────────────────────────────────────────── -->
+<section class="relative flex items-center overflow-hidden bg-surface" style="min-height: calc(100svh - var(--navbar-height)); scroll-snap-align: start">
   <div class="absolute inset-0 z-0 pointer-events-none opacity-[0.04]"
-       style="background-image: radial-gradient(circle at 2px 2px, #b6171e 1px, transparent 0); background-size: 28px 28px;">
-  </div>
+       style="background-image: radial-gradient(circle at 2px 2px, #b6171e 1px, transparent 0); background-size: 28px 28px;"></div>
 
   <div class="container mx-auto px-8 relative z-10 grid md:grid-cols-2 gap-16 items-center">
-
-    <!-- Left: text -->
     <div class="max-w-xl">
-
-      <!-- Badge -->
       <span class="animate-fade-in-up hero-badge inline-block py-1 px-3 mb-8 text-secondary font-inter font-bold text-xs tracking-widest uppercase bg-secondary-fixed rounded-full">
         {{ 'about-us.hero_badge' | translate }}
       </span>
-
-      <!-- Title + Est -->
       <h1 class="animate-fade-in-up hero-title font-romania font-extrabold tracking-tighter text-primary leading-[0.9] mb-8" style="font-size: clamp(4rem, 9vw, 7rem)">
         {{ 'about-us.hero_title' | translate }}
-        <span class="text-secondary" style="font-size: 0.38em; vertical-align: middle;">
-          {{ 'about-us.hero_est' | translate }}
-        </span>
+        <span class="text-secondary" style="font-size: 0.38em; vertical-align: middle;">{{ 'about-us.hero_est' | translate }}</span>
       </h1>
-
-      <!-- Subtitle -->
       <p class="animate-fade-in-up hero-sub text-xl text-on-surface-variant font-inter font-light leading-relaxed max-w-md">
         {{ 'about-us.hero_subtitle' | translate }}
       </p>
-
     </div>
-
-    <!-- Right: image -->
     <div class="animate-fade-in hero-image relative hidden md:flex justify-center">
       <div class="relative rounded-3xl overflow-hidden shadow-2xl w-full max-w-lg aspect-[3/4] bg-surface-container">
-        <img src="/img/about-hero.jpg"
-             alt="Ie românească brodată"
+        <img src="/img/about-hero.jpg" alt="Ie românească brodată"
              class="parallax-img w-full h-full object-cover scale-110"
              [style.transform]="'translateY(' + parallaxOffset + 'px) scale(1.1)'" />
-
-        <!-- Caption overlay -->
         <div class="absolute bottom-0 left-0 right-0 px-6 py-5 bg-gradient-to-t from-primary/80 to-transparent">
-          <p class="text-on-primary font-inter text-sm leading-snug">
-            {{ 'about-us.hero_img_caption' | translate }}
-          </p>
+          <p class="text-on-primary font-inter text-sm leading-snug">{{ 'about-us.hero_img_caption' | translate }}</p>
         </div>
       </div>
     </div>
+  </div>
+</section>
 
+<!-- ── MISSION + TIMELINE ─────────────────────────────────────────────── -->
+<section class="py-24 bg-surface-container-low" style="scroll-snap-align: start">
+  <div class="container mx-auto px-8 grid md:grid-cols-2 gap-16 items-start">
+
+    <!-- Left: mission + pillars -->
+    <div>
+      <div class="border-l-4 border-secondary pl-6 mb-10">
+        <h2 class="font-romania font-extrabold text-primary text-4xl mb-4">
+          {{ 'about-us.mission_title' | translate }}
+        </h2>
+        <p class="font-inter text-on-surface-variant leading-relaxed">
+          {{ 'about-us.mission_text' | translate }}
+        </p>
+      </div>
+
+      <div class="grid grid-cols-2 gap-4">
+        @for (p of pillars; track p.titleKey) {
+          <div class="bg-surface-container-lowest rounded-2xl p-6 shadow-sm">
+            <span class="material-symbols-outlined text-secondary text-2xl mb-3 block">{{ p.icon }}</span>
+            <h3 class="font-romania font-bold text-primary text-lg mb-2">{{ p.titleKey | translate }}</h3>
+            <p class="font-inter text-on-surface-variant text-sm leading-relaxed">{{ p.descKey | translate }}</p>
+          </div>
+        }
+      </div>
+    </div>
+
+    <!-- Right: timeline -->
+    <div class="flex flex-col gap-8">
+      @for (item of timeline; track item.yearKey; let last = $last) {
+        <div class="flex gap-6 items-start">
+          <div class="font-romania font-extrabold text-surface-container-highest text-5xl leading-none min-w-[5rem] text-right select-none">
+            {{ item.yearKey | translate }}
+          </div>
+          <div class="pt-1" [class.opacity-40]="last">
+            <h3 class="font-inter font-bold text-primary text-base mb-1">{{ item.titleKey | translate }}</h3>
+            <p class="font-inter text-on-surface-variant text-sm leading-relaxed">{{ item.descKey | translate }}</p>
+          </div>
+        </div>
+        @if (!last) {
+          <div class="ml-[5rem] pl-6 h-px bg-outline-variant/30"></div>
+        }
+      }
+    </div>
+
+  </div>
+</section>
+
+<!-- ── VALORI ──────────────────────────────────────────────────────────── -->
+<section class="py-24 bg-surface" style="scroll-snap-align: start">
+  <div class="container mx-auto px-8 text-center">
+
+    <h2 class="font-romania font-extrabold text-primary text-4xl mb-3">
+      {{ 'about-us.values_title' | translate }}
+    </h2>
+    <div class="w-16 h-1 bg-[#f8bd2a] rounded-full mx-auto mb-16"></div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-10">
+      @for (v of values; track v.titleKey) {
+        <div class="flex flex-col items-center">
+          <div class="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mb-5">
+            <span class="material-symbols-outlined text-primary text-2xl">{{ v.icon }}</span>
+          </div>
+          <h3 class="font-romania font-bold text-primary text-xl mb-3">{{ v.titleKey | translate }}</h3>
+          <p class="font-inter text-on-surface-variant text-sm leading-relaxed max-w-xs">{{ v.descKey | translate }}</p>
+        </div>
+      }
+    </div>
+
+  </div>
+</section>
+
+<!-- ── CONSIGLIO DIRETTIVO ─────────────────────────────────────────────── -->
+<section class="py-24 bg-surface-container-low" style="scroll-snap-align: start">
+  <div class="container mx-auto px-8">
+
+    <!-- Header -->
+    <div class="flex items-end justify-between mb-12">
+      <div>
+        <h2 class="font-romania font-extrabold text-primary text-4xl mb-1">
+          {{ 'about-us.board_title' | translate }}
+        </h2>
+        <p class="font-inter text-on-surface-variant max-w-sm">
+          {{ 'about-us.board_subtitle' | translate }}
+        </p>
+      </div>
+      <div class="flex gap-2">
+        <button (click)="prevBoard()"
+                [disabled]="boardOffset() === 0"
+                class="w-10 h-10 rounded-full border border-outline-variant flex items-center justify-center text-primary hover:bg-surface-container transition-all disabled:opacity-30">
+          <span class="material-symbols-outlined text-xl">arrow_back</span>
+        </button>
+        <button (click)="nextBoard()"
+                [disabled]="boardOffset() >= members.length - 1"
+                class="w-10 h-10 rounded-full border border-outline-variant flex items-center justify-center text-primary hover:bg-surface-container transition-all disabled:opacity-30">
+          <span class="material-symbols-outlined text-xl">arrow_forward</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Cards -->
+    <div class="overflow-hidden">
+      <div class="flex gap-6 transition-transform duration-500"
+           [style.transform]="'translateX(calc(-' + boardOffset() + ' * (100% / 4 + 1.5rem)))'">
+        @for (m of members; track m.nameKey) {
+          <div class="flex-none w-full md:w-[calc(25%-1.5rem*3/4)]" style="min-width: calc(25% - 1.125rem)">
+            <div class="aspect-[3/4] rounded-2xl overflow-hidden bg-surface-container mb-4 grayscale">
+              <img [src]="m.img" [alt]="m.nameKey | translate"
+                   class="parallax-img w-full h-full object-cover object-top scale-110"
+                   [style.transform]="'translateY(' + parallaxOffset * 0.15 + 'px) scale(1.1)'" />
+            </div>
+            <h3 class="font-romania font-bold text-primary text-lg">{{ m.nameKey | translate }}</h3>
+            <p class="font-inter font-bold text-secondary text-xs uppercase tracking-wider mb-2">{{ m.roleKey | translate }}</p>
+            <p class="font-inter text-on-surface-variant text-sm leading-relaxed">{{ m.descKey | translate }}</p>
+          </div>
+        }
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ── CTA ────────────────────────────────────────────────────────────── -->
+<section class="py-24 bg-primary" style="scroll-snap-align: start">
+  <div class="container mx-auto px-8 text-center max-w-2xl">
+    <h2 class="font-romania font-extrabold text-on-primary text-4xl md:text-5xl mb-4">
+      {{ 'about-us.cta_title' | translate }}
+    </h2>
+    <p class="font-inter text-on-primary/70 text-lg mb-10">
+      {{ 'about-us.cta_subtitle' | translate }}
+    </p>
+    <div class="flex flex-wrap gap-4 justify-center">
+      <a routerLink="/membership"
+         class="px-8 py-3 border-2 border-[#f8bd2a] text-[#f8bd2a] font-inter font-semibold rounded-full hover:bg-[#f8bd2a] hover:text-[#261a00] transition-all">
+        {{ 'about-us.cta_join' | translate }}
+      </a>
+      <a routerLink="/contacts"
+         class="px-8 py-3 border-2 border-on-primary/40 text-on-primary font-inter font-semibold rounded-full hover:bg-on-primary/10 transition-all">
+        {{ 'about-us.cta_contact' | translate }}
+      </a>
+    </div>
   </div>
 </section>

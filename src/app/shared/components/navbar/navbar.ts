@@ -19,7 +19,7 @@ export class Navbar implements AfterViewInit {
 
   readonly navItems: NavItem[] = [
     { route: '/about-us',  labelKey: 'nav.about-us'  },
-    { route: '/donations', labelKey: 'nav.donations'  },
+    { route: '/boutique',  labelKey: 'nav.boutique'  },
     { route: '/events',    labelKey: 'nav.events'     },
     { route: '/news',      labelKey: 'nav.news'       },
     { route: '/projects',  labelKey: 'nav.projects'   },

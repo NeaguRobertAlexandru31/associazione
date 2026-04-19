@@ -1,1 +1,227 @@
-<p>contacts works!</p>
+<!-- ── HERO ────────────────────────────────────────────────────────────── -->
+<section class="relative pt-20 pb-14 overflow-hidden bg-surface" style="scroll-snap-align: start">
+  <div class="absolute inset-0 z-0 pointer-events-none opacity-[0.04]"
+       style="background-image: radial-gradient(circle at 2px 2px, #b6171e 1px, transparent 0); background-size: 28px 28px;"></div>
+
+  <div class="container mx-auto px-8 relative z-10">
+    <span class="animate-fade-in-up hero-badge inline-block py-1 px-3 mb-5 text-secondary font-inter font-bold text-xs tracking-widest uppercase bg-secondary-fixed rounded-full">
+      {{ 'contacts.hero_badge' | translate }}
+    </span>
+
+    <div class="flex items-end justify-between gap-8">
+      <h1 class="animate-fade-in-up hero-title font-romania font-extrabold text-primary tracking-tighter leading-[0.95]"
+          style="font-size: clamp(2.8rem, 7vw, 5rem)">
+        {{ 'contacts.hero_title' | translate }}
+      </h1>
+      <p class="animate-fade-in-up hero-sub font-inter italic text-on-surface-variant text-sm whitespace-nowrap hidden md:block mb-2">
+        {{ 'contacts.hero_tagline' | translate }}
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ── FORM + INFO ────────────────────────────────────────────────────── -->
+<section class="py-12 bg-surface" style="scroll-snap-align: start">
+  <div class="container mx-auto px-8 grid md:grid-cols-[1fr_360px] gap-6 items-start">
+
+    <!-- Left: form -->
+    <div class="bg-surface-container-lowest rounded-3xl shadow-sm p-8">
+      <div class="flex items-center gap-3 mb-8">
+        <span class="material-symbols-outlined text-secondary" style="font-variation-settings:'FILL' 1">mail</span>
+        <h2 class="font-romania font-bold text-primary text-2xl">
+          {{ 'contacts.form_title' | translate }}
+        </h2>
+      </div>
+
+      <form (ngSubmit)="submitForm()" #contactForm="ngForm" class="flex flex-col gap-5">
+
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="font-inter font-semibold text-[10px] text-on-surface-variant uppercase tracking-widest block mb-2">
+              {{ 'contacts.form_name' | translate }}
+            </label>
+            <input type="text" name="name" [(ngModel)]="name" required
+                   [placeholder]="'contacts.form_name_ph' | translate"
+                   class="w-full px-4 py-3 rounded-xl border border-outline-variant bg-surface-container-low font-inter text-sm text-on-surface focus:outline-none focus:border-primary transition-colors" />
+          </div>
+          <div>
+            <label class="font-inter font-semibold text-[10px] text-on-surface-variant uppercase tracking-widest block mb-2">
+              {{ 'contacts.form_email' | translate }}
+            </label>
+            <input type="email" name="email" [(ngModel)]="email" required
+                   [placeholder]="'contacts.form_email_ph' | translate"
+                   class="w-full px-4 py-3 rounded-xl border border-outline-variant bg-surface-container-low font-inter text-sm text-on-surface focus:outline-none focus:border-primary transition-colors" />
+          </div>
+        </div>
+
+        <div>
+          <label class="font-inter font-semibold text-[10px] text-on-surface-variant uppercase tracking-widest block mb-2">
+            {{ 'contacts.form_subject' | translate }}
+          </label>
+          <input type="text" name="subject" [(ngModel)]="subject"
+                 [placeholder]="'contacts.form_subject_ph' | translate"
+                 class="w-full px-4 py-3 rounded-xl border border-outline-variant bg-surface-container-low font-inter text-sm text-on-surface focus:outline-none focus:border-primary transition-colors" />
+        </div>
+
+        <div>
+          <label class="font-inter font-semibold text-[10px] text-on-surface-variant uppercase tracking-widest block mb-2">
+            {{ 'contacts.form_message' | translate }}
+          </label>
+          <textarea name="message" [(ngModel)]="message" required rows="5"
+                    [placeholder]="'contacts.form_message_ph' | translate"
+                    class="w-full px-4 py-3 rounded-xl border border-outline-variant bg-surface-container-low font-inter text-sm text-on-surface focus:outline-none focus:border-primary transition-colors resize-none"></textarea>
+        </div>
+
+        <button type="submit"
+                [disabled]="!name || !email || !message"
+                class="self-start px-8 py-3 bg-primary text-on-primary font-inter font-semibold rounded-xl flex items-center gap-2 hover:opacity-90 transition-all disabled:opacity-40">
+          @if (sent()) {
+            <span class="material-symbols-outlined text-base">check_circle</span>
+            {{ 'contacts.form_sent' | translate }}
+          } @else {
+            {{ 'contacts.form_send' | translate }}
+            <span class="material-symbols-outlined text-base">arrow_forward</span>
+          }
+        </button>
+
+      </form>
+    </div>
+
+    <!-- Right: info -->
+    <div class="flex flex-col gap-4">
+
+      <!-- Address -->
+      <div class="bg-surface-container-lowest rounded-3xl shadow-sm p-7">
+        <p class="font-inter font-bold text-secondary text-[10px] uppercase tracking-widest mb-4">
+          {{ 'contacts.info_sede_label' | translate }}
+        </p>
+        <div class="flex items-start gap-3 mb-6">
+          <span class="material-symbols-outlined text-primary mt-0.5" style="font-variation-settings:'FILL' 1">location_on</span>
+          <div>
+            <p class="font-romania font-bold text-primary text-lg">{{ 'contacts.info_address' | translate }}</p>
+            <p class="font-inter text-on-surface-variant text-sm">{{ 'contacts.info_city' | translate }}</p>
+            <p class="font-inter text-on-surface-variant text-sm">{{ 'contacts.info_country' | translate }}</p>
+          </div>
+        </div>
+        <div class="grid grid-cols-2 gap-4 border-t border-outline-variant/20 pt-5">
+          <div>
+            <p class="font-inter text-[10px] text-on-surface-variant uppercase tracking-widest mb-1">{{ 'contacts.info_phone_label' | translate }}</p>
+            <a [href]="'tel:' + ('contacts.info_phone' | translate)"
+               class="font-romania font-bold text-primary hover:text-secondary transition-colors">
+              {{ 'contacts.info_phone' | translate }}
+            </a>
+          </div>
+          <div>
+            <p class="font-inter text-[10px] text-on-surface-variant uppercase tracking-widest mb-1">{{ 'contacts.info_email_label' | translate }}</p>
+            <a [href]="'mailto:' + ('contacts.info_email' | translate)"
+               class="font-romania font-bold text-primary hover:text-secondary transition-colors">
+              {{ 'contacts.info_email' | translate }}
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Social -->
+      <div class="bg-primary rounded-3xl p-7">
+        <p class="font-inter font-bold text-on-primary/60 text-[10px] uppercase tracking-widest mb-3">
+          {{ 'contacts.social_title' | translate }}
+        </p>
+        <p class="font-inter text-on-primary/80 text-sm leading-relaxed mb-5">
+          {{ 'contacts.social_subtitle' | translate }}
+        </p>
+        <div class="flex gap-3">
+          <a href="#" class="w-10 h-10 rounded-full bg-on-primary/10 flex items-center justify-center text-on-primary hover:bg-on-primary/20 transition-all">
+            <span class="material-symbols-outlined text-xl">public</span>
+          </a>
+          <a href="#" class="w-10 h-10 rounded-full bg-on-primary/10 flex items-center justify-center text-on-primary hover:bg-on-primary/20 transition-all">
+            <span class="material-symbols-outlined text-xl">share</span>
+          </a>
+          <a href="#" class="w-10 h-10 rounded-full bg-on-primary/10 flex items-center justify-center text-on-primary hover:bg-on-primary/20 transition-all">
+            <span class="material-symbols-outlined text-xl">photo_camera</span>
+          </a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ── MAP ────────────────────────────────────────────────────────────── -->
+<section class="py-6 bg-surface" style="scroll-snap-align: start">
+  <div class="container mx-auto px-8">
+    <div class="relative rounded-3xl overflow-hidden h-80 bg-surface-container shadow-sm">
+
+      <!-- Map placeholder styled -->
+      <div class="absolute inset-0 bg-gradient-to-br from-surface-container to-surface-container-high flex items-center justify-center">
+        <div class="text-center">
+          <span class="material-symbols-outlined text-5xl text-primary/20 mb-2 block">map</span>
+        </div>
+        <!-- Grid lines -->
+        <div class="absolute inset-0 opacity-10"
+             style="background-image: linear-gradient(#002068 1px, transparent 1px), linear-gradient(90deg, #002068 1px, transparent 1px); background-size: 40px 40px;"></div>
+      </div>
+
+      <!-- Pin -->
+      <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-full flex flex-col items-center">
+        <div class="bg-secondary text-on-primary font-inter font-semibold text-xs px-3 py-1.5 rounded-full shadow-lg mb-1 whitespace-nowrap">
+          Associazione Culturale Rumena
+        </div>
+        <span class="material-symbols-outlined text-secondary text-3xl" style="font-variation-settings:'FILL' 1">location_on</span>
+      </div>
+
+      <!-- How to reach card -->
+      <div class="absolute bottom-4 left-4 bg-surface-container-lowest rounded-2xl px-5 py-4 shadow-md max-w-xs">
+        <p class="font-inter font-bold text-secondary text-[10px] uppercase tracking-widest mb-1">
+          {{ 'contacts.map_how_label' | translate }}
+        </p>
+        <p class="font-inter text-on-surface-variant text-xs leading-relaxed">
+          {{ 'contacts.map_how_text' | translate }}
+        </p>
+      </div>
+
+      <!-- Directions button -->
+      <a [href]="mapsUrl" target="_blank" rel="noopener"
+         class="absolute top-4 right-4 flex items-center gap-2 bg-surface-container-lowest px-4 py-2 rounded-full shadow-md font-inter font-semibold text-sm text-primary hover:bg-surface-container transition-all">
+        <span class="material-symbols-outlined text-secondary text-base" style="font-variation-settings:'FILL' 1">directions</span>
+        {{ 'contacts.map_directions' | translate }}
+      </a>
+
+    </div>
+  </div>
+</section>
+
+<!-- ── NEWSLETTER ─────────────────────────────────────────────────────── -->
+<section class="py-20 bg-surface" style="scroll-snap-align: start">
+  <div class="container mx-auto px-8 max-w-xl text-center">
+
+    <!-- Divider -->
+    <div class="w-px h-12 bg-secondary mx-auto mb-10"></div>
+
+    <h2 class="font-romania font-extrabold text-primary text-3xl mb-3">
+      {{ 'contacts.newsletter_title' | translate }}
+    </h2>
+    <p class="font-inter text-on-surface-variant leading-relaxed mb-8">
+      {{ 'contacts.newsletter_subtitle' | translate }}
+    </p>
+
+    <form (ngSubmit)="submitNewsletter()" class="flex gap-3">
+      <input type="email" name="newsletterEmail" [(ngModel)]="newsletterEmail" required
+             [placeholder]="'contacts.newsletter_ph' | translate"
+             class="flex-1 px-5 py-3 rounded-xl border border-outline-variant bg-surface-container-low font-inter text-sm text-on-surface focus:outline-none focus:border-primary transition-colors" />
+      <button type="submit"
+              [disabled]="!newsletterEmail"
+              class="px-7 py-3 rounded-xl font-inter font-semibold text-sm transition-all disabled:opacity-40"
+              [class]="newsletterDone() ? 'bg-[#155724] text-white' : 'bg-secondary text-on-primary hover:opacity-90'">
+        @if (newsletterDone()) {
+          <span class="flex items-center gap-1">
+            <span class="material-symbols-outlined text-base">check</span>
+            {{ 'contacts.newsletter_done' | translate }}
+          </span>
+        } @else {
+          {{ 'contacts.newsletter_cta' | translate }}
+        }
+      </button>
+    </form>
+
+  </div>
+</section>

@@ -1,1 +1,232 @@
-<p>donations works!</p>
+<!-- ── HERO ────────────────────────────────────────────────────────────── -->
+<section class="relative pt-20 pb-14 overflow-hidden bg-surface" style="scroll-snap-align: start">
+  <div class="absolute inset-0 z-0 pointer-events-none opacity-[0.04]"
+       style="background-image: radial-gradient(circle at 2px 2px, #b6171e 1px, transparent 0); background-size: 28px 28px;"></div>
+
+  <div class="container mx-auto px-8 relative z-10">
+    <span class="animate-fade-in-up hero-badge inline-block py-1 px-3 mb-5 text-secondary font-inter font-bold text-xs tracking-widest uppercase bg-secondary-fixed rounded-full">
+      {{ 'donations.hero_badge' | translate }}
+    </span>
+
+    <h1 class="animate-fade-in-up hero-title font-romania font-extrabold tracking-tighter leading-none mb-5"
+        style="font-size: clamp(3rem, 8vw, 5.5rem)">
+      <span class="text-on-surface">{{ 'donations.hero_title_1' | translate }}</span><br>
+      <span class="text-secondary">{{ 'donations.hero_title_2' | translate }}</span>
+    </h1>
+
+    <p class="animate-fade-in-up hero-sub font-inter text-on-surface-variant leading-relaxed max-w-lg">
+      {{ 'donations.hero_subtitle' | translate }}
+    </p>
+  </div>
+</section>
+
+<!-- ── IMPATTO ────────────────────────────────────────────────────────── -->
+<section class="py-16 bg-surface-container-low" style="scroll-snap-align: start">
+  <div class="container mx-auto px-8">
+
+    <div class="mb-10">
+      <h2 class="font-romania font-extrabold text-primary text-3xl mb-2">
+        {{ 'donations.impact_title' | translate }}
+      </h2>
+      <p class="font-inter text-on-surface-variant text-sm leading-relaxed max-w-lg">
+        {{ 'donations.impact_subtitle' | translate }}
+      </p>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+      @for (item of impacts; track item.titleKey) {
+        <div class="bg-surface-container-lowest rounded-2xl p-6 shadow-sm flex flex-col gap-3">
+          <div class="w-11 h-11 rounded-full bg-secondary-fixed flex items-center justify-center">
+            <span class="material-symbols-outlined text-secondary text-xl" style="font-variation-settings:'FILL' 1">
+              {{ item.iconKey | translate }}
+            </span>
+          </div>
+          <h3 class="font-romania font-bold text-primary text-lg leading-tight">
+            {{ item.titleKey | translate }}
+          </h3>
+          <p class="font-inter text-on-surface-variant text-sm leading-relaxed">
+            {{ item.descKey | translate }}
+          </p>
+        </div>
+      }
+    </div>
+
+  </div>
+</section>
+
+<!-- ── FORM DONAZIONE ─────────────────────────────────────────────────── -->
+<section class="py-16 bg-surface" style="scroll-snap-align: start">
+  <div class="container mx-auto px-8">
+    <div class="grid md:grid-cols-[1fr_360px] gap-10 items-start">
+
+      <!-- Left: amount + frequency -->
+      <div>
+        <h2 class="font-romania font-extrabold text-primary text-3xl mb-2">
+          {{ 'donations.amounts_title' | translate }}
+        </h2>
+        <p class="font-inter text-on-surface-variant text-sm leading-relaxed mb-8">
+          {{ 'donations.amounts_subtitle' | translate }}
+        </p>
+
+        <!-- Frequency toggle -->
+        <div class="inline-flex rounded-xl border border-outline-variant overflow-hidden mb-8">
+          <button (click)="frequency.set('once')"
+                  [class]="frequency() === 'once'
+                    ? 'px-6 py-2.5 font-inter font-semibold text-sm bg-primary text-on-primary transition-all'
+                    : 'px-6 py-2.5 font-inter font-semibold text-sm text-on-surface-variant hover:bg-surface-container transition-all'">
+            {{ 'donations.freq_once' | translate }}
+          </button>
+          <button (click)="frequency.set('monthly')"
+                  [class]="frequency() === 'monthly'
+                    ? 'px-6 py-2.5 font-inter font-semibold text-sm bg-primary text-on-primary transition-all'
+                    : 'px-6 py-2.5 font-inter font-semibold text-sm text-on-surface-variant hover:bg-surface-container transition-all'">
+            {{ 'donations.freq_monthly' | translate }}
+          </button>
+        </div>
+
+        <!-- Amount pills -->
+        <div class="flex flex-wrap gap-3 mb-6">
+          @for (a of amounts; track a) {
+            <button (click)="selectAmount(a)"
+                    [class]="selectedAmount() === a
+                      ? 'px-6 py-3 rounded-xl font-romania font-bold text-xl bg-primary text-on-primary shadow-sm transition-all'
+                      : 'px-6 py-3 rounded-xl font-romania font-bold text-xl bg-surface-container text-on-surface hover:bg-surface-container-high transition-all'">
+              €{{ a }}
+            </button>
+          }
+        </div>
+
+        <!-- Custom amount -->
+        <div class="relative mb-8 max-w-xs">
+          <span class="absolute left-4 top-1/2 -translate-y-1/2 font-romania font-bold text-on-surface-variant text-lg">€</span>
+          <input type="number" min="1"
+                 [value]="customAmount()"
+                 (input)="onCustomInput($any($event.target).value)"
+                 [placeholder]="'donations.amount_custom_ph' | translate"
+                 class="w-full pl-8 pr-4 py-3 rounded-xl border border-outline-variant bg-surface font-inter text-sm focus:outline-none focus:border-primary transition-colors" />
+        </div>
+
+        <!-- Method tabs -->
+        <div class="flex gap-3 mb-6">
+          <button (click)="method.set('card')"
+                  [class]="method() === 'card'
+                    ? 'flex items-center gap-2 px-5 py-2.5 rounded-xl font-inter font-semibold text-sm bg-primary text-on-primary transition-all'
+                    : 'flex items-center gap-2 px-5 py-2.5 rounded-xl font-inter font-semibold text-sm bg-surface-container text-on-surface-variant hover:bg-surface-container-high transition-all'">
+            <span class="material-symbols-outlined text-base">credit_card</span>
+            {{ 'donations.method_card' | translate }}
+          </button>
+          <button (click)="method.set('bank')"
+                  [class]="method() === 'bank'
+                    ? 'flex items-center gap-2 px-5 py-2.5 rounded-xl font-inter font-semibold text-sm bg-primary text-on-primary transition-all'
+                    : 'flex items-center gap-2 px-5 py-2.5 rounded-xl font-inter font-semibold text-sm bg-surface-container text-on-surface-variant hover:bg-surface-container-high transition-all'">
+            <span class="material-symbols-outlined text-base">account_balance</span>
+            {{ 'donations.method_bank' | translate }}
+          </button>
+        </div>
+
+        <!-- Card method -->
+        @if (method() === 'card') {
+          <button class="flex items-center justify-center gap-2 w-full max-w-xs py-4 bg-primary text-on-primary font-inter font-bold text-sm rounded-xl hover:opacity-90 transition-all uppercase tracking-wide">
+            <span class="material-symbols-outlined text-base" style="font-variation-settings:'FILL' 1">favorite</span>
+            {{ 'donations.donate_cta' | translate }}
+          </button>
+          <p class="font-inter text-on-surface-variant text-xs mt-3 flex items-center gap-1.5">
+            <span class="material-symbols-outlined text-sm">lock</span>
+            {{ 'donations.donate_secure' | translate }}
+          </p>
+        }
+
+        <!-- Bank transfer method -->
+        @if (method() === 'bank') {
+          <div class="bg-surface-container-lowest rounded-2xl p-6 shadow-sm max-w-md flex flex-col gap-4">
+            <h3 class="font-romania font-bold text-primary text-lg">{{ 'donations.bank_title' | translate }}</h3>
+
+            @for (row of [
+              { label: 'donations.bank_iban_label',        value: 'donations.bank_iban',        copy: true,  field: 'iban'        },
+              { label: 'donations.bank_bic_label',         value: 'donations.bank_bic',         copy: false, field: ''            },
+              { label: 'donations.bank_beneficiary_label', value: 'donations.bank_beneficiary', copy: false, field: ''            },
+              { label: 'donations.bank_reason_label',      value: 'donations.bank_reason',      copy: false, field: ''            }
+            ]; track row.label) {
+              <div class="flex items-start justify-between gap-4 border-b border-outline-variant/20 pb-3 last:border-0 last:pb-0">
+                <div>
+                  <p class="font-inter text-on-surface-variant text-[10px] uppercase tracking-widest mb-0.5">{{ row.label | translate }}</p>
+                  <p class="font-inter font-semibold text-on-surface text-sm">{{ row.value | translate }}</p>
+                </div>
+                @if (row.copy) {
+                  <button (click)="copyIban()"
+                          class="flex-shrink-0 flex items-center gap-1 font-inter font-semibold text-xs text-secondary hover:underline underline-offset-4 mt-3">
+                    <span class="material-symbols-outlined text-sm">{{ ibanCopied() ? 'check' : 'content_copy' }}</span>
+                    {{ (ibanCopied() ? 'donations.bank_copied' : 'donations.bank_copy') | translate }}
+                  </button>
+                }
+              </div>
+            }
+          </div>
+        }
+      </div>
+
+      <!-- Right: summary card -->
+      <div class="bg-primary rounded-3xl p-7 text-on-primary sticky top-[calc(var(--navbar-height)+1rem)]">
+        <h3 class="font-romania font-bold text-on-primary text-xl mb-1">
+          {{ frequency() === 'monthly' ? ('donations.freq_monthly' | translate) : ('donations.freq_once' | translate) }}
+        </h3>
+        <div class="font-romania font-extrabold text-on-primary text-5xl my-6">
+          €{{ selectedAmount() ?? (customAmount() || '—') }}
+        </div>
+        <div class="flex flex-col gap-3 mb-8">
+          @for (item of impacts; track item.titleKey) {
+            <div class="flex items-center gap-2 font-inter text-on-primary/80 text-sm">
+              <span class="material-symbols-outlined text-base text-[#f8bd2a]" style="font-variation-settings:'FILL' 1">check_circle</span>
+              {{ item.titleKey | translate }}
+            </div>
+          }
+        </div>
+        <button class="w-full py-3 bg-[#f8bd2a] text-[#261a00] font-inter font-bold text-sm rounded-xl hover:brightness-105 transition-all uppercase tracking-wide">
+          {{ 'donations.donate_cta' | translate }}
+        </button>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ── 5×1000 ─────────────────────────────────────────────────────────── -->
+<section class="py-20 bg-surface-container-low" style="scroll-snap-align: start">
+  <div class="container mx-auto px-8">
+    <div class="bg-primary rounded-3xl overflow-hidden grid md:grid-cols-[1fr_auto] items-center gap-0">
+
+      <div class="p-10">
+        <span class="inline-block font-inter font-bold text-[#f8bd2a] text-xs tracking-widest uppercase mb-4">5×1000</span>
+        <h2 class="font-romania font-extrabold text-on-primary text-3xl leading-tight mb-4">
+          {{ 'donations.fivepermille_title' | translate }}
+        </h2>
+        <p class="font-inter text-on-primary/80 text-sm leading-relaxed mb-6 max-w-xl">
+          {{ 'donations.fivepermille_desc' | translate }}
+        </p>
+
+        <div class="bg-on-primary/10 rounded-2xl p-5 mb-6 flex items-center justify-between gap-4">
+          <div>
+            <p class="font-inter text-on-primary/60 text-xs uppercase tracking-widest mb-1">{{ 'donations.fivepermille_cf_label' | translate }}</p>
+            <p class="font-romania font-extrabold text-on-primary text-2xl tracking-widest">{{ 'donations.fivepermille_cf' | translate }}</p>
+          </div>
+          <button (click)="copyCf()"
+                  class="flex items-center gap-1.5 px-4 py-2 bg-[#f8bd2a] text-[#261a00] font-inter font-bold text-xs rounded-xl hover:brightness-105 transition-all uppercase tracking-wide flex-shrink-0">
+            <span class="material-symbols-outlined text-sm">{{ cfCopied() ? 'check' : 'content_copy' }}</span>
+            {{ (cfCopied() ? 'donations.bank_copied' : 'donations.bank_copy') | translate }}
+          </button>
+        </div>
+
+        <p class="font-inter text-on-primary/70 text-xs leading-relaxed max-w-xl">
+          {{ 'donations.fivepermille_how' | translate }}
+        </p>
+      </div>
+
+      <!-- Decorative number -->
+      <div class="hidden md:flex items-center justify-center px-12 text-on-primary/5 font-romania font-extrabold select-none"
+           style="font-size: 12rem; line-height: 1">
+        5‰
+      </div>
+
+    </div>
+  </div>
+</section>
