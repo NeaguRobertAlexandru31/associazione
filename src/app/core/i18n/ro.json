@@ -1,0 +1,55 @@
+{
+  "nav": {
+    "home": "Acasă",
+    "about-us": "Despre noi",
+    "projects": "Proiecte",
+    "news": "Știri",
+    "events": "Evenimente",
+    "donations": "Donații",
+    "contacts": "Contact",
+    "documents": "Documente"
+  },
+  "home": {
+    "title": "Bine ați venit",
+    "subtitle": "Asociația noastră"
+  },
+  "about-us": {
+    "title": "Despre noi",
+    "description": "Descoperă istoria și misiunea noastră"
+  },
+  "projects": {
+    "title": "Proiecte",
+    "description": "Proiectele noastre în curs și trecute"
+  },
+  "news": {
+    "title": "Știri",
+    "description": "Ultimele noutăți din asociație"
+  },
+  "events": {
+    "title": "Evenimente",
+    "description": "Evenimente și întâlniri viitoare"
+  },
+  "donations": {
+    "title": "Donații",
+    "description": "Susține asociația noastră",
+    "donate_button": "Donează acum"
+  },
+  "contacts": {
+    "title": "Contact",
+    "description": "Ia legătura cu noi",
+    "name": "Nume",
+    "email": "Email",
+    "message": "Mesaj",
+    "send": "Trimite"
+  },
+  "documents": {
+    "title": "Documente",
+    "description": "Statut, procese verbale și documente oficiale"
+  },
+  "common": {
+    "read_more": "Citește mai mult",
+    "back": "Înapoi",
+    "loading": "Se încarcă...",
+    "error": "A apărut o eroare"
+  }
+}

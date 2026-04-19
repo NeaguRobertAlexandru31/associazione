@@ -1,0 +1,55 @@
+{
+  "nav": {
+    "home": "Home",
+    "about-us": "Chi siamo",
+    "projects": "Progetti",
+    "news": "Notizie",
+    "events": "Eventi",
+    "donations": "Donazioni",
+    "contacts": "Contatti",
+    "documents": "Documenti"
+  },
+  "home": {
+    "title": "Benvenuti",
+    "subtitle": "La nostra associazione"
+  },
+  "about-us": {
+    "title": "Chi siamo",
+    "description": "Scopri la nostra storia e la nostra missione"
+  },
+  "projects": {
+    "title": "Progetti",
+    "description": "I nostri progetti in corso e passati"
+  },
+  "news": {
+    "title": "Notizie",
+    "description": "Le ultime novità dall'associazione"
+  },
+  "events": {
+    "title": "Eventi",
+    "description": "Prossimi eventi e appuntamenti"
+  },
+  "donations": {
+    "title": "Donazioni",
+    "description": "Sostieni la nostra associazione",
+    "donate_button": "Dona ora"
+  },
+  "contacts": {
+    "title": "Contatti",
+    "description": "Mettiti in contatto con noi",
+    "name": "Nome",
+    "email": "Email",
+    "message": "Messaggio",
+    "send": "Invia"
+  },
+  "documents": {
+    "title": "Documenti",
+    "description": "Statuto, verbali e documenti ufficiali"
+  },
+  "common": {
+    "read_more": "Leggi di più",
+    "back": "Indietro",
+    "loading": "Caricamento...",
+    "error": "Si è verificato un errore"
+  }
+}
