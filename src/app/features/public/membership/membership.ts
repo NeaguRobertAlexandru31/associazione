@@ -1,6 +1,6 @@
 import { Component, HostListener, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { TranslatePipe } from '../../i18n/translate.pipe';
+import { TranslatePipe } from '../../../i18n/translate.pipe';
 
 export interface Plan {
   nameKey: string;

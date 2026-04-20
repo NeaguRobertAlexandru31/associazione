@@ -1,6 +1,6 @@
 import { Component, HostListener } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { TranslatePipe } from '../../i18n/translate.pipe';
+import { TranslatePipe } from '../../../i18n/translate.pipe';
 
 export interface NewsItem {
   img: string;
