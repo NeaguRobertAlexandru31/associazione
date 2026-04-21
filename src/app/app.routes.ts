@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import { authGuard } from './core/guards/auth.guard';
 
 export const routes: Routes = [
 	{ path: '', redirectTo: 'home', pathMatch: 'full' },
@@ -12,5 +13,12 @@ export const routes: Routes = [
 	{ path: 'documents', loadComponent: () => import('./features/public/documents/documents').then(m => m.Documents) },
 	{ path: 'membership', loadComponent: () => import('./features/public/membership/membership').then(m => m.Membership) },
 	{ path: 'boutique', loadComponent: () => import('./features/public/boutique/boutique').then(m => m.Boutique) },
+	// ── Auth & private ────────────────────────────────────────────────────
+	{ path: 'login',
+	  loadComponent: () => import('./features/private/auth/auth').then(m => m.Auth) },
+	{ path: 'dashboard',
+	  canActivate: [authGuard],
+	  loadComponent: () => import('./features/private/dashboard/dashboard').then(m => m.Dashboard) },
+
 	{ path: '**', redirectTo: 'home' },
 ];

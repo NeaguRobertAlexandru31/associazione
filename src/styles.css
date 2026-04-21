@@ -50,8 +50,6 @@ app-root {
 }
 
 html {
-  scroll-behavior: smooth;
-  scroll-snap-type: y proximity;
   scroll-padding-top: var(--navbar-height, 64px);
 }
 

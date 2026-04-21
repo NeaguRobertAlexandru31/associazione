@@ -1,8 +1,8 @@
 import { AfterViewInit, Component, ElementRef, HostListener, inject, signal } from '@angular/core';
 import { NavigationEnd, Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { filter } from 'rxjs/operators';
-import { TranslatePipe } from '../../../i18n/translate.pipe';
-import { TranslationService, Lang } from '../../../i18n/translation.service';
+import { TranslatePipe } from '../../../../i18n/translate.pipe';
+import { TranslationService, Lang } from '../../../../i18n/translation.service';
 
 export interface NavItem {
   route: string;

@@ -1,7 +1,8 @@
-import { Component, signal } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
-import { Navbar } from './shared/components/navbar/navbar';
-import { Footer } from './shared/components/footer/footer';
+import { Component, computed, inject, signal } from '@angular/core';
+import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
+import { filter } from 'rxjs/operators';
+import { Navbar } from './shared/components/public/navbar/navbar';
+import { Footer } from './shared/components/public/footer/footer';
 
 @Component({
   selector: 'app-root',
@@ -10,5 +11,16 @@ import { Footer } from './shared/components/footer/footer';
   styleUrl: './app.css',
 })
 export class App {
-  protected readonly title = signal('associazione');
+  private router = inject(Router);
+  private url = signal(this.router.url);
+
+  readonly showShell = computed(() =>
+    !this.url().startsWith('/login') && !this.url().startsWith('/dashboard')
+  );
+
+  constructor() {
+    this.router.events
+      .pipe(filter(e => e instanceof NavigationEnd))
+      .subscribe(e => this.url.set((e as NavigationEnd).urlAfterRedirects));
+  }
 }

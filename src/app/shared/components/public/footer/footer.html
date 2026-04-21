@@ -90,8 +90,34 @@
       <p class="font-inter text-xs text-on-surface-variant leading-relaxed">
         {{ 'footer.copyright' | translate }}
       </p>
+      <div class="mt-5 pt-4 border-t border-outline-variant/20">
+        <a routerLink="/login"
+           class="inline-flex items-center gap-1.5 font-inter text-[10px] text-on-surface-variant/35 hover:text-on-surface-variant transition-colors group">
+          <span class="material-symbols-outlined text-sm group-hover:text-primary transition-colors" style="font-variation-settings:'FILL' 1">lock</span>
+          Area riservata
+        </a>
+      </div>
     </div>
 
+  </div>
+
+  <!-- Credits -->
+  <div class="border-t border-outline-variant/15 py-5">
+    <div class="container mx-auto px-8 flex flex-col sm:flex-row items-center justify-center gap-1.5 text-center">
+      <span class="font-inter text-[11px] text-on-surface-variant/50">Progetto ideato e realizzato da</span>
+      <div class="flex items-center gap-2">
+        <a href="https://www.linkedin.com/in/angelica-biondo/" target="_blank" rel="noopener noreferrer"
+           class="font-inter font-semibold text-[11px] text-on-surface-variant/70 hover:text-primary transition-colors underline underline-offset-2 decoration-on-surface-variant/30 hover:decoration-primary">
+          Angelica Biondo
+        </a>
+        <span class="font-inter text-[11px] text-on-surface-variant/40">&</span>
+        <a href="https://www.linkedin.com/in/robert-alexandru-neagu/" target="_blank" rel="noopener noreferrer"
+           class="font-inter font-semibold text-[11px] text-on-surface-variant/70 hover:text-primary transition-colors underline underline-offset-2 decoration-on-surface-variant/30 hover:decoration-primary">
+          Robert Alexandru Neagu
+        </a>
+        <span class="font-inter text-[11px] text-on-surface-variant/40">— grafica, UX e sviluppo</span>
+      </div>
+    </div>
   </div>
 
 </footer>

@@ -1,0 +1,13 @@
+<header class="sticky top-0 z-40 bg-primary px-4 py-3 flex items-center justify-between md:hidden">
+  <div class="flex items-center gap-3">
+    <button (click)="menuClick.emit()"
+      class="w-9 h-9 flex items-center justify-center rounded-lg text-on-primary hover:bg-on-primary/10 transition-colors">
+      <span class="material-symbols-outlined text-xl">menu</span>
+    </button>
+    <span class="font-romania font-extrabold text-on-primary text-lg">{{ title }}</span>
+  </div>
+  <button (click)="logoutClick.emit()"
+    class="w-9 h-9 flex items-center justify-center rounded-lg text-on-primary hover:bg-on-primary/10 transition-colors">
+    <span class="material-symbols-outlined text-base">logout</span>
+  </button>
+</header>
