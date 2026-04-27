@@ -1,0 +1,400 @@
+<div class="min-h-screen bg-[#0a0f1e] flex flex-col items-center justify-center px-6 py-16 page-in">
+
+  <!-- Header label -->
+  <div class="mb-10 text-center">
+    <p class="text-[11px] uppercase tracking-[0.3em] text-white/30 mb-2">Anteprima tessera digitale</p>
+    <h1 class="font-romania text-white/80 text-2xl">Tessera Socio A.C.R.</h1>
+  </div>
+
+  <!-- Card scene -->
+  <div class="card-scene cursor-pointer" (click)="flip()">
+    <div class="card-inner" [class.flipped]="flipped">
+
+      <!-- ═══════════════════════════════════════
+           FRONTE
+      ════════════════════════════════════════ -->
+      <div class="card-face shadow-2xl">
+
+        <!-- Background navy gradient -->
+        <div class="absolute inset-0"
+             style="background: linear-gradient(135deg, #001040 0%, #002068 45%, #003399 100%);">
+        </div>
+
+        <!-- Subtle diagonal lines pattern -->
+        <div class="absolute inset-0 opacity-[0.04]"
+             style="background-image: repeating-linear-gradient(
+               45deg,
+               #fff 0px, #fff 1px,
+               transparent 1px, transparent 12px
+             );">
+        </div>
+
+        <!-- Circular light blob top-right -->
+        <div class="absolute -top-16 -right-16 w-64 h-64 rounded-full opacity-10"
+             style="background: radial-gradient(circle, #f8bd2a 0%, transparent 70%);">
+        </div>
+
+        <!-- Romanian tricolor accent strip (left edge) -->
+        <div class="absolute left-0 top-0 bottom-0 w-[5px] flex flex-col">
+          <div class="flex-1" style="background:#002B7F;"></div>
+          <div class="flex-1" style="background:#FCD116;"></div>
+          <div class="flex-1" style="background:#CE1126;"></div>
+        </div>
+
+        <!-- Gold top bar -->
+        <div class="gold-bar absolute top-0 left-[5px] right-0 h-[3px]"></div>
+
+        <!-- Holographic overlay -->
+        <div class="holo"></div>
+        <div class="noise"></div>
+
+        <!-- ── Card content ── -->
+        <div class="absolute inset-0 flex flex-col pl-9 pr-6 pt-5 pb-5">
+
+          <!-- Top row: logo + anno -->
+          <div class="flex items-start justify-between mb-4">
+            <div class="flex items-center gap-2.5">
+              <!-- Monogram badge -->
+              <div class="w-9 h-9 rounded-lg flex items-center justify-center badge-pulse"
+                   style="background: linear-gradient(135deg, #f8bd2a, #e8a820);">
+                <span class="font-romania font-bold text-[#001040] text-sm leading-none">ACR</span>
+              </div>
+              <div>
+                <p class="font-romania text-white font-bold text-[11px] leading-tight">Associazione</p>
+                <p class="font-romania text-white font-bold text-[11px] leading-tight">Culturale Rumena</p>
+              </div>
+            </div>
+            <div class="text-right">
+              <p class="font-inter text-[8px] uppercase tracking-widest text-white/40">Validità</p>
+              <p class="font-romania text-[#f8bd2a] font-bold text-lg leading-tight">2025</p>
+            </div>
+          </div>
+
+          <!-- Chip + card number row -->
+          <div class="flex items-center gap-3 mb-5">
+            <div class="chip"></div>
+            <div>
+              <p class="font-inter text-[7px] uppercase tracking-[0.2em] text-white/30 mb-0.5">N° Tessera</p>
+              <p class="font-inter text-white/70 text-[11px] tracking-[0.15em] font-medium">ACR · 2025 · 0042</p>
+            </div>
+          </div>
+
+          <!-- Member section -->
+          <div class="flex items-end gap-4 mt-auto">
+
+            <!-- Photo -->
+            <div class="relative flex-shrink-0">
+              <div class="w-16 h-16 rounded-full overflow-hidden"
+                   style="border: 2px solid rgba(248,189,42,0.6);">
+                <!-- Photo placeholder -->
+                <div class="w-full h-full flex flex-col items-center justify-center"
+                     style="background: linear-gradient(160deg, #1a2a5e 0%, #0d1a40 100%);">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                    <circle cx="12" cy="8" r="4" fill="rgba(255,255,255,0.25)"/>
+                    <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" stroke="rgba(255,255,255,0.25)" stroke-width="2" stroke-linecap="round"/>
+                  </svg>
+                </div>
+              </div>
+              <!-- Gold dot indicator -->
+              <div class="absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full border-2 flex items-center justify-center"
+                   style="background:#f8bd2a; border-color:#002068;">
+                <svg width="8" height="8" viewBox="0 0 10 10" fill="none">
+                  <path d="M2 5l2.5 2.5L8 3" stroke="#001040" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </div>
+            </div>
+
+            <!-- Name & type -->
+            <div class="flex-1 min-w-0">
+              <p class="font-inter text-[8px] uppercase tracking-[0.2em] text-white/35 mb-0.5">Socio</p>
+              <p class="font-romania text-white font-bold text-xl leading-tight truncate">Maria Ionescu</p>
+              <div class="flex items-center gap-2 mt-1.5">
+                <span class="font-inter text-[8px] uppercase tracking-widest px-2 py-0.5 rounded-full"
+                      style="background: rgba(248,189,42,0.15); color: #f8bd2a; border: 1px solid rgba(248,189,42,0.3);">
+                  Ordinario
+                </span>
+                <span class="font-inter text-[8px] text-white/30">Milano</span>
+              </div>
+            </div>
+
+            <!-- Mini flag -->
+            <div class="flex-shrink-0 opacity-40" style="width:28px; height:18px; border-radius:2px; overflow:hidden; display:flex;">
+              <div style="flex:1; background:#002B7F;"></div>
+              <div style="flex:1; background:#FCD116;"></div>
+              <div style="flex:1; background:#CE1126;"></div>
+            </div>
+
+          </div>
+
+        </div>
+        <!-- end card content -->
+
+      </div>
+      <!-- end front -->
+
+
+      <!-- ═══════════════════════════════════════
+           RETRO
+      ════════════════════════════════════════ -->
+      <div class="card-face card-back shadow-2xl">
+
+        <!-- Background -->
+        <div class="absolute inset-0"
+             style="background: linear-gradient(135deg, #001040 0%, #001a55 60%, #002068 100%);">
+        </div>
+
+        <!-- Magnetic stripe -->
+        <div class="absolute top-8 left-0 right-0 h-10"
+             style="background: linear-gradient(180deg, #0a0a0a 0%, #1a1a1a 100%); opacity:0.9;">
+        </div>
+
+        <!-- Romanian tricolor (right edge on back) -->
+        <div class="absolute right-0 top-0 bottom-0 w-[5px] flex flex-col">
+          <div class="flex-1" style="background:#002B7F;"></div>
+          <div class="flex-1" style="background:#FCD116;"></div>
+          <div class="flex-1" style="background:#CE1126;"></div>
+        </div>
+
+        <!-- Gold bottom bar -->
+        <div class="gold-bar absolute bottom-0 left-0 right-[5px] h-[3px]"></div>
+
+        <div class="holo"></div>
+        <div class="noise"></div>
+
+        <!-- Back content -->
+        <div class="absolute inset-0 flex items-end pb-5 pl-6 pr-8 gap-5">
+
+          <!-- QR code placeholder -->
+          <div class="flex-shrink-0">
+            <div class="w-[80px] h-[80px] p-1.5 rounded-lg"
+                 style="background: white;">
+              <!-- SVG QR mock -->
+              <svg viewBox="0 0 21 21" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" shape-rendering="crispEdges">
+                <!-- Top-left finder -->
+                <rect x="0" y="0" width="7" height="7" fill="#001040"/>
+                <rect x="1" y="1" width="5" height="5" fill="white"/>
+                <rect x="2" y="2" width="3" height="3" fill="#001040"/>
+                <!-- Top-right finder -->
+                <rect x="14" y="0" width="7" height="7" fill="#001040"/>
+                <rect x="15" y="1" width="5" height="5" fill="white"/>
+                <rect x="16" y="2" width="3" height="3" fill="#001040"/>
+                <!-- Bottom-left finder -->
+                <rect x="0" y="14" width="7" height="7" fill="#001040"/>
+                <rect x="1" y="15" width="5" height="5" fill="white"/>
+                <rect x="2" y="16" width="3" height="3" fill="#001040"/>
+                <!-- Data modules (random-looking but static) -->
+                <rect x="8" y="0" width="1" height="1" fill="#001040"/>
+                <rect x="10" y="0" width="1" height="1" fill="#001040"/>
+                <rect x="12" y="0" width="1" height="1" fill="#001040"/>
+                <rect x="9" y="1" width="1" height="1" fill="#001040"/>
+                <rect x="11" y="1" width="2" height="1" fill="#001040"/>
+                <rect x="8" y="2" width="2" height="1" fill="#001040"/>
+                <rect x="12" y="2" width="1" height="1" fill="#001040"/>
+                <rect x="9" y="3" width="3" height="1" fill="#001040"/>
+                <rect x="8" y="4" width="1" height="1" fill="#001040"/>
+                <rect x="11" y="4" width="2" height="1" fill="#001040"/>
+                <rect x="8" y="5" width="3" height="1" fill="#001040"/>
+                <rect x="12" y="5" width="1" height="1" fill="#001040"/>
+                <rect x="9" y="6" width="1" height="1" fill="#001040"/>
+                <rect x="11" y="6" width="2" height="1" fill="#001040"/>
+                <rect x="0" y="8" width="1" height="1" fill="#001040"/>
+                <rect x="2" y="8" width="3" height="1" fill="#001040"/>
+                <rect x="7" y="8" width="1" height="1" fill="#001040"/>
+                <rect x="9" y="8" width="2" height="1" fill="#001040"/>
+                <rect x="12" y="8" width="2" height="1" fill="#001040"/>
+                <rect x="15" y="8" width="2" height="1" fill="#001040"/>
+                <rect x="18" y="8" width="1" height="1" fill="#001040"/>
+                <rect x="1" y="9" width="2" height="1" fill="#001040"/>
+                <rect x="4" y="9" width="1" height="1" fill="#001040"/>
+                <rect x="8" y="9" width="1" height="1" fill="#001040"/>
+                <rect x="11" y="9" width="3" height="1" fill="#001040"/>
+                <rect x="16" y="9" width="1" height="1" fill="#001040"/>
+                <rect x="19" y="9" width="2" height="1" fill="#001040"/>
+                <rect x="0" y="10" width="3" height="1" fill="#001040"/>
+                <rect x="5" y="10" width="2" height="1" fill="#001040"/>
+                <rect x="9" y="10" width="1" height="1" fill="#001040"/>
+                <rect x="12" y="10" width="1" height="1" fill="#001040"/>
+                <rect x="14" y="10" width="3" height="1" fill="#001040"/>
+                <rect x="19" y="10" width="1" height="1" fill="#001040"/>
+                <rect x="1" y="11" width="1" height="1" fill="#001040"/>
+                <rect x="4" y="11" width="3" height="1" fill="#001040"/>
+                <rect x="8" y="11" width="2" height="1" fill="#001040"/>
+                <rect x="11" y="11" width="2" height="1" fill="#001040"/>
+                <rect x="15" y="11" width="1" height="1" fill="#001040"/>
+                <rect x="18" y="11" width="2" height="1" fill="#001040"/>
+                <rect x="0" y="12" width="2" height="1" fill="#001040"/>
+                <rect x="3" y="12" width="1" height="1" fill="#001040"/>
+                <rect x="6" y="12" width="1" height="1" fill="#001040"/>
+                <rect x="9" y="12" width="3" height="1" fill="#001040"/>
+                <rect x="13" y="12" width="2" height="1" fill="#001040"/>
+                <rect x="17" y="12" width="1" height="1" fill="#001040"/>
+                <rect x="20" y="12" width="1" height="1" fill="#001040"/>
+                <rect x="8" y="14" width="2" height="1" fill="#001040"/>
+                <rect x="11" y="14" width="1" height="1" fill="#001040"/>
+                <rect x="13" y="14" width="3" height="1" fill="#001040"/>
+                <rect x="18" y="14" width="2" height="1" fill="#001040"/>
+                <rect x="9" y="15" width="1" height="1" fill="#001040"/>
+                <rect x="12" y="15" width="2" height="1" fill="#001040"/>
+                <rect x="16" y="15" width="1" height="1" fill="#001040"/>
+                <rect x="19" y="15" width="1" height="1" fill="#001040"/>
+                <rect x="8" y="16" width="3" height="1" fill="#001040"/>
+                <rect x="13" y="16" width="1" height="1" fill="#001040"/>
+                <rect x="15" y="16" width="2" height="1" fill="#001040"/>
+                <rect x="20" y="16" width="1" height="1" fill="#001040"/>
+                <rect x="9" y="17" width="2" height="1" fill="#001040"/>
+                <rect x="12" y="17" width="3" height="1" fill="#001040"/>
+                <rect x="17" y="17" width="1" height="1" fill="#001040"/>
+                <rect x="8" y="18" width="1" height="1" fill="#001040"/>
+                <rect x="11" y="18" width="1" height="1" fill="#001040"/>
+                <rect x="14" y="18" width="2" height="1" fill="#001040"/>
+                <rect x="18" y="18" width="3" height="1" fill="#001040"/>
+                <rect x="9" y="19" width="3" height="1" fill="#001040"/>
+                <rect x="13" y="19" width="1" height="1" fill="#001040"/>
+                <rect x="16" y="19" width="2" height="1" fill="#001040"/>
+                <rect x="8" y="20" width="2" height="1" fill="#001040"/>
+                <rect x="12" y="20" width="2" height="1" fill="#001040"/>
+                <rect x="15" y="20" width="1" height="1" fill="#001040"/>
+                <rect x="19" y="20" width="2" height="1" fill="#001040"/>
+              </svg>
+            </div>
+            <p class="font-inter text-[7px] text-white/25 text-center mt-1 tracking-wider">VERIFICA</p>
+          </div>
+
+          <!-- Right side info -->
+          <div class="flex-1 min-w-0">
+            <p class="font-romania text-white font-bold text-base leading-tight mb-0.5">Maria Ionescu</p>
+            <p class="font-inter text-[8px] text-white/40 mb-3">Socio Ordinario · ACR-2025-0042</p>
+
+            <div class="space-y-1 mb-3">
+              <div class="flex items-center gap-1.5">
+                <div class="w-1 h-1 rounded-full" style="background:#f8bd2a;"></div>
+                <p class="font-inter text-[8px] text-white/50">Valida dal 01/01/2025 al 31/12/2025</p>
+              </div>
+              <div class="flex items-center gap-1.5">
+                <div class="w-1 h-1 rounded-full" style="background:#f8bd2a;"></div>
+                <p class="font-inter text-[8px] text-white/50">acr-milano.it/verifica/a7f3c9</p>
+              </div>
+            </div>
+
+            <p class="font-inter text-[7px] leading-relaxed"
+               style="color:rgba(255,255,255,0.2);">
+              Questa tessera è personale e non cedibile. Il codice QR
+              consente la verifica dello stato associativo agli eventi.
+            </p>
+          </div>
+
+        </div>
+
+      </div>
+      <!-- end back -->
+
+    </div>
+  </div>
+  <!-- end card scene -->
+
+  <!-- Flip hint -->
+  <p class="mt-6 font-inter text-[10px] uppercase tracking-[0.25em] text-white/20">
+    {{ flipped ? '← fronte' : 'retro →' }} · click per girare
+  </p>
+
+  <!-- Email preview -->
+  <div class="mt-16 w-full max-w-xl page-in" style="animation-delay:0.15s; opacity:0;">
+
+    <p class="font-inter text-[10px] uppercase tracking-[0.25em] text-white/20 text-center mb-6">
+      Anteprima email
+    </p>
+
+    <!-- Email card -->
+    <div class="rounded-2xl overflow-hidden shadow-2xl" style="background:#f4f3fc;">
+
+      <!-- Email header bar -->
+      <div class="px-5 py-3 flex items-center gap-2" style="background:#e8e7f0; border-bottom:1px solid #d4d3de;">
+        <div class="w-2.5 h-2.5 rounded-full bg-red-400"></div>
+        <div class="w-2.5 h-2.5 rounded-full bg-yellow-400"></div>
+        <div class="w-2.5 h-2.5 rounded-full bg-green-400"></div>
+        <span class="ml-3 font-inter text-[11px] text-on-surface-variant/50">Da: noreply&#64;acr-milano.it</span>
+      </div>
+
+      <!-- Email body -->
+      <div class="px-8 py-8">
+
+        <!-- Logo area -->
+        <div class="flex items-center gap-2 mb-6">
+          <div class="w-8 h-8 rounded-lg flex items-center justify-center"
+               style="background: linear-gradient(135deg, #002068, #003399);">
+            <span class="font-romania font-bold text-white text-[10px]">ACR</span>
+          </div>
+          <span class="font-romania font-bold text-primary text-sm">Associazione Culturale Rumena</span>
+        </div>
+
+        <h2 class="font-romania font-bold text-primary text-xl mb-2">
+          Benvenuta, Maria!
+        </h2>
+        <p class="font-inter text-on-surface-variant text-xs leading-relaxed mb-6">
+          La tua iscrizione è stata confermata. Sei ufficialmente socia dell'Associazione Culturale Rumena per l'anno 2025. Qui sotto trovi la tua tessera digitale personale.
+        </p>
+
+        <!-- Mini card in email -->
+        <div class="rounded-xl overflow-hidden mx-auto mb-6" style="width:280px; height:176px; position:relative;">
+          <div class="absolute inset-0" style="background:linear-gradient(135deg,#001040,#002068,#003399);"></div>
+          <div class="absolute inset-0 opacity-[0.04]" style="background-image:repeating-linear-gradient(45deg,#fff 0px,#fff 1px,transparent 1px,transparent 12px);"></div>
+          <!-- tricolor -->
+          <div class="absolute left-0 top-0 bottom-0 flex flex-col" style="width:4px;">
+            <div class="flex-1" style="background:#002B7F;"></div>
+            <div class="flex-1" style="background:#FCD116;"></div>
+            <div class="flex-1" style="background:#CE1126;"></div>
+          </div>
+          <!-- gold top bar -->
+          <div class="gold-bar absolute top-0 h-[2px]" style="left:4px;right:0;"></div>
+          <div class="absolute inset-0 flex flex-col pl-6 pr-4 pt-3 pb-3">
+            <div class="flex items-center justify-between mb-3">
+              <div class="flex items-center gap-2">
+                <div class="w-6 h-6 rounded-md flex items-center justify-center" style="background:linear-gradient(135deg,#f8bd2a,#e8a820);">
+                  <span class="font-romania font-bold text-[#001040] text-[8px]">ACR</span>
+                </div>
+                <span class="font-romania text-white text-[9px] font-bold">Associazione Culturale Rumena</span>
+              </div>
+              <span class="font-romania text-[#f8bd2a] font-bold text-sm">2025</span>
+            </div>
+            <div class="mt-auto flex items-end gap-3">
+              <div class="w-11 h-11 rounded-full flex items-center justify-center flex-shrink-0" style="border:1.5px solid rgba(248,189,42,0.6);background:linear-gradient(160deg,#1a2a5e,#0d1a40);">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                  <circle cx="12" cy="8" r="4" fill="rgba(255,255,255,0.25)"/>
+                  <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" stroke="rgba(255,255,255,0.25)" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+              </div>
+              <div>
+                <p class="font-inter text-[6px] uppercase tracking-widest text-white/30">Socia</p>
+                <p class="font-romania text-white font-bold text-[15px] leading-tight">Maria Ionescu</p>
+                <p class="font-inter text-[7px] tracking-widest text-white/40 mt-0.5">ACR · 2025 · 0042</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <p class="font-inter text-on-surface-variant/60 text-[10px] leading-relaxed mb-6 text-center">
+          Scarica e conserva la tua tessera. Presentala agli eventi per accedere alle attività riservate ai soci.
+        </p>
+
+        <!-- CTA button -->
+        <div class="flex justify-center mb-6">
+          <div class="px-6 py-2.5 rounded-full font-inter font-semibold text-xs text-white cursor-default"
+               style="background:linear-gradient(90deg,#002068,#003399);">
+            Scarica tessera PDF
+          </div>
+        </div>
+
+        <hr style="border-color:#e2e1eb; margin-bottom:16px;">
+
+        <p class="font-inter text-[9px] text-on-surface-variant/40 text-center leading-relaxed">
+          Associazione Culturale Rumena · Milano<br>
+          Hai ricevuto questa email perché hai completato l'iscrizione.<br>
+          <span style="text-decoration:underline; cursor:default;">Disiscrivi</span>
+        </p>
+
+      </div>
+    </div>
+
+  </div>
+
+</div>

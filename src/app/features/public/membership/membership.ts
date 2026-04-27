@@ -1,5 +1,6 @@
-import { Component, HostListener, signal } from '@angular/core';
+import { Component, HostListener, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 import { TranslatePipe } from '../../../i18n/translate.pipe';
 
 export interface Plan {
@@ -17,6 +18,7 @@ export interface Plan {
   styleUrl: './membership.css',
 })
 export class Membership {
+  private router = inject(Router);
   parallaxOffset = 0;
 
   // ── Piani ────────────────────────────────────────────────────────────
@@ -45,8 +47,7 @@ export class Membership {
   ];
 
   selectPlan(plan: Plan): void {
-    // TODO: stripeService.redirectToCheckout(plan.stripeProductId)
-    console.log('Selected plan:', plan.stripeProductId);
+    this.router.navigate(['/tessera-preview'], { queryParams: { plan: plan.stripeProductId } });
   }
 
   // ── 5×1000 ───────────────────────────────────────────────────────────

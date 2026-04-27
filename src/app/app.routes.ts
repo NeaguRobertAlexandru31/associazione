@@ -13,6 +13,8 @@ export const routes: Routes = [
 	{ path: 'documents', loadComponent: () => import('./features/public/documents/documents').then(m => m.Documents) },
 	{ path: 'membership', loadComponent: () => import('./features/public/membership/membership').then(m => m.Membership) },
 	{ path: 'boutique', loadComponent: () => import('./features/public/boutique/boutique').then(m => m.Boutique) },
+	// ── Test / preview ───────────────────────────────────────────────────
+	{ path: 'tessera-preview', loadComponent: () => import('./features/public/tessera-preview/tessera-preview').then(m => m.TesseraPreview) },
 	// ── Auth & private ────────────────────────────────────────────────────
 	{ path: 'login',
 	  loadComponent: () => import('./features/private/auth/auth').then(m => m.Auth) },

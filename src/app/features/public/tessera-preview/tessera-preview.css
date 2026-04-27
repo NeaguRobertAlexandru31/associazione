@@ -1,0 +1,133 @@
+/* Card 3D flip */
+.card-scene {
+  perspective: 1200px;
+  width: 420px;
+  height: 265px;
+}
+
+.card-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+  transition: transform 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.card-inner.flipped {
+  transform: rotateY(180deg);
+}
+
+.card-face {
+  position: absolute;
+  inset: 0;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  border-radius: 18px;
+  overflow: hidden;
+}
+
+.card-back {
+  transform: rotateY(180deg);
+}
+
+/* Holographic shimmer overlay */
+.holo {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    135deg,
+    transparent 20%,
+    rgba(255,255,255,0.04) 30%,
+    rgba(255,220,100,0.06) 40%,
+    transparent 50%,
+    rgba(180,200,255,0.04) 60%,
+    transparent 70%
+  );
+  pointer-events: none;
+}
+
+/* Noise texture overlay */
+.noise {
+  position: absolute;
+  inset: 0;
+  opacity: 0.03;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  pointer-events: none;
+}
+
+/* QR placeholder */
+.qr-placeholder {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 2px;
+  width: 80px;
+  height: 80px;
+}
+
+/* Shine pulse on card */
+@keyframes shine {
+  0%   { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+
+.gold-bar {
+  background: linear-gradient(
+    90deg,
+    #c8972a 0%,
+    #f8e07a 30%,
+    #f8bd2a 50%,
+    #e8a820 70%,
+    #c8972a 100%
+  );
+  background-size: 200% auto;
+  animation: shine 4s linear infinite;
+}
+
+/* Chip */
+.chip {
+  width: 42px;
+  height: 32px;
+  border-radius: 5px;
+  background: linear-gradient(135deg, #d4a853 0%, #f8e07a 40%, #c8972a 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+.chip::before {
+  content: '';
+  position: absolute;
+  inset: 4px;
+  border: 1.5px solid rgba(0,0,0,0.15);
+  border-radius: 2px;
+}
+
+.chip::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 1.5px;
+  background: rgba(0,0,0,0.12);
+  transform: translateY(-50%);
+}
+
+/* Page fade in */
+@keyframes pageIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.page-in {
+  animation: pageIn 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+/* Badge pulse */
+@keyframes badgePulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(248,189,42,0.4); }
+  50%       { box-shadow: 0 0 0 8px rgba(248,189,42,0); }
+}
+
+.badge-pulse {
+  animation: badgePulse 2.5s ease infinite;
+}
