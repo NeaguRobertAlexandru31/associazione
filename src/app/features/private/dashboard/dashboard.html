@@ -96,7 +96,55 @@
         </div>
       }
 
-      @if (activeTab() !== 'overview') {
+      @if (activeTab() === 'settings') {
+        <div class="dash-content max-w-lg">
+          <div class="mb-8">
+            <h1 class="font-romania font-extrabold text-primary text-3xl mb-1">Impostazioni</h1>
+            <p class="font-inter text-on-surface-variant text-sm">Gestione accessi e configurazione.</p>
+          </div>
+
+          @if (isSuperAdmin()) {
+            <div class="bg-surface-container-lowest rounded-2xl shadow-sm p-6">
+              <div class="flex items-center gap-3 mb-4">
+                <div class="w-10 h-10 rounded-xl bg-primary/8 flex items-center justify-center flex-shrink-0">
+                  <span class="material-symbols-outlined text-primary text-xl" style="font-variation-settings:'FILL' 1">person_add</span>
+                </div>
+                <div>
+                  <h2 class="font-romania font-bold text-on-surface text-base">Invita un Admin</h2>
+                  <p class="font-inter text-on-surface-variant text-xs mt-0.5">Genera un link monouso valido 7 giorni.</p>
+                </div>
+              </div>
+
+              <button (click)="generateInvite()" [disabled]="inviteLoading()"
+                      class="w-full py-3 bg-primary text-on-primary font-inter font-bold text-sm rounded-xl hover:opacity-90 transition-all uppercase tracking-wide flex items-center justify-center gap-2 disabled:opacity-60">
+                @if (inviteLoading()) {
+                  <span class="material-symbols-outlined text-base spin">progress_activity</span>
+                  Generazione in corso…
+                } @else {
+                  <span class="material-symbols-outlined text-base" style="font-variation-settings:'FILL' 1">link</span>
+                  Genera link di invito
+                }
+              </button>
+
+              @if (inviteLink()) {
+                <div class="mt-4 p-3 rounded-xl bg-surface-container border border-outline-variant/30 flex items-center gap-2">
+                  <span class="font-inter text-xs text-on-surface-variant truncate flex-1 select-all">{{ inviteLink() }}</span>
+                  <button (click)="copyLink()"
+                          class="flex-shrink-0 flex items-center gap-1 px-3 py-1.5 rounded-lg font-inter font-semibold text-xs transition-colors"
+                          [class]="copied() ? 'bg-green-100 text-green-700' : 'bg-primary/10 text-primary hover:bg-primary/20'">
+                    <span class="material-symbols-outlined text-sm" style="font-variation-settings:'FILL' 1">
+                      {{ copied() ? 'check' : 'content_copy' }}
+                    </span>
+                    {{ copied() ? 'Copiato!' : 'Copia' }}
+                  </button>
+                </div>
+              }
+            </div>
+          }
+        </div>
+      }
+
+      @if (activeTab() !== 'overview' && activeTab() !== 'settings') {
         <div class="dash-content flex flex-col items-center justify-center min-h-[60vh] text-center">
           @for (item of navItems; track item.id) {
             @if (activeTab() === item.id) {

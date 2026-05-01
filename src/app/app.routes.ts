@@ -18,6 +18,8 @@ export const routes: Routes = [
 	// ── Auth & private ────────────────────────────────────────────────────
 	{ path: 'login',
 	  loadComponent: () => import('./features/private/auth/auth').then(m => m.Auth) },
+	{ path: 'register',
+	  loadComponent: () => import('./features/private/register/register').then(m => m.Register) },
 	{ path: 'dashboard',
 	  canActivate: [authGuard],
 	  loadComponent: () => import('./features/private/dashboard/dashboard').then(m => m.Dashboard) },

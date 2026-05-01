@@ -1,7 +1,8 @@
 import { Component, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
-import { AuthService } from '../../../core/services/auth.service';
+import { AuthService } from '../../../core/services/auth/auth';
+import { LoginRequest } from '../../../core/models/login.model';
 
 @Component({
   selector: 'app-auth',
@@ -15,16 +16,23 @@ export class Auth {
 
   email    = '';
   password = '';
-  error    = signal(false);
+  error    = signal<string | null>(null);
   loading  = signal(false);
 
-  async submit(): Promise<void> {
-    this.error.set(false);
+  submit(): void {
+    this.error.set(null);
     this.loading.set(true);
-    await new Promise(r => setTimeout(r, 600));
-    const ok = this.auth.login(this.email, this.password);
-    this.loading.set(false);
-    if (ok) this.router.navigate(['/dashboard']);
-    else     this.error.set(true);
+    const dto: LoginRequest = { email: this.email, password: this.password };
+    this.auth.login(dto).subscribe({
+      next: () => {
+        this.loading.set(false);
+        this.router.navigate(['/dashboard']);
+      },
+      error: (err) => {
+        this.loading.set(false);
+        const msg = err?.error?.message ?? 'Credenziali non valide. Riprova.';
+        this.error.set(msg);
+      },
+    });
   }
 }

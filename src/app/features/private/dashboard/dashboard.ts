@@ -1,12 +1,12 @@
 import { Component, inject, signal } from '@angular/core';
-import { Router, RouterLink } from '@angular/router';
-import { AuthService } from '../../../core/services/auth.service';
+import { Router } from '@angular/router';
+import { AuthService } from '../../../core/services/auth/auth';
 import { Sidebar, SidebarItem } from '../../../shared/components/private/sidebar/sidebar';
 import { PrivateNavbar } from '../../../shared/components/private/navbar/navbar';
 
 @Component({
   selector: 'app-dashboard',
-  imports: [RouterLink, Sidebar, PrivateNavbar],
+  imports: [Sidebar, PrivateNavbar],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.css',
 })
@@ -14,9 +14,13 @@ export class Dashboard {
   private auth   = inject(AuthService);
   private router = inject(Router);
 
-  readonly user        = this.auth.user;
+  readonly user         = this.auth.user;
+  readonly isSuperAdmin = this.auth.isSuperAdmin;
   activeTab    = signal('overview');
   sidebarOpen  = signal(false);
+  inviteLink   = signal<string | null>(null);
+  inviteLoading = signal(false);
+  copied       = signal(false);
 
   readonly navItems: SidebarItem[] = [
     { id: 'overview',  icon: 'dashboard',          label: 'Panoramica'  },
@@ -49,4 +53,27 @@ export class Dashboard {
   setTab(id: string): void { this.activeTab.set(id); this.sidebarOpen.set(false); }
 
   logout(): void { this.auth.logout(); this.router.navigate(['/login']); }
+
+  generateInvite(): void {
+    this.inviteLoading.set(true);
+    this.inviteLink.set(null);
+    this.copied.set(false);
+    this.auth.createInvite().subscribe({
+      next: (res) => {
+        const link = `${window.location.origin}/register?token=${res.token}`;
+        this.inviteLink.set(link);
+        this.inviteLoading.set(false);
+      },
+      error: () => this.inviteLoading.set(false),
+    });
+  }
+
+  copyLink(): void {
+    const link = this.inviteLink();
+    if (!link) return;
+    navigator.clipboard.writeText(link).then(() => {
+      this.copied.set(true);
+      setTimeout(() => this.copied.set(false), 2500);
+    });
+  }
 }
