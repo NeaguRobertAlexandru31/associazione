@@ -46,17 +46,14 @@
 
           <!-- Stats -->
           <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 mb-8">
-            @for (s of stats; track s.label) {
-              <div class="bg-surface-container-lowest rounded-2xl p-5 shadow-sm flex flex-col gap-3">
-                <div class="w-10 h-10 rounded-xl bg-primary/8 flex items-center justify-center">
-                  <span class="material-symbols-outlined text-primary text-xl" style="font-variation-settings:'FILL' 1">{{ s.icon }}</span>
-                </div>
-                <div>
-                  <div class="font-romania font-extrabold text-primary text-3xl">{{ s.value }}</div>
-                  <div class="font-inter font-semibold text-on-surface-variant text-xs uppercase tracking-wider mt-0.5">{{ s.label }}</div>
-                </div>
-                <p class="font-inter text-xs" [class]="s.positive ? 'text-green-600' : 'text-on-surface-variant'">{{ s.delta }}</p>
-              </div>
+            @for (s of stats(); track s.label) {
+              <app-metric-card
+                [icon]="s.icon"
+                [label]="s.label"
+                [value]="s.value"
+                [delta]="s.delta"
+                [positive]="s.positive"
+                [loading]="s.loading" />
             }
           </div>
 
@@ -93,6 +90,94 @@
             </div>
 
           </div>
+        </div>
+      }
+
+      @if (activeTab() === 'members') {
+        <div class="dash-content">
+          <div class="mb-8">
+            <h1 class="font-romania font-extrabold text-primary text-3xl mb-1">Soci</h1>
+            <p class="font-inter text-on-surface-variant text-sm">Direttivo e soci dell'associazione.</p>
+          </div>
+
+          @if (membersLoading()) {
+            <div class="flex items-center justify-center min-h-[40vh]">
+              <span class="material-symbols-outlined text-primary text-4xl spin">progress_activity</span>
+            </div>
+          } @else if (membersError()) {
+            <div class="flex flex-col items-center justify-center min-h-[40vh] gap-3">
+              <span class="material-symbols-outlined text-secondary text-4xl">error</span>
+              <p class="font-inter text-on-surface-variant text-sm">Errore nel caricamento.</p>
+              <button (click)="setTab('members')" class="font-inter text-xs text-primary underline">Riprova</button>
+            </div>
+          } @else {
+
+            <!-- Direttivo -->
+            <section class="mb-8">
+              <div class="flex items-center gap-2 mb-4">
+                <span class="material-symbols-outlined text-primary text-lg" style="font-variation-settings:'FILL' 1">shield_person</span>
+                <h2 class="font-romania font-bold text-primary text-xl">Direttivo</h2>
+                <span class="ml-auto font-inter text-xs text-on-surface-variant bg-surface-container px-2 py-1 rounded-full">{{ direttivo().length }}</span>
+              </div>
+              <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3">
+                @for (m of direttivo(); track m.id) {
+                  <div class="bg-surface-container-lowest rounded-2xl p-4 shadow-sm flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-full bg-primary flex items-center justify-center flex-shrink-0">
+                      <span class="font-romania font-bold text-on-primary text-sm">{{ m.name[0] }}</span>
+                    </div>
+                    <div class="min-w-0">
+                      <p class="font-inter font-semibold text-on-surface text-sm truncate">{{ m.name }}</p>
+                      <p class="font-inter text-on-surface-variant text-xs truncate">{{ m.email }}</p>
+                    </div>
+                    <span class="ml-auto flex-shrink-0 font-inter text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded-full"
+                          [class]="m.role === 'SUPERADMIN' ? 'bg-primary/10 text-primary' : 'bg-surface-container text-on-surface-variant'">
+                      {{ m.role === 'SUPERADMIN' ? 'Presidente' : 'Admin' }}
+                    </span>
+                  </div>
+                }
+              </div>
+            </section>
+
+            <!-- Soci -->
+            <section>
+              <div class="flex items-center gap-2 mb-4">
+                <span class="material-symbols-outlined text-primary text-lg" style="font-variation-settings:'FILL' 1">group</span>
+                <h2 class="font-romania font-bold text-primary text-xl">Soci</h2>
+                <span class="ml-auto font-inter text-xs text-on-surface-variant bg-surface-container px-2 py-1 rounded-full">{{ soci().length }}</span>
+              </div>
+              @if (soci().length === 0) {
+                <p class="font-inter text-on-surface-variant text-sm italic">Nessun socio registrato.</p>
+              } @else {
+                <div class="bg-surface-container-lowest rounded-2xl shadow-sm overflow-hidden">
+                  <div class="hidden sm:grid grid-cols-[1fr_1fr_auto] gap-4 px-5 py-3 border-b border-outline-variant/20">
+                    <span class="font-inter font-semibold text-[10px] text-on-surface-variant uppercase tracking-widest">Nome</span>
+                    <span class="font-inter font-semibold text-[10px] text-on-surface-variant uppercase tracking-widest">Email</span>
+                    <span class="font-inter font-semibold text-[10px] text-on-surface-variant uppercase tracking-widest">Tipo</span>
+                  </div>
+                  @for (s of soci(); track s.id) {
+                    <div class="grid grid-cols-[1fr_auto] sm:grid-cols-[1fr_1fr_auto] gap-4 items-center px-5 py-3.5 border-b border-outline-variant/10 last:border-0 hover:bg-surface-container/50 transition-colors">
+                      <div class="flex items-center gap-3 min-w-0">
+                        <div class="w-8 h-8 rounded-full bg-surface-container flex items-center justify-center flex-shrink-0">
+                          <span class="font-romania font-bold text-on-surface-variant text-xs">{{ s.name[0] }}</span>
+                        </div>
+                        <span class="font-inter text-on-surface text-sm truncate">{{ s.name }}</span>
+                      </div>
+                      <span class="hidden sm:block font-inter text-on-surface-variant text-sm truncate">{{ s.email }}</span>
+                      <span class="font-inter text-[11px] font-semibold px-2.5 py-1 rounded-full capitalize"
+                            [class]="{
+                              'bg-primary/10 text-primary': s.subscription === 'benemerito',
+                              'bg-secondary/10 text-secondary': s.subscription === 'sostenitore',
+                              'bg-surface-container text-on-surface-variant': s.subscription === 'simpatizzante'
+                            }">
+                        {{ s.subscription }}
+                      </span>
+                    </div>
+                  }
+                </div>
+              }
+            </section>
+
+          }
         </div>
       }
 
@@ -144,7 +229,7 @@
         </div>
       }
 
-      @if (activeTab() !== 'overview' && activeTab() !== 'settings') {
+      @if (activeTab() !== 'overview' && activeTab() !== 'settings' && activeTab() !== 'members') {
         <div class="dash-content flex flex-col items-center justify-center min-h-[60vh] text-center">
           @for (item of navItems; track item.id) {
             @if (activeTab() === item.id) {
