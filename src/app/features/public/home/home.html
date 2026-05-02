@@ -44,18 +44,19 @@
              [style.transform]="'translateY(' + parallaxOffset + 'px) scale(1.1)'" />
         <div class="absolute inset-0 bg-gradient-to-t from-primary/40 to-transparent"></div>
       </div>
-      <div class="animate-fade-in-up hero-card absolute -bottom-8 -left-8 p-8 bg-surface-container-lowest rounded-3xl shadow-2xl max-w-xs border border-outline-variant/20">
-        <p class="text-secondary font-inter font-bold text-sm uppercase tracking-widest mb-2">
-          {{ 'home.hero_next_event_label' | translate }}
-        </p>
-        <h3 class="text-primary font-romania font-bold text-xl mb-4">
-          {{ 'home.hero_next_event_title' | translate }}
-        </h3>
-        <div class="flex items-center gap-2 text-on-surface-variant font-inter text-sm">
-          <span class="material-symbols-outlined text-sm">calendar_today</span>
-          {{ 'home.hero_next_event_date' | translate }}
-        </div>
-      </div>
+      @if (nextEvent(); as ev) {
+        <a [routerLink]="ev.slug ? ['/events', ev.slug] : ['/events']"
+           class="animate-fade-in-up hero-card absolute -bottom-8 -left-8 p-8 bg-surface-container-lowest rounded-3xl shadow-2xl max-w-xs border border-outline-variant/20 hover:shadow-3xl hover:-translate-y-0.5 transition-all">
+          <p class="text-secondary font-inter font-bold text-sm uppercase tracking-widest mb-2">
+            {{ 'home.hero_next_event_label' | translate }}
+          </p>
+          <h3 class="text-primary font-romania font-bold text-xl mb-4">{{ ev.name }}</h3>
+          <div class="flex items-center gap-2 text-on-surface-variant font-inter text-sm">
+            <span class="material-symbols-outlined text-sm">calendar_today</span>
+            {{ formatHeroDate(ev.date) }}
+          </div>
+        </a>
+      }
     </div>
 
   </div>
@@ -137,44 +138,42 @@
       </div>
     </div>
 
-    <div class="flex flex-col gap-4">
-      @for (ev of events; track ev.titleKey) {
-        <div class="flex flex-col sm:flex-row sm:items-center gap-4 bg-surface-container-lowest rounded-2xl px-5 py-5 shadow-sm border-l-4" [class]="ev.accentClass">
-          <div class="flex items-center gap-4 flex-1 min-w-0">
-            <!-- Date -->
-            <div class="text-center min-w-[3rem] flex-shrink-0">
-              <div class="font-romania font-extrabold text-primary text-3xl leading-none">
-                {{ ev.dayKey | translate }}
+    @if (upcoming().length === 0) {
+      <p class="font-inter text-on-surface-variant text-sm">Nessun evento in programma al momento.</p>
+    } @else {
+      <div class="flex flex-col gap-4">
+        @for (ev of upcoming(); track ev.id; let i = $index) {
+          <a [routerLink]="ev.slug ? ['/events', ev.slug] : ['/events']"
+             class="flex flex-col sm:flex-row sm:items-center gap-4 bg-surface-container-lowest rounded-2xl px-5 py-5 shadow-sm border-l-4 hover:shadow-md transition-shadow" [class]="accent(i)">
+            <div class="flex items-center gap-4 flex-1 min-w-0">
+              <!-- Date -->
+              <div class="text-center min-w-[3rem] flex-shrink-0">
+                <div class="font-romania font-extrabold text-primary text-3xl leading-none">{{ formatDay(ev.date) }}</div>
+                <div class="font-inter font-semibold text-on-surface-variant text-xs uppercase tracking-wider mt-0.5">{{ formatMonth(ev.date) }}</div>
               </div>
-              <div class="font-inter font-semibold text-on-surface-variant text-xs uppercase tracking-wider mt-0.5">
-                {{ ev.monthKey | translate }}
+              <!-- Info -->
+              <div class="flex-1 min-w-0">
+                <h3 class="font-romania font-bold text-primary text-lg leading-tight">{{ ev.name }}</h3>
+                <div class="flex flex-wrap items-center gap-x-4 gap-y-1 mt-1 text-on-surface-variant font-inter text-sm">
+                  <span class="flex items-center gap-1">
+                    <span class="material-symbols-outlined text-sm">location_on</span>
+                    {{ ev.location }}
+                  </span>
+                  <span class="flex items-center gap-1">
+                    <span class="material-symbols-outlined text-sm">schedule</span>
+                    {{ ev.time }}
+                  </span>
+                </div>
               </div>
             </div>
-            <!-- Info -->
-            <div class="flex-1 min-w-0">
-              <h3 class="font-romania font-bold text-primary text-lg leading-tight">
-                {{ ev.titleKey | translate }}
-              </h3>
-              <div class="flex flex-wrap items-center gap-x-4 gap-y-1 mt-1 text-on-surface-variant font-inter text-sm">
-                <span class="flex items-center gap-1">
-                  <span class="material-symbols-outlined text-sm">location_on</span>
-                  {{ ev.locationKey | translate }}
-                </span>
-                <span class="flex items-center gap-1">
-                  <span class="material-symbols-outlined text-sm">schedule</span>
-                  {{ ev.timeKey | translate }}
-                </span>
-              </div>
-            </div>
-          </div>
-          <!-- Button -->
-          <a [routerLink]="ev.route"
-             class="self-start sm:self-center font-inter font-semibold text-sm px-5 py-2 rounded-lg border border-outline-variant text-primary hover:bg-surface-container transition-all">
-            {{ ev.btnKey | translate }}
+            <span class="self-start sm:self-center flex items-center gap-1 font-inter font-semibold text-sm text-primary flex-shrink-0">
+              {{ 'home.event_1_btn' | translate }}
+              <span class="material-symbols-outlined text-base">arrow_forward</span>
+            </span>
           </a>
-        </div>
-      }
-    </div>
+        }
+      </div>
+    }
 
   </div>
 </section>

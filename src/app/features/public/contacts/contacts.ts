@@ -1,6 +1,7 @@
-import { Component, signal } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { TranslatePipe } from '../../../i18n/translate.pipe';
+import { ContactService } from '../../../core/services/contact/contact';
 
 @Component({
   selector: 'app-contacts',
@@ -9,22 +10,30 @@ import { TranslatePipe } from '../../../i18n/translate.pipe';
   styleUrl: './contacts.css',
 })
 export class Contacts {
+  private contactService = inject(ContactService);
+
   // Form
   name = '';
   email = '';
   subject = '';
   message = '';
+  sending = signal(false);
   sent = signal(false);
 
   submitForm(): void {
-    if (!this.name || !this.email || !this.message) return;
-    // TODO: send via backend / EmailJS / FormSubmit
-    console.log({ name: this.name, email: this.email, subject: this.subject, message: this.message });
-    this.sent.set(true);
-    setTimeout(() => {
-      this.sent.set(false);
-      this.name = this.email = this.subject = this.message = '';
-    }, 3000);
+    if (!this.name || !this.email || !this.message || this.sending()) return;
+    this.sending.set(true);
+    this.contactService.send({ name: this.name, email: this.email, subject: this.subject, message: this.message }).subscribe({
+      next: () => {
+        this.sending.set(false);
+        this.sent.set(true);
+        setTimeout(() => {
+          this.sent.set(false);
+          this.name = this.email = this.subject = this.message = '';
+        }, 3000);
+      },
+      error: () => this.sending.set(false),
+    });
   }
 
   // Newsletter

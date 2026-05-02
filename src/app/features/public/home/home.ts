@@ -1,6 +1,8 @@
-import { Component, HostListener } from '@angular/core';
+import { Component, HostListener, OnInit, computed, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { TranslatePipe } from '../../../i18n/translate.pipe';
+import { CalendarEvent } from '../../../core/models/event.model';
+import { EventsService } from '../../../core/services/events/events';
 
 export interface NewsItem {
   img: string;
@@ -11,16 +13,7 @@ export interface NewsItem {
   descKey: string;
 }
 
-export interface EventItem {
-  dayKey: string;
-  monthKey: string;
-  titleKey: string;
-  locationKey: string;
-  timeKey: string;
-  accentClass: string;
-  btnKey: string;
-  route: string;
-}
+const ACCENTS = ['border-secondary', 'border-[#f8bd2a]', 'border-primary/40'];
 
 @Component({
   selector: 'app-home',
@@ -28,8 +21,21 @@ export interface EventItem {
   templateUrl: './home.html',
   styleUrl: './home.css',
 })
-export class Home {
+export class Home implements OnInit {
+  private eventsService = inject(EventsService);
+
   parallaxOffset = 0;
+
+  allEvents = signal<CalendarEvent[]>([]);
+
+  readonly upcoming = computed(() => {
+    const now = new Date();
+    return this.allEvents()
+      .filter(e => new Date(e.date) >= now)
+      .slice(0, 3);
+  });
+
+  readonly nextEvent = computed(() => this.upcoming()[0] ?? null);
 
   readonly news: NewsItem[] = [
     {
@@ -58,28 +64,29 @@ export class Home {
     },
   ];
 
-  readonly events: EventItem[] = [
-    {
-      dayKey: 'home.event_1_day',
-      monthKey: 'home.event_1_month',
-      titleKey: 'home.event_1_title',
-      locationKey: 'home.event_1_location',
-      timeKey: 'home.event_1_time',
-      accentClass: 'border-secondary',
-      btnKey: 'home.event_1_btn',
-      route: '/events',
-    },
-    {
-      dayKey: 'home.event_2_day',
-      monthKey: 'home.event_2_month',
-      titleKey: 'home.event_2_title',
-      locationKey: 'home.event_2_location',
-      timeKey: 'home.event_2_time',
-      accentClass: 'border-[#f8bd2a]',
-      btnKey: 'home.event_2_btn',
-      route: '/events',
-    },
-  ];
+  ngOnInit(): void {
+    this.eventsService.getAll().subscribe({
+      next: evts => this.allEvents.set(evts),
+    });
+  }
+
+  accent(index: number): string {
+    return ACCENTS[index % ACCENTS.length];
+  }
+
+  formatDay(iso: string): string {
+    return new Date(iso).toLocaleDateString('it-IT', { day: '2-digit' });
+  }
+
+  formatMonth(iso: string): string {
+    return new Date(iso).toLocaleDateString('it-IT', { month: 'short' }).toUpperCase();
+  }
+
+  formatHeroDate(iso: string): string {
+    return new Date(iso).toLocaleDateString('it-IT', {
+      day: 'numeric', month: 'long', year: 'numeric',
+    });
+  }
 
   @HostListener('window:scroll')
   onScroll(): void {

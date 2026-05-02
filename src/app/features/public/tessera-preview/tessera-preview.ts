@@ -1,11 +1,10 @@
 import { Component, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
 import { RegistrationResultService } from '../../../core/services/registration-result/registration-result';
 
 @Component({
   selector: 'app-tessera-preview',
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule],
   templateUrl: './tessera-preview.html',
   styleUrl: './tessera-preview.css',
 })

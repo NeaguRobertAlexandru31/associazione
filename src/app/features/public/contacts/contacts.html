@@ -39,7 +39,7 @@
         </h2>
       </div>
 
-      <form (ngSubmit)="submitForm()" #contactForm="ngForm" class="flex flex-col gap-5">
+      <form (ngSubmit)="submitForm()" class="flex flex-col gap-5">
 
         <div class="grid grid-cols-2 gap-4">
           <div>
@@ -79,11 +79,14 @@
         </div>
 
         <button type="submit"
-                [disabled]="!name || !email || !message"
+                [disabled]="!name || !email || !message || sending()"
                 class="self-start px-8 py-3 bg-primary text-on-primary font-inter font-semibold rounded-xl flex items-center gap-2 hover:opacity-90 transition-all disabled:opacity-40">
           @if (sent()) {
             <span class="material-symbols-outlined text-base">check_circle</span>
             {{ 'contacts.form_sent' | translate }}
+          } @else if (sending()) {
+            <span class="material-symbols-outlined text-base spin">progress_activity</span>
+            Invio in corso…
           } @else {
             {{ 'contacts.form_send' | translate }}
             <span class="material-symbols-outlined text-base">arrow_forward</span>

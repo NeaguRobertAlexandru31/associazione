@@ -5,6 +5,7 @@ export interface SidebarItem {
   id: string;
   icon: string;
   label: string;
+  badge?: number;
 }
 
 export interface SidebarUser {

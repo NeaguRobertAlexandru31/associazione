@@ -6,17 +6,22 @@ import { MembersService } from '../../../core/services/members/members';
 import { MetricCard } from '../../../shared/components/private/metric-card/metric-card';
 import { Sidebar, SidebarItem } from '../../../shared/components/private/sidebar/sidebar';
 import { PrivateNavbar } from '../../../shared/components/private/navbar/navbar';
+import { Recents } from '../../../shared/components/private/recents/recents';
+import { EventCalendar } from '../../../shared/components/private/event-calendar/event-calendar';
+import { Messages } from '../../../shared/components/private/messages/messages';
+import { ContactService } from '../../../core/services/contact/contact';
 
 @Component({
   selector: 'app-dashboard',
-  imports: [Sidebar, PrivateNavbar, MetricCard],
+  imports: [Sidebar, PrivateNavbar, MetricCard, Recents, EventCalendar, Messages],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.css',
 })
 export class Dashboard implements OnInit {
-  private auth    = inject(AuthService);
-  private router  = inject(Router);
+  private auth           = inject(AuthService);
+  private router         = inject(Router);
   private membersService = inject(MembersService);
+  private contactService = inject(ContactService);
 
   readonly user         = this.auth.user;
   readonly isSuperAdmin = this.auth.isSuperAdmin;
@@ -30,6 +35,8 @@ export class Dashboard implements OnInit {
   soci           = signal<SocioMember[]>([]);
   membersLoading = signal(false);
   membersError   = signal(false);
+
+  unreadMessages = signal(0);
 
   readonly stats = computed(() => [
     {
@@ -45,29 +52,33 @@ export class Dashboard implements OnInit {
     { icon: 'newspaper',         label: 'Articoli Pubblicati', value: '9',      delta: '2 bozze in attesa',        positive: false, loading: false },
   ]);
 
-  readonly navItems: SidebarItem[] = [
+  readonly navItems = computed((): SidebarItem[] => [
     { id: 'overview',  icon: 'dashboard',          label: 'Panoramica'  },
     { id: 'members',   icon: 'group',               label: 'Soci'        },
     { id: 'events',    icon: 'calendar_month',      label: 'Calendario'  },
+    { id: 'messages',  icon: 'mail',                label: 'Messaggi',   badge: this.unreadMessages() },
     { id: 'content',   icon: 'article',             label: 'Contenuti'   },
     { id: 'donations', icon: 'volunteer_activism',  label: 'Donazioni'   },
     { id: 'settings',  icon: 'settings',            label: 'Impostazioni'},
-  ];
-
-  readonly activity = [
-    { icon: 'person_add',          text: 'Nuovo socio: Maria Ionescu',                time: '2h fa',  color: 'text-primary'           },
-    { icon: 'event',               text: 'Evento "Sânziene" aggiornato',              time: '5h fa',  color: 'text-secondary'         },
-    { icon: 'volunteer_activism',  text: 'Donazione €50 da Ion Popescu',              time: 'Ieri',   color: 'text-primary'           },
-    { icon: 'article',             text: 'Articolo pubblicato: Borsa di Studio 2024', time: 'Ieri',   color: 'text-on-surface-variant' },
-    { icon: 'person_add',          text: 'Nuovo socio: Alexandru Dumitrescu',         time: '2gg fa', color: 'text-primary'           },
-  ];
+  ]);
 
   get activeLabel(): string {
-    return this.navItems.find(i => i.id === this.activeTab())?.label ?? 'A.C.R.';
+    return this.navItems().find(i => i.id === this.activeTab())?.label ?? 'A.C.R.';
   }
 
   ngOnInit(): void {
     this.loadMembers();
+    this.loadUnreadCount();
+  }
+
+  private loadUnreadCount(): void {
+    this.contactService.getUnreadCount().subscribe({
+      next: count => this.unreadMessages.set(count),
+    });
+  }
+
+  onMessagesRead(delta: number): void {
+    this.unreadMessages.update(n => Math.max(0, n - delta));
   }
 
   setTab(id: string): void {

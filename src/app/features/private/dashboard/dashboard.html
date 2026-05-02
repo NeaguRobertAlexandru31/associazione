@@ -3,7 +3,7 @@
   <!-- Desktop sidebar -->
   <div class="hidden md:block sticky top-0 h-screen flex-shrink-0">
     <app-sidebar
-      [items]="navItems"
+      [items]="navItems()"
       [activeId]="activeTab()"
       [user]="user()"
       (tabChange)="setTab($event)"
@@ -24,7 +24,7 @@
       <div class="md:hidden fixed inset-0 z-50 flex">
         <div class="sidebar-animate h-full">
           <app-sidebar
-            [items]="navItems"
+            [items]="navItems()"
             [activeId]="activeTab()"
             [user]="user()"
             (tabChange)="setTab($event)"
@@ -60,26 +60,11 @@
           <!-- Activity + Quick actions -->
           <div class="grid md:grid-cols-[1fr_300px] gap-6">
 
-            <div class="bg-surface-container-lowest rounded-2xl shadow-sm p-6">
-              <h2 class="font-romania font-bold text-primary text-lg mb-5">Attività Recente</h2>
-              <div class="flex flex-col divide-y divide-outline-variant/20">
-                @for (a of activity; track a.text) {
-                  <div class="flex items-start gap-3 py-4 first:pt-0 last:pb-0">
-                    <div class="w-8 h-8 rounded-full bg-surface-container flex items-center justify-center flex-shrink-0 mt-0.5">
-                      <span class="material-symbols-outlined text-sm" [class]="a.color" style="font-variation-settings:'FILL' 1">{{ a.icon }}</span>
-                    </div>
-                    <div class="flex-1 min-w-0">
-                      <p class="font-inter text-on-surface text-sm">{{ a.text }}</p>
-                      <p class="font-inter text-on-surface-variant text-xs mt-0.5">{{ a.time }}</p>
-                    </div>
-                  </div>
-                }
-              </div>
-            </div>
+            <app-recents />
 
             <div class="bg-surface-container-lowest rounded-2xl shadow-sm p-6 flex flex-col gap-3">
               <h2 class="font-romania font-bold text-primary text-lg mb-2">Azioni Rapide</h2>
-              @for (item of navItems.slice(1); track item.id) {
+              @for (item of navItems().slice(1); track item.id) {
                 <button (click)="setTab(item.id)"
                   class="flex items-center gap-3 px-4 py-3 rounded-xl bg-surface-container hover:bg-surface-container-high transition-colors text-left w-full">
                   <span class="material-symbols-outlined text-primary text-lg" style="font-variation-settings:'FILL' 1">{{ item.icon }}</span>
@@ -264,9 +249,17 @@
         </div>
       }
 
-      @if (activeTab() !== 'overview' && activeTab() !== 'settings' && activeTab() !== 'members') {
+      @if (activeTab() === 'events') {
+        <app-event-calendar />
+      }
+
+      @if (activeTab() === 'messages') {
+        <app-messages (messageRead)="onMessagesRead(1)" />
+      }
+
+      @if (activeTab() !== 'overview' && activeTab() !== 'settings' && activeTab() !== 'members' && activeTab() !== 'events' && activeTab() !== 'messages') {
         <div class="dash-content flex flex-col items-center justify-center min-h-[60vh] text-center">
-          @for (item of navItems; track item.id) {
+          @for (item of navItems(); track item.id) {
             @if (activeTab() === item.id) {
               <div class="w-20 h-20 rounded-3xl bg-primary flex items-center justify-center mb-6">
                 <span class="material-symbols-outlined text-on-primary text-4xl" style="font-variation-settings:'FILL' 1">{{ item.icon }}</span>

@@ -1,6 +1,9 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { TranslatePipe } from '../../../i18n/translate.pipe';
+import { CalendarEvent } from '../../../core/models/event.model';
+import { EventsService } from '../../../core/services/events/events';
+import { environment } from '../../../../environments/environment';
 
 @Component({
   selector: 'app-events',
@@ -8,23 +11,50 @@ import { TranslatePipe } from '../../../i18n/translate.pipe';
   templateUrl: './events.html',
   styleUrl: './events.css',
 })
-export class Events {
-  readonly upcoming = [
-    {
-      dayKey: 'events.e1_day', monthKey: 'events.e1_month',
-      titleKey: 'events.e1_title', descKey: 'events.e1_desc',
-      locationKey: 'events.e1_location',
-    },
-    {
-      dayKey: 'events.e2_day', monthKey: 'events.e2_month',
-      titleKey: 'events.e2_title', descKey: 'events.e2_desc',
-      locationKey: 'events.e2_location',
-    },
-  ];
+export class Events implements OnInit {
+  private eventsService = inject(EventsService);
 
-  readonly archived = [
-    { img: '/img/member3.jpg', dateKey: 'events.a1_date', titleKey: 'events.a1_title', descKey: 'events.a1_desc' },
-    { img: '/img/member2.jpg', dateKey: 'events.a2_date', titleKey: 'events.a2_title', descKey: 'events.a2_desc' },
-    { img: '/img/about-hero.jpg', dateKey: 'events.a3_date', titleKey: 'events.a3_title', descKey: 'events.a3_desc' },
-  ];
+  events  = signal<CalendarEvent[]>([]);
+  loading = signal(true);
+
+  readonly upcoming = computed(() => {
+    const now = new Date();
+    return this.events()
+      .filter(e => new Date(e.date) >= now)
+      .slice(0, 6);
+  });
+
+  readonly featured = computed(() => this.upcoming()[0] ?? null);
+
+  readonly archived = computed(() => {
+    const now = new Date();
+    return this.events()
+      .filter(e => new Date(e.date) < now)
+      .slice(0, 3);
+  });
+
+  ngOnInit(): void {
+    this.eventsService.getAll().subscribe({
+      next: evts => { this.events.set(evts); this.loading.set(false); },
+      error: ()   => this.loading.set(false),
+    });
+  }
+
+  resolveImg(path: string | undefined, fallback: string): string {
+    return path ? `${environment.apiUrl}${path}` : fallback;
+  }
+
+  formatDay(iso: string): string {
+    return new Date(iso).toLocaleDateString('it-IT', { day: '2-digit' });
+  }
+
+  formatMonth(iso: string): string {
+    return new Date(iso).toLocaleDateString('it-IT', { month: 'short' }).toUpperCase();
+  }
+
+  formatFullDate(iso: string): string {
+    return new Date(iso).toLocaleDateString('it-IT', {
+      day: 'numeric', month: 'long', year: 'numeric',
+    });
+  }
 }

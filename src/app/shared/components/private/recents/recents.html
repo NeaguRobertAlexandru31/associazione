@@ -1,0 +1,50 @@
+<div class="bg-surface-container-lowest rounded-2xl shadow-sm p-6">
+  <div class="flex items-center justify-between mb-5">
+    <h2 class="font-romania font-bold text-primary text-lg">Attività Recente</h2>
+    <button (click)="load()"
+            [disabled]="loading()"
+            class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-inter font-semibold text-xs text-primary hover:bg-primary/8 transition-colors disabled:opacity-40">
+      <span class="material-symbols-outlined text-sm" [class.spin]="loading()">refresh</span>
+      Aggiorna
+    </button>
+  </div>
+
+  @if (loading()) {
+    <div class="flex flex-col gap-3">
+      @for (_ of [1,2,3,4,5]; track $index) {
+        <div class="flex items-start gap-3 py-2">
+          <div class="w-8 h-8 rounded-full bg-surface-container animate-pulse flex-shrink-0"></div>
+          <div class="flex-1 space-y-2 pt-1">
+            <div class="h-3 bg-surface-container animate-pulse rounded-full w-3/4"></div>
+            <div class="h-2.5 bg-surface-container animate-pulse rounded-full w-1/4"></div>
+          </div>
+        </div>
+      }
+    </div>
+  } @else if (error()) {
+    <div class="flex flex-col items-center gap-2 py-6 text-center">
+      <span class="material-symbols-outlined text-secondary text-3xl">error</span>
+      <p class="font-inter text-on-surface-variant text-sm">Errore nel caricamento.</p>
+      <button (click)="load()" class="font-inter text-xs text-primary underline">Riprova</button>
+    </div>
+  } @else if (items().length === 0) {
+    <div class="flex flex-col items-center gap-2 py-6 text-center">
+      <span class="material-symbols-outlined text-on-surface-variant text-3xl">inbox</span>
+      <p class="font-inter text-on-surface-variant text-sm">Nessuna attività recente.</p>
+    </div>
+  } @else {
+    <div class="flex flex-col divide-y divide-outline-variant/20">
+      @for (a of items(); track a.text) {
+        <div class="flex items-start gap-3 py-4 first:pt-0 last:pb-0">
+          <div class="w-8 h-8 rounded-full bg-surface-container flex items-center justify-center flex-shrink-0 mt-0.5">
+            <span class="material-symbols-outlined text-sm" [class]="a.color" style="font-variation-settings:'FILL' 1">{{ a.icon }}</span>
+          </div>
+          <div class="flex-1 min-w-0">
+            <p class="font-inter text-on-surface text-sm">{{ a.text }}</p>
+            <p class="font-inter text-on-surface-variant text-xs mt-0.5">{{ a.time }}</p>
+          </div>
+        </div>
+      }
+    </div>
+  }
+</div>
