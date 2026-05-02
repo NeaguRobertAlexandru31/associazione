@@ -149,28 +149,63 @@
                 <p class="font-inter text-on-surface-variant text-sm italic">Nessun socio registrato.</p>
               } @else {
                 <div class="bg-surface-container-lowest rounded-2xl shadow-sm overflow-hidden">
-                  <div class="hidden sm:grid grid-cols-[1fr_1fr_auto] gap-4 px-5 py-3 border-b border-outline-variant/20">
+                  <div class="hidden lg:grid grid-cols-[1fr_1fr_auto_auto_auto] gap-4 px-5 py-3 border-b border-outline-variant/20">
                     <span class="font-inter font-semibold text-[10px] text-on-surface-variant uppercase tracking-widest">Nome</span>
                     <span class="font-inter font-semibold text-[10px] text-on-surface-variant uppercase tracking-widest">Email</span>
-                    <span class="font-inter font-semibold text-[10px] text-on-surface-variant uppercase tracking-widest">Tipo</span>
+                    <span class="font-inter font-semibold text-[10px] text-on-surface-variant uppercase tracking-widest">Categoria</span>
+                    <span class="font-inter font-semibold text-[10px] text-on-surface-variant uppercase tracking-widest">Anno</span>
+                    <span class="font-inter font-semibold text-[10px] text-on-surface-variant uppercase tracking-widest">Stato</span>
                   </div>
                   @for (s of soci(); track s.id) {
-                    <div class="grid grid-cols-[1fr_auto] sm:grid-cols-[1fr_1fr_auto] gap-4 items-center px-5 py-3.5 border-b border-outline-variant/10 last:border-0 hover:bg-surface-container/50 transition-colors">
+                    <div class="grid grid-cols-[1fr_auto] lg:grid-cols-[1fr_1fr_auto_auto_auto] gap-4 items-center px-5 py-3.5 border-b border-outline-variant/10 last:border-0 hover:bg-surface-container/50 transition-colors">
+
+                      <!-- Nome -->
                       <div class="flex items-center gap-3 min-w-0">
                         <div class="w-8 h-8 rounded-full bg-surface-container flex items-center justify-center flex-shrink-0">
-                          <span class="font-romania font-bold text-on-surface-variant text-xs">{{ s.name[0] }}</span>
+                          <span class="font-romania font-bold text-on-surface-variant text-xs">{{ s.firstName[0] }}</span>
                         </div>
-                        <span class="font-inter text-on-surface text-sm truncate">{{ s.name }}</span>
+                        <div class="min-w-0">
+                          <p class="font-inter text-on-surface text-sm truncate">{{ s.firstName }} {{ s.lastName }}</p>
+                          <p class="lg:hidden font-inter text-on-surface-variant text-xs truncate">{{ s.email }}</p>
+                        </div>
                       </div>
-                      <span class="hidden sm:block font-inter text-on-surface-variant text-sm truncate">{{ s.email }}</span>
-                      <span class="font-inter text-[11px] font-semibold px-2.5 py-1 rounded-full capitalize"
+
+                      <!-- Email (desktop) -->
+                      <span class="hidden lg:block font-inter text-on-surface-variant text-sm truncate">{{ s.email }}</span>
+
+                      <!-- Categoria -->
+                      <span class="hidden lg:inline-flex font-inter text-[11px] font-semibold px-2.5 py-1 rounded-full capitalize"
                             [class]="{
-                              'bg-primary/10 text-primary': s.subscription === 'benemerito',
-                              'bg-secondary/10 text-secondary': s.subscription === 'sostenitore',
-                              'bg-surface-container text-on-surface-variant': s.subscription === 'simpatizzante'
+                              'bg-primary/10 text-primary':            s.category === 'sostenitore',
+                              'bg-blue-50 text-blue-700':              s.category === 'under26',
+                              'bg-surface-container text-on-surface-variant': s.category === 'ordinario'
                             }">
-                        {{ s.subscription }}
+                        {{ s.category }}
                       </span>
+
+                      <!-- Anno -->
+                      <span class="hidden lg:block font-inter text-on-surface-variant text-sm">{{ s.membershipYear }}</span>
+
+                      <!-- Stato -->
+                      <span class="inline-flex items-center gap-1 font-inter text-[11px] font-semibold px-2.5 py-1 rounded-full"
+                            [class]="{
+                              'bg-green-100 text-green-700':   s.status === 'attivo',
+                              'bg-yellow-100 text-yellow-700': s.status === 'in_attesa_pagamento',
+                              'bg-blue-100 text-blue-700':     s.status === 'pagamento_in_corso',
+                              'bg-red-100 text-red-700':       s.status === 'rifiutato'
+                            }">
+                        <span class="w-1.5 h-1.5 rounded-full flex-shrink-0"
+                              [class]="{
+                                'bg-green-500':  s.status === 'attivo',
+                                'bg-yellow-500': s.status === 'in_attesa_pagamento',
+                                'bg-blue-500':   s.status === 'pagamento_in_corso',
+                                'bg-red-500':    s.status === 'rifiutato'
+                              }"></span>
+                        {{ s.status === 'in_attesa_pagamento' ? 'In attesa' :
+                           s.status === 'pagamento_in_corso'  ? 'Pagamento' :
+                           s.status === 'attivo'              ? 'Attivo'    : 'Rifiutato' }}
+                      </span>
+
                     </div>
                   }
                 </div>

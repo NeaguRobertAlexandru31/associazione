@@ -46,8 +46,15 @@ export class Membership {
     },
   ];
 
+  private readonly planCategoryMap: Record<string, string> = {
+    price_simpatizzante: 'ordinario',
+    price_sostenitore:   'sostenitore',
+    price_benemerito:    'sostenitore',
+  };
+
   selectPlan(plan: Plan): void {
-    this.router.navigate(['/tessera-preview'], { queryParams: { plan: plan.stripeProductId } });
+    const category = this.planCategoryMap[plan.stripeProductId] ?? 'ordinario';
+    this.router.navigate(['/unisciti'], { queryParams: { category } });
   }
 
   // ── 5×1000 ───────────────────────────────────────────────────────────

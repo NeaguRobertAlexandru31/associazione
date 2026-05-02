@@ -75,7 +75,7 @@
             <div class="chip"></div>
             <div>
               <p class="font-inter text-[7px] uppercase tracking-[0.2em] text-white/30 mb-0.5">N° Tessera</p>
-              <p class="font-inter text-white/70 text-[11px] tracking-[0.15em] font-medium">ACR · 2025 · 0042</p>
+              <p class="font-inter text-white/70 text-[11px] tracking-[0.15em] font-medium">{{ cardCode() }}</p>
             </div>
           </div>
 
@@ -107,11 +107,11 @@
             <!-- Name & type -->
             <div class="flex-1 min-w-0">
               <p class="font-inter text-[8px] uppercase tracking-[0.2em] text-white/35 mb-0.5">Socio</p>
-              <p class="font-romania text-white font-bold text-xl leading-tight truncate">Maria Ionescu</p>
+              <p class="font-romania text-white font-bold text-xl leading-tight truncate">{{ memberName() }}</p>
               <div class="flex items-center gap-2 mt-1.5">
                 <span class="font-inter text-[8px] uppercase tracking-widest px-2 py-0.5 rounded-full"
                       style="background: rgba(248,189,42,0.15); color: #f8bd2a; border: 1px solid rgba(248,189,42,0.3);">
-                  Ordinario
+                  {{ categoryLabel() }}
                 </span>
                 <span class="font-inter text-[8px] text-white/30">Milano</span>
               </div>
@@ -262,13 +262,13 @@
 
           <!-- Right side info -->
           <div class="flex-1 min-w-0">
-            <p class="font-romania text-white font-bold text-base leading-tight mb-0.5">Maria Ionescu</p>
-            <p class="font-inter text-[8px] text-white/40 mb-3">Socio Ordinario · ACR-2025-0042</p>
+            <p class="font-romania text-white font-bold text-base leading-tight mb-0.5">{{ memberName() }}</p>
+            <p class="font-inter text-[8px] text-white/40 mb-3">Socio {{ categoryLabel() }} · {{ cardCode() }}</p>
 
             <div class="space-y-1 mb-3">
               <div class="flex items-center gap-1.5">
                 <div class="w-1 h-1 rounded-full" style="background:#f8bd2a;"></div>
-                <p class="font-inter text-[8px] text-white/50">Valida dal 01/01/2025 al 31/12/2025</p>
+                <p class="font-inter text-[8px] text-white/50">{{ validityLabel() }}</p>
               </div>
               <div class="flex items-center gap-1.5">
                 <div class="w-1 h-1 rounded-full" style="background:#f8bd2a;"></div>
@@ -328,7 +328,7 @@
         </div>
 
         <h2 class="font-romania font-bold text-primary text-xl mb-2">
-          Benvenuta, Maria!
+          Benvenuto/a, {{ memberFirstName() }}!
         </h2>
         <p class="font-inter text-on-surface-variant text-xs leading-relaxed mb-6">
           La tua iscrizione è stata confermata. Sei ufficialmente socia dell'Associazione Culturale Rumena per l'anno 2025. Qui sotto trovi la tua tessera digitale personale.
@@ -365,8 +365,8 @@
               </div>
               <div>
                 <p class="font-inter text-[6px] uppercase tracking-widest text-white/30">Socia</p>
-                <p class="font-romania text-white font-bold text-[15px] leading-tight">Maria Ionescu</p>
-                <p class="font-inter text-[7px] tracking-widest text-white/40 mt-0.5">ACR · 2025 · 0042</p>
+                <p class="font-romania text-white font-bold text-[15px] leading-tight">{{ memberName() }}</p>
+                <p class="font-inter text-[7px] tracking-widest text-white/40 mt-0.5">{{ cardCode() }}</p>
               </div>
             </div>
           </div>

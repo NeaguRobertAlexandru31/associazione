@@ -1,5 +1,6 @@
-export type SubscriptionType = 'simpatizzante' | 'sostenitore' | 'benemerito';
-export type AdminRole = 'SUPERADMIN' | 'ADMIN';
+export type MemberCategory = 'ordinario' | 'under26' | 'sostenitore';
+export type MemberStatus  = 'in_attesa_pagamento' | 'pagamento_in_corso' | 'attivo' | 'rifiutato';
+export type AdminRole     = 'SUPERADMIN' | 'ADMIN';
 
 export interface DirettivoMember {
   id: string;
@@ -11,10 +12,12 @@ export interface DirettivoMember {
 
 export interface SocioMember {
   id: string;
-  name: string;
+  firstName: string;
+  lastName: string;
   email: string;
-  subscription: SubscriptionType;
-  profileImage: string | null;
+  category: MemberCategory;
+  status: MemberStatus;
+  membershipYear: number;
   createdAt: string;
 }
 

@@ -1,0 +1,325 @@
+<div class="min-h-screen bg-surface">
+
+  <!-- Top bar -->
+  <div class="sticky top-0 z-10 bg-surface/80 backdrop-blur-md border-b border-outline-variant/20">
+    <div class="max-w-2xl mx-auto px-4 py-3 flex items-center gap-4">
+      <a routerLink="/membership" class="inline-flex items-center gap-1.5 font-inter text-xs text-on-surface-variant hover:text-primary transition-colors flex-shrink-0">
+        <span class="material-symbols-outlined text-sm">arrow_back</span>
+        Piani
+      </a>
+      <div class="flex-1">
+        <div class="h-1.5 bg-surface-container rounded-full overflow-hidden">
+          <div class="h-full bg-primary rounded-full transition-all duration-500" [style.width]="progressWidth()"></div>
+        </div>
+      </div>
+      <span class="font-inter text-xs text-on-surface-variant flex-shrink-0">{{ step() }} / {{ totalSteps() }}</span>
+    </div>
+  </div>
+
+  <div class="max-w-2xl mx-auto px-4 py-10">
+
+    <!-- Header -->
+    <div class="mb-8 form-step">
+      <div class="flex items-center gap-3 mb-1">
+        <div class="w-10 h-10 rounded-xl bg-primary flex items-center justify-center flex-shrink-0">
+          <span class="material-symbols-outlined text-on-primary text-xl" style="font-variation-settings:'FILL' 1">how_to_reg</span>
+        </div>
+        <div>
+          <h1 class="font-romania font-extrabold text-primary text-2xl leading-tight">Iscrizione A.C.R.</h1>
+          <p class="font-inter text-on-surface-variant text-xs">
+            @if (step() === 1) { Scegli il tipo di iscrizione }
+            @else if (step() === 2) { Dati anagrafici }
+            @else if (step() === 3) { Documento e contatti }
+            @else if (step() === 4) { Dati del tutore legale }
+            @else { Privacy e pagamento }
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Error -->
+    @if (error()) {
+      <div class="form-error flex items-center gap-2 bg-secondary/10 text-secondary border border-secondary/20 rounded-xl px-4 py-3 mb-6 font-inter text-sm">
+        <span class="material-symbols-outlined text-base flex-shrink-0" style="font-variation-settings:'FILL' 1">error</span>
+        {{ error() }}
+      </div>
+    }
+
+    <!-- Step 1: Tipo -->
+    @if (step() === 1) {
+      <div class="form-step flex flex-col gap-4">
+        <span class="font-inter font-semibold text-[10px] text-on-surface-variant uppercase tracking-widest">Categoria</span>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          @for (opt of categoryOptions; track opt.value) {
+            <button type="button" (click)="category = opt.value"
+                    class="relative p-4 rounded-2xl border-2 text-left transition-all duration-200"
+                    [class]="category === opt.value ? 'border-primary bg-primary/5' : 'border-outline-variant/30 bg-surface-container-lowest hover:border-primary/40'">
+              @if (category === opt.value) {
+                <span class="absolute top-3 right-3 material-symbols-outlined text-primary text-lg" style="font-variation-settings:'FILL' 1">check_circle</span>
+              }
+              <p class="font-romania font-bold text-primary text-base mb-1">{{ opt.label }}</p>
+              <p class="font-inter text-on-surface-variant text-xs leading-relaxed mb-2">{{ opt.desc }}</p>
+              <p class="font-inter font-bold text-on-surface text-sm">{{ opt.price }}</p>
+            </button>
+          }
+        </div>
+
+        <div class="p-4 rounded-2xl bg-surface-container-lowest border border-outline-variant/20 flex items-center justify-between">
+          <div>
+            <p class="font-inter font-semibold text-on-surface text-sm">Minorenne</p>
+            <p class="font-inter text-on-surface-variant text-xs mt-0.5">Richiede i dati del tutore legale</p>
+          </div>
+          <button type="button" (click)="isMinor = !isMinor"
+                  class="w-12 h-6 rounded-full transition-colors duration-200 flex items-center px-1 flex-shrink-0"
+                  [class]="isMinor ? 'bg-primary' : 'bg-surface-container'">
+            <span class="w-4 h-4 rounded-full bg-white shadow transition-transform duration-200"
+                  [class]="isMinor ? 'translate-x-6' : 'translate-x-0'"></span>
+          </button>
+        </div>
+      </div>
+    }
+
+    <!-- Step 2: Dati anagrafici -->
+    @if (step() === 2) {
+      <div class="form-step grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div>
+          <label class="font-inter font-semibold text-[10px] text-on-surface-variant uppercase tracking-widest block mb-2">Nome</label>
+          <input type="text" [(ngModel)]="firstName" name="firstName" placeholder="Mario" class="w-full px-4 py-3 rounded-xl border border-outline-variant bg-surface font-inter text-sm focus:outline-none focus:border-primary transition-colors placeholder:text-on-surface-variant/40" />
+        </div>
+        <div>
+          <label class="font-inter font-semibold text-[10px] text-on-surface-variant uppercase tracking-widest block mb-2">Cognome</label>
+          <input type="text" [(ngModel)]="lastName" name="lastName" placeholder="Rossi" class="w-full px-4 py-3 rounded-xl border border-outline-variant bg-surface font-inter text-sm focus:outline-none focus:border-primary transition-colors placeholder:text-on-surface-variant/40" />
+        </div>
+        <div class="sm:col-span-2">
+          <label class="font-inter font-semibold text-[10px] text-on-surface-variant uppercase tracking-widest block mb-2">Codice fiscale</label>
+          <input type="text" [(ngModel)]="fiscalCode" name="fiscalCode" placeholder="RSSMRA85M01H501Z"
+                 class="w-full px-4 py-3 rounded-xl border border-outline-variant bg-surface font-inter text-sm focus:outline-none focus:border-primary transition-colors placeholder:text-on-surface-variant/40 uppercase" maxlength="16" />
+        </div>
+        <div>
+          <label class="font-inter font-semibold text-[10px] text-on-surface-variant uppercase tracking-widest block mb-2">Data di nascita</label>
+          <input type="date" [(ngModel)]="birthDate" name="birthDate" class="w-full px-4 py-3 rounded-xl border border-outline-variant bg-surface font-inter text-sm focus:outline-none focus:border-primary transition-colors placeholder:text-on-surface-variant/40" />
+        </div>
+        <div>
+          <label class="font-inter font-semibold text-[10px] text-on-surface-variant uppercase tracking-widest block mb-2">Luogo di nascita</label>
+          <input type="text" [(ngModel)]="birthPlace" name="birthPlace" placeholder="Roma" class="w-full px-4 py-3 rounded-xl border border-outline-variant bg-surface font-inter text-sm focus:outline-none focus:border-primary transition-colors placeholder:text-on-surface-variant/40" />
+        </div>
+        <div class="sm:col-span-2">
+          <label class="font-inter font-semibold text-[10px] text-on-surface-variant uppercase tracking-widest block mb-2">Sesso</label>
+          <div class="flex gap-2">
+            @for (g of genderOptions; track g.value) {
+              <button type="button" (click)="gender = $any(g.value)"
+                      class="flex-1 py-2.5 rounded-xl border-2 font-inter text-sm transition-all duration-150"
+                      [class]="gender === g.value ? 'border-primary bg-primary/5 text-primary font-semibold' : 'border-outline-variant/30 text-on-surface-variant'">
+                {{ g.label }}
+              </button>
+            }
+          </div>
+        </div>
+      </div>
+    }
+
+    <!-- Step 3: Documento & Contatti -->
+    @if (step() === 3) {
+      <div class="form-step flex flex-col gap-6">
+        <section>
+          <span class="font-inter font-semibold text-[10px] text-on-surface-variant uppercase tracking-widest block mb-3">Documento di identità</span>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div class="sm:col-span-2">
+              <div class="flex gap-2">
+                @for (d of docTypeOptions; track d.value) {
+                  <button type="button" (click)="docType = $any(d.value)"
+                          class="flex-1 py-2.5 rounded-xl border-2 font-inter text-sm transition-all duration-150"
+                          [class]="docType === d.value ? 'border-primary bg-primary/5 text-primary font-semibold' : 'border-outline-variant/30 text-on-surface-variant'">
+                    {{ d.label }}
+                  </button>
+                }
+              </div>
+            </div>
+            <div>
+              <label class="font-inter font-semibold text-[10px] text-on-surface-variant uppercase tracking-widest block mb-2">Numero documento</label>
+              <input type="text" [(ngModel)]="docNumber" name="docNumber" placeholder="AB1234567" class="w-full px-4 py-3 rounded-xl border border-outline-variant bg-surface font-inter text-sm focus:outline-none focus:border-primary transition-colors placeholder:text-on-surface-variant/40 uppercase" />
+            </div>
+            <div>
+              <label class="font-inter font-semibold text-[10px] text-on-surface-variant uppercase tracking-widest block mb-2">Scadenza</label>
+              <input type="date" [(ngModel)]="docExpiry" name="docExpiry" class="w-full px-4 py-3 rounded-xl border border-outline-variant bg-surface font-inter text-sm focus:outline-none focus:border-primary transition-colors placeholder:text-on-surface-variant/40" />
+            </div>
+          </div>
+        </section>
+
+        <section>
+          <span class="font-inter font-semibold text-[10px] text-on-surface-variant uppercase tracking-widest block mb-3">Contatti</span>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label class="font-inter font-semibold text-[10px] text-on-surface-variant uppercase tracking-widest block mb-2">Email</label>
+              <input type="email" [(ngModel)]="email" name="email" placeholder="mario@esempio.it" class="w-full px-4 py-3 rounded-xl border border-outline-variant bg-surface font-inter text-sm focus:outline-none focus:border-primary transition-colors placeholder:text-on-surface-variant/40" />
+            </div>
+            <div>
+              <label class="font-inter font-semibold text-[10px] text-on-surface-variant uppercase tracking-widest block mb-2">Telefono</label>
+              <input type="tel" [(ngModel)]="phone" name="phone" placeholder="+39 333 1234567" class="w-full px-4 py-3 rounded-xl border border-outline-variant bg-surface font-inter text-sm focus:outline-none focus:border-primary transition-colors placeholder:text-on-surface-variant/40" />
+            </div>
+          </div>
+        </section>
+
+        <section>
+          <span class="font-inter font-semibold text-[10px] text-on-surface-variant uppercase tracking-widest block mb-3">Indirizzo di residenza</span>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div class="sm:col-span-2">
+              <label class="font-inter font-semibold text-[10px] text-on-surface-variant uppercase tracking-widest block mb-2">Via / Piazza</label>
+              <input type="text" [(ngModel)]="addressStreet" name="addressStreet" placeholder="Via Roma 1" class="w-full px-4 py-3 rounded-xl border border-outline-variant bg-surface font-inter text-sm focus:outline-none focus:border-primary transition-colors placeholder:text-on-surface-variant/40" />
+            </div>
+            <div>
+              <label class="font-inter font-semibold text-[10px] text-on-surface-variant uppercase tracking-widest block mb-2">CAP</label>
+              <input type="text" [(ngModel)]="addressZip" name="addressZip" placeholder="00100" maxlength="5" class="w-full px-4 py-3 rounded-xl border border-outline-variant bg-surface font-inter text-sm focus:outline-none focus:border-primary transition-colors placeholder:text-on-surface-variant/40" />
+            </div>
+            <div>
+              <label class="font-inter font-semibold text-[10px] text-on-surface-variant uppercase tracking-widest block mb-2">Prov.</label>
+              <input type="text" [(ngModel)]="addressProvince" name="addressProvince" placeholder="RM" maxlength="2" class="w-full px-4 py-3 rounded-xl border border-outline-variant bg-surface font-inter text-sm focus:outline-none focus:border-primary transition-colors placeholder:text-on-surface-variant/40 uppercase" />
+            </div>
+            <div class="sm:col-span-2">
+              <label class="font-inter font-semibold text-[10px] text-on-surface-variant uppercase tracking-widest block mb-2">Città</label>
+              <input type="text" [(ngModel)]="addressCity" name="addressCity" placeholder="Roma" class="w-full px-4 py-3 rounded-xl border border-outline-variant bg-surface font-inter text-sm focus:outline-none focus:border-primary transition-colors placeholder:text-on-surface-variant/40" />
+            </div>
+          </div>
+        </section>
+      </div>
+    }
+
+    <!-- Step 4: Tutore -->
+    @if (step() === 4) {
+      <div class="form-step grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div>
+          <label class="font-inter font-semibold text-[10px] text-on-surface-variant uppercase tracking-widest block mb-2">Nome tutore</label>
+          <input type="text" [(ngModel)]="guardian.firstName" name="guardianFirstName" placeholder="Anna" class="w-full px-4 py-3 rounded-xl border border-outline-variant bg-surface font-inter text-sm focus:outline-none focus:border-primary transition-colors placeholder:text-on-surface-variant/40" />
+        </div>
+        <div>
+          <label class="font-inter font-semibold text-[10px] text-on-surface-variant uppercase tracking-widest block mb-2">Cognome tutore</label>
+          <input type="text" [(ngModel)]="guardian.lastName" name="guardianLastName" placeholder="Rossi" class="w-full px-4 py-3 rounded-xl border border-outline-variant bg-surface font-inter text-sm focus:outline-none focus:border-primary transition-colors placeholder:text-on-surface-variant/40" />
+        </div>
+        <div class="sm:col-span-2">
+          <label class="font-inter font-semibold text-[10px] text-on-surface-variant uppercase tracking-widest block mb-2">Codice fiscale tutore</label>
+          <input type="text" [(ngModel)]="guardian.fiscalCode" name="guardianCF" placeholder="RSSNNX60A41H501Y" class="w-full px-4 py-3 rounded-xl border border-outline-variant bg-surface font-inter text-sm focus:outline-none focus:border-primary transition-colors placeholder:text-on-surface-variant/40 uppercase" maxlength="16" />
+        </div>
+        <div class="sm:col-span-2">
+          <label class="font-inter font-semibold text-[10px] text-on-surface-variant uppercase tracking-widest block mb-2">Relazione</label>
+          <div class="flex gap-2">
+            @for (r of relationOptions; track r.value) {
+              <button type="button" (click)="guardian.relation = $any(r.value)"
+                      class="flex-1 py-2.5 rounded-xl border-2 font-inter text-sm transition-all duration-150"
+                      [class]="guardian.relation === r.value ? 'border-primary bg-primary/5 text-primary font-semibold' : 'border-outline-variant/30 text-on-surface-variant'">
+                {{ r.label }}
+              </button>
+            }
+          </div>
+        </div>
+        <div class="sm:col-span-2">
+          <label class="font-inter font-semibold text-[10px] text-on-surface-variant uppercase tracking-widest block mb-2">Tipo documento</label>
+          <div class="flex gap-2">
+            @for (d of docTypeOptions; track d.value) {
+              <button type="button" (click)="guardian.docType = $any(d.value)"
+                      class="flex-1 py-2.5 rounded-xl border-2 font-inter text-xs sm:text-sm transition-all duration-150"
+                      [class]="guardian.docType === d.value ? 'border-primary bg-primary/5 text-primary font-semibold' : 'border-outline-variant/30 text-on-surface-variant'">
+                {{ d.label }}
+              </button>
+            }
+          </div>
+        </div>
+        <div>
+          <label class="font-inter font-semibold text-[10px] text-on-surface-variant uppercase tracking-widest block mb-2">Numero documento</label>
+          <input type="text" [(ngModel)]="guardian.docNumber" name="guardianDoc" placeholder="AB1234567" class="w-full px-4 py-3 rounded-xl border border-outline-variant bg-surface font-inter text-sm focus:outline-none focus:border-primary transition-colors placeholder:text-on-surface-variant/40 uppercase" />
+        </div>
+        <div>
+          <label class="font-inter font-semibold text-[10px] text-on-surface-variant uppercase tracking-widest block mb-2">Scadenza</label>
+          <input type="date" [(ngModel)]="guardian.docExpiry" name="guardianExpiry" class="w-full px-4 py-3 rounded-xl border border-outline-variant bg-surface font-inter text-sm focus:outline-none focus:border-primary transition-colors placeholder:text-on-surface-variant/40" />
+        </div>
+      </div>
+    }
+
+    <!-- Step 5: Privacy & Pagamento -->
+    @if (step() === 5) {
+      <div class="form-step flex flex-col gap-5">
+
+        <!-- Riepilogo -->
+        <div class="bg-surface-container-lowest rounded-2xl border border-outline-variant/20 p-4 flex items-center gap-4">
+          <div class="w-10 h-10 rounded-full bg-primary flex items-center justify-center flex-shrink-0">
+            <span class="font-romania font-bold text-on-primary">{{ firstName[0] }}{{ lastName[0] }}</span>
+          </div>
+          <div class="min-w-0">
+            <p class="font-inter font-semibold text-on-surface text-sm">{{ firstName }} {{ lastName }}</p>
+            <p class="font-inter text-on-surface-variant text-xs capitalize">{{ categoryLabel }} · {{ email }}</p>
+          </div>
+        </div>
+
+        <!-- Privacy -->
+        <section class="flex flex-col gap-3">
+          <span class="font-inter font-semibold text-[10px] text-on-surface-variant uppercase tracking-widest">Privacy</span>
+          <label class="flex items-start gap-3 cursor-pointer">
+            <input type="checkbox" [(ngModel)]="privacyBase" name="privacyBase" class="mt-0.5 accent-primary w-4 h-4 flex-shrink-0" />
+            <span class="font-inter text-sm text-on-surface leading-relaxed">
+              <span class="font-semibold text-secondary">* </span>
+              Acconsento al trattamento dei dati personali per la gestione dell'iscrizione.
+            </span>
+          </label>
+          <label class="flex items-start gap-3 cursor-pointer">
+            <input type="checkbox" [(ngModel)]="privacyNewsletter" name="privacyNewsletter" class="mt-0.5 accent-primary w-4 h-4 flex-shrink-0" />
+            <span class="font-inter text-sm text-on-surface-variant leading-relaxed">Acconsento a ricevere newsletter e comunicazioni dell'associazione.</span>
+          </label>
+          <label class="flex items-start gap-3 cursor-pointer">
+            <input type="checkbox" [(ngModel)]="privacyThirdParties" name="privacyThirdParties" class="mt-0.5 accent-primary w-4 h-4 flex-shrink-0" />
+            <span class="font-inter text-sm text-on-surface-variant leading-relaxed">Acconsento alla cessione dei dati a partner dell'associazione.</span>
+          </label>
+        </section>
+
+        <!-- Pagamento -->
+        <section>
+          <span class="font-inter font-semibold text-[10px] text-on-surface-variant uppercase tracking-widest block mb-3">Metodo di pagamento</span>
+          <div class="grid grid-cols-2 gap-3">
+            <button type="button" (click)="paymentMethod = 'contanti'"
+                    class="p-4 rounded-2xl border-2 text-left transition-all duration-200"
+                    [class]="paymentMethod === 'contanti' ? 'border-primary bg-primary/5' : 'border-outline-variant/30 bg-surface-container-lowest hover:border-primary/30'">
+              <span class="material-symbols-outlined text-primary text-2xl block mb-2" style="font-variation-settings:'FILL' 1">payments</span>
+              <p class="font-inter font-semibold text-on-surface text-sm">Contanti</p>
+              <p class="font-inter text-on-surface-variant text-xs mt-0.5">Pagamento in sede</p>
+            </button>
+            <button type="button" (click)="paymentMethod = 'online'"
+                    class="p-4 rounded-2xl border-2 text-left transition-all duration-200"
+                    [class]="paymentMethod === 'online' ? 'border-primary bg-primary/5' : 'border-outline-variant/30 bg-surface-container-lowest hover:border-primary/30'">
+              <span class="material-symbols-outlined text-primary text-2xl block mb-2" style="font-variation-settings:'FILL' 1">credit_card</span>
+              <p class="font-inter font-semibold text-on-surface text-sm">Online</p>
+              <p class="font-inter text-on-surface-variant text-xs mt-0.5">Carta / Bonifico</p>
+            </button>
+          </div>
+        </section>
+      </div>
+    }
+
+    <!-- Navigation -->
+    <div class="flex gap-3 mt-8">
+      @if (step() > 1) {
+        <button type="button" (click)="back()"
+                class="flex-1 py-3.5 rounded-xl border-2 border-outline-variant/40 font-inter font-semibold text-sm text-on-surface-variant hover:border-primary/40 transition-colors flex items-center justify-center gap-2">
+          <span class="material-symbols-outlined text-base">arrow_back</span>
+          Indietro
+        </button>
+      }
+      @if (step() < 5) {
+        <button type="button" (click)="next()"
+                class="flex-1 py-3.5 rounded-xl bg-primary text-on-primary font-inter font-bold text-sm hover:opacity-90 transition-all flex items-center justify-center gap-2">
+          Avanti
+          <span class="material-symbols-outlined text-base">arrow_forward</span>
+        </button>
+      } @else {
+        <button type="button" (click)="submit()" [disabled]="loading()"
+                class="flex-1 py-3.5 rounded-xl bg-primary text-on-primary font-inter font-bold text-sm hover:opacity-90 transition-all flex items-center justify-center gap-2 disabled:opacity-60">
+          @if (loading()) {
+            <span class="material-symbols-outlined text-base spin">progress_activity</span>
+            Invio in corso…
+          } @else {
+            <span class="material-symbols-outlined text-base" style="font-variation-settings:'FILL' 1">how_to_reg</span>
+            Completa iscrizione
+          }
+        </button>
+      }
+    </div>
+
+  </div>
+</div>

@@ -15,6 +15,7 @@ export const routes: Routes = [
 	{ path: 'boutique', loadComponent: () => import('./features/public/boutique/boutique').then(m => m.Boutique) },
 	// ── Test / preview ───────────────────────────────────────────────────
 	{ path: 'tessera-preview', loadComponent: () => import('./features/public/tessera-preview/tessera-preview').then(m => m.TesseraPreview) },
+	{ path: 'unisciti', loadComponent: () => import('./features/public/register/register').then(m => m.Register) },
 	// ── Auth & private ────────────────────────────────────────────────────
 	{ path: 'login',
 	  loadComponent: () => import('./features/private/auth/auth').then(m => m.Auth) },
