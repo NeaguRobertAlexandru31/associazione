@@ -1,1 +1,225 @@
-<p>members-detail works!</p>
+<div class="dash-content max-w-2xl">
+
+  <!-- Back -->
+  <button (click)="back()" class="flex items-center gap-2 mb-6 font-inter text-sm text-on-surface-variant hover:text-on-surface transition-colors">
+    <span class="material-symbols-outlined text-base">arrow_back</span>
+    Torna ai soci
+  </button>
+
+  @if (loading()) {
+    <div class="flex items-center justify-center min-h-[40vh]">
+      <span class="material-symbols-outlined text-primary text-4xl spin">progress_activity</span>
+    </div>
+  } @else if (error()) {
+    <div class="flex flex-col items-center justify-center min-h-[40vh] gap-3">
+      <span class="material-symbols-outlined text-secondary text-4xl">error</span>
+      <p class="font-inter text-on-surface-variant text-sm">Errore nel caricamento.</p>
+    </div>
+
+  } @else if (type() === 'admin' && admin()) {
+    <!-- ── DIRETTIVO DETAIL ── -->
+    <div class="bg-surface-container-lowest rounded-2xl shadow-sm p-6">
+      <div class="flex items-center gap-4 mb-6">
+        <div class="w-14 h-14 rounded-full bg-primary flex items-center justify-center flex-shrink-0">
+          <span class="font-romania font-bold text-on-primary text-xl">{{ admin()!.name[0] }}</span>
+        </div>
+        <div>
+          <h1 class="font-romania font-bold text-on-surface text-2xl">{{ admin()!.name }}</h1>
+          <span class="font-inter text-[11px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full"
+                [class]="admin()!.role === 'SUPERADMIN' ? 'bg-primary/10 text-primary' : 'bg-surface-container text-on-surface-variant'">
+            {{ admin()!.role === 'SUPERADMIN' ? 'Presidente' : 'Admin' }}
+          </span>
+        </div>
+      </div>
+
+      <dl class="divide-y divide-outline-variant/20">
+        <div class="flex justify-between py-3">
+          <dt class="font-inter text-xs text-on-surface-variant uppercase tracking-wide">Email</dt>
+          <dd class="font-inter text-sm text-on-surface">{{ admin()!.email }}</dd>
+        </div>
+        <div class="flex justify-between py-3">
+          <dt class="font-inter text-xs text-on-surface-variant uppercase tracking-wide">Membro dal</dt>
+          <dd class="font-inter text-sm text-on-surface">{{ admin()!.createdAt | date:'dd/MM/yyyy' }}</dd>
+        </div>
+      </dl>
+    </div>
+
+  } @else if (type() === 'socio' && socio()) {
+    <!-- ── SOCIO DETAIL ── -->
+    <div class="flex items-center gap-4 mb-6">
+      <div class="w-14 h-14 rounded-full bg-surface-container flex items-center justify-center flex-shrink-0">
+        <span class="font-romania font-bold text-on-surface-variant text-xl">{{ socio()!.firstName[0] }}</span>
+      </div>
+      <div>
+        <h1 class="font-romania font-bold text-on-surface text-2xl">{{ socio()!.firstName }} {{ socio()!.lastName }}</h1>
+        <div class="flex items-center gap-2 mt-1">
+          <span class="font-inter text-[11px] font-semibold px-2.5 py-1 rounded-full"
+                [class]="{
+                  'bg-primary/10 text-primary':                   socio()!.category === 'sostenitore',
+                  'bg-blue-100 text-blue-700':                    socio()!.category === 'under26',
+                  'bg-surface-container text-on-surface-variant': socio()!.category === 'ordinario'
+                }">
+            {{ categoryLabel(socio()!.category) }}
+          </span>
+          <span class="font-inter text-[11px] font-semibold px-2.5 py-1 rounded-full inline-flex items-center gap-1.5"
+                [class]="{
+                  'bg-green-100 text-green-700':   socio()!.status === 'attivo',
+                  'bg-yellow-100 text-yellow-700': socio()!.status === 'in_attesa_pagamento',
+                  'bg-blue-100 text-blue-700':     socio()!.status === 'pagamento_in_corso',
+                  'bg-red-100 text-red-700':       socio()!.status === 'rifiutato'
+                }">
+            <span class="w-1.5 h-1.5 rounded-full"
+                  [class]="{
+                    'bg-green-500':  socio()!.status === 'attivo',
+                    'bg-yellow-500': socio()!.status === 'in_attesa_pagamento',
+                    'bg-blue-500':   socio()!.status === 'pagamento_in_corso',
+                    'bg-red-500':    socio()!.status === 'rifiutato'
+                  }"></span>
+            {{ statusLabel(socio()!.status) }}
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Dati anagrafici -->
+    <div class="bg-surface-container-lowest rounded-2xl shadow-sm p-5 mb-4">
+      <h2 class="font-romania font-bold text-on-surface text-base mb-3">Dati anagrafici</h2>
+      <dl class="divide-y divide-outline-variant/20">
+        <div class="flex justify-between py-2.5">
+          <dt class="font-inter text-xs text-on-surface-variant uppercase tracking-wide">Email</dt>
+          <dd class="font-inter text-sm text-on-surface">{{ socio()!.email }}</dd>
+        </div>
+        <div class="flex justify-between py-2.5">
+          <dt class="font-inter text-xs text-on-surface-variant uppercase tracking-wide">Telefono</dt>
+          <dd class="font-inter text-sm text-on-surface">{{ socio()!.phone }}</dd>
+        </div>
+        <div class="flex justify-between py-2.5">
+          <dt class="font-inter text-xs text-on-surface-variant uppercase tracking-wide">Codice fiscale</dt>
+          <dd class="font-inter text-sm text-on-surface font-mono">{{ socio()!.fiscalCode }}</dd>
+        </div>
+        <div class="flex justify-between py-2.5">
+          <dt class="font-inter text-xs text-on-surface-variant uppercase tracking-wide">Data di nascita</dt>
+          <dd class="font-inter text-sm text-on-surface">{{ socio()!.birthDate | date:'dd/MM/yyyy' }}</dd>
+        </div>
+        <div class="flex justify-between py-2.5">
+          <dt class="font-inter text-xs text-on-surface-variant uppercase tracking-wide">Luogo di nascita</dt>
+          <dd class="font-inter text-sm text-on-surface">{{ socio()!.birthPlace }}</dd>
+        </div>
+        <div class="flex justify-between py-2.5">
+          <dt class="font-inter text-xs text-on-surface-variant uppercase tracking-wide">Sesso</dt>
+          <dd class="font-inter text-sm text-on-surface uppercase">{{ socio()!.gender }}</dd>
+        </div>
+        @if (socio()!.isMinor) {
+          <div class="flex justify-between py-2.5">
+            <dt class="font-inter text-xs text-on-surface-variant uppercase tracking-wide">Minore</dt>
+            <dd class="font-inter text-sm text-orange-600 font-semibold">Sì — vedi tutore</dd>
+          </div>
+        }
+      </dl>
+    </div>
+
+    <!-- Documento -->
+    <div class="bg-surface-container-lowest rounded-2xl shadow-sm p-5 mb-4">
+      <h2 class="font-romania font-bold text-on-surface text-base mb-3">Documento d'identità</h2>
+      <dl class="divide-y divide-outline-variant/20">
+        <div class="flex justify-between py-2.5">
+          <dt class="font-inter text-xs text-on-surface-variant uppercase tracking-wide">Tipo</dt>
+          <dd class="font-inter text-sm text-on-surface">{{ docTypeLabel(socio()!.docType) }}</dd>
+        </div>
+        <div class="flex justify-between py-2.5">
+          <dt class="font-inter text-xs text-on-surface-variant uppercase tracking-wide">Numero</dt>
+          <dd class="font-inter text-sm text-on-surface font-mono">{{ socio()!.docNumber }}</dd>
+        </div>
+        <div class="flex justify-between py-2.5">
+          <dt class="font-inter text-xs text-on-surface-variant uppercase tracking-wide">Scadenza</dt>
+          <dd class="font-inter text-sm text-on-surface">{{ socio()!.docExpiry | date:'dd/MM/yyyy' }}</dd>
+        </div>
+      </dl>
+    </div>
+
+    <!-- Indirizzo -->
+    <div class="bg-surface-container-lowest rounded-2xl shadow-sm p-5 mb-4">
+      <h2 class="font-romania font-bold text-on-surface text-base mb-3">Indirizzo</h2>
+      <dl class="divide-y divide-outline-variant/20">
+        <div class="flex justify-between py-2.5">
+          <dt class="font-inter text-xs text-on-surface-variant uppercase tracking-wide">Via</dt>
+          <dd class="font-inter text-sm text-on-surface">{{ socio()!.addressStreet }}</dd>
+        </div>
+        <div class="flex justify-between py-2.5">
+          <dt class="font-inter text-xs text-on-surface-variant uppercase tracking-wide">CAP</dt>
+          <dd class="font-inter text-sm text-on-surface">{{ socio()!.addressZip }}</dd>
+        </div>
+        <div class="flex justify-between py-2.5">
+          <dt class="font-inter text-xs text-on-surface-variant uppercase tracking-wide">Città</dt>
+          <dd class="font-inter text-sm text-on-surface">{{ socio()!.addressCity }} ({{ socio()!.addressProvince }})</dd>
+        </div>
+      </dl>
+    </div>
+
+    <!-- Iscrizione -->
+    <div class="bg-surface-container-lowest rounded-2xl shadow-sm p-5 mb-4">
+      <h2 class="font-romania font-bold text-on-surface text-base mb-3">Iscrizione</h2>
+      <dl class="divide-y divide-outline-variant/20">
+        <div class="flex justify-between py-2.5">
+          <dt class="font-inter text-xs text-on-surface-variant uppercase tracking-wide">Anno</dt>
+          <dd class="font-inter text-sm text-on-surface">{{ socio()!.membershipYear }}</dd>
+        </div>
+        <div class="flex justify-between py-2.5">
+          <dt class="font-inter text-xs text-on-surface-variant uppercase tracking-wide">Pagamento</dt>
+          <dd class="font-inter text-sm text-on-surface">{{ paymentLabel(socio()!.paymentMethod) }}</dd>
+        </div>
+        <div class="flex justify-between py-2.5">
+          <dt class="font-inter text-xs text-on-surface-variant uppercase tracking-wide">Registrato il</dt>
+          <dd class="font-inter text-sm text-on-surface">{{ socio()!.createdAt | date:'dd/MM/yyyy HH:mm' }}</dd>
+        </div>
+      </dl>
+    </div>
+
+    <!-- Tutore (se minore) -->
+    @if (socio()!.isMinor && socio()!.guardian) {
+      <div class="bg-surface-container-lowest rounded-2xl shadow-sm p-5 mb-4">
+        <h2 class="font-romania font-bold text-on-surface text-base mb-3">Tutore legale</h2>
+        <dl class="divide-y divide-outline-variant/20">
+          <div class="flex justify-between py-2.5">
+            <dt class="font-inter text-xs text-on-surface-variant uppercase tracking-wide">Nome</dt>
+            <dd class="font-inter text-sm text-on-surface">{{ socio()!.guardian!.firstName }} {{ socio()!.guardian!.lastName }}</dd>
+          </div>
+          <div class="flex justify-between py-2.5">
+            <dt class="font-inter text-xs text-on-surface-variant uppercase tracking-wide">Codice fiscale</dt>
+            <dd class="font-inter text-sm text-on-surface font-mono">{{ socio()!.guardian!.fiscalCode }}</dd>
+          </div>
+          <div class="flex justify-between py-2.5">
+            <dt class="font-inter text-xs text-on-surface-variant uppercase tracking-wide">Telefono</dt>
+            <dd class="font-inter text-sm text-on-surface">{{ socio()!.guardian!.phone }}</dd>
+          </div>
+        </dl>
+      </div>
+    }
+
+    <!-- Privacy -->
+    <div class="bg-surface-container-lowest rounded-2xl shadow-sm p-5">
+      <h2 class="font-romania font-bold text-on-surface text-base mb-3">Privacy</h2>
+      <dl class="divide-y divide-outline-variant/20">
+        <div class="flex justify-between py-2.5">
+          <dt class="font-inter text-xs text-on-surface-variant uppercase tracking-wide">Base</dt>
+          <dd class="font-inter text-sm" [class]="socio()!.privacyBase ? 'text-green-600' : 'text-red-600'">
+            {{ socio()!.privacyBase ? 'Accettata' : 'Non accettata' }}
+          </dd>
+        </div>
+        <div class="flex justify-between py-2.5">
+          <dt class="font-inter text-xs text-on-surface-variant uppercase tracking-wide">Newsletter</dt>
+          <dd class="font-inter text-sm" [class]="socio()!.privacyNewsletter ? 'text-green-600' : 'text-on-surface-variant'">
+            {{ socio()!.privacyNewsletter ? 'Sì' : 'No' }}
+          </dd>
+        </div>
+        <div class="flex justify-between py-2.5">
+          <dt class="font-inter text-xs text-on-surface-variant uppercase tracking-wide">Terze parti</dt>
+          <dd class="font-inter text-sm" [class]="socio()!.privacyThirdParties ? 'text-green-600' : 'text-on-surface-variant'">
+            {{ socio()!.privacyThirdParties ? 'Sì' : 'No' }}
+          </dd>
+        </div>
+      </dl>
+    </div>
+  }
+
+</div>

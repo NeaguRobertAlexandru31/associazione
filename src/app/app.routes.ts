@@ -27,7 +27,9 @@ export const routes: Routes = [
 		children: [
 			{ path: '', redirectTo: 'overview', pathMatch: 'full' },
 			{ path: 'overview',  loadComponent: () => import('./features/private/overview/overview').then(m => m.Overview) },
-			{ path: 'members',   loadComponent: () => import('./features/private/members/members').then(m => m.Members) },
+			{ path: 'members',           loadComponent: () => import('./features/private/members/members').then(m => m.Members) },
+			{ path: 'members/socio/:id', loadComponent: () => import('./features/private/members/members-detail/members-detail').then(m => m.MembersDetail) },
+			{ path: 'members/admin/:id', loadComponent: () => import('./features/private/members/members-detail/members-detail').then(m => m.MembersDetail) },
 			{ path: 'events',    loadComponent: () => import('./features/private/events/events').then(m => m.Events) },
 			{ path: 'messages',  loadComponent: () => import('./features/private/messagges/messagges').then(m => m.Messagges) },
 			{ path: 'news',      loadComponent: () => import('./features/private/news/news').then(m => m.News) },

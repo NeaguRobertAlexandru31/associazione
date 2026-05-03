@@ -24,15 +24,16 @@
       </div>
       <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3">
         @for (m of direttivo(); track m.id) {
-          <div class="bg-surface-container-lowest rounded-2xl p-4 shadow-sm flex items-center gap-3">
+          <div (click)="goToAdmin(m.id)"
+               class="bg-surface-container-lowest rounded-2xl p-4 shadow-sm flex items-center gap-3 cursor-pointer hover:bg-surface-container transition-colors">
             <div class="w-10 h-10 rounded-full bg-primary flex items-center justify-center flex-shrink-0">
               <span class="font-romania font-bold text-on-primary text-sm">{{ m.name[0] }}</span>
             </div>
-            <div class="min-w-0">
+            <div class="min-w-0 flex-1">
               <p class="font-inter font-semibold text-on-surface text-sm truncate">{{ m.name }}</p>
               <p class="font-inter text-on-surface-variant text-xs truncate">{{ m.email }}</p>
             </div>
-            <span class="ml-auto flex-shrink-0 font-inter text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded-full"
+            <span class="flex-shrink-0 font-inter text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full"
                   [class]="m.role === 'SUPERADMIN' ? 'bg-primary/10 text-primary' : 'bg-surface-container text-on-surface-variant'">
               {{ m.role === 'SUPERADMIN' ? 'Presidente' : 'Admin' }}
             </span>
@@ -48,20 +49,28 @@
         <h2 class="font-romania font-bold text-primary text-xl">Soci</h2>
         <span class="ml-auto font-inter text-xs text-on-surface-variant bg-surface-container px-2 py-1 rounded-full">{{ soci().length }}</span>
       </div>
+
       @if (soci().length === 0) {
         <p class="font-inter text-on-surface-variant text-sm italic">Nessun socio registrato.</p>
       } @else {
         <div class="bg-surface-container-lowest rounded-2xl shadow-sm overflow-hidden">
-          <div class="hidden lg:grid grid-cols-[1fr_1fr_auto_auto_auto] gap-4 px-5 py-3 border-b border-outline-variant/20">
-            <span class="font-inter font-semibold text-[10px] text-on-surface-variant uppercase tracking-widest">Nome</span>
-            <span class="font-inter font-semibold text-[10px] text-on-surface-variant uppercase tracking-widest">Email</span>
-            <span class="font-inter font-semibold text-[10px] text-on-surface-variant uppercase tracking-widest">Categoria</span>
-            <span class="font-inter font-semibold text-[10px] text-on-surface-variant uppercase tracking-widest">Anno</span>
-            <span class="font-inter font-semibold text-[10px] text-on-surface-variant uppercase tracking-widest">Stato</span>
+
+          <!-- Desktop header -->
+          <div class="hidden lg:flex items-center gap-4 px-5 py-3 border-b border-outline-variant/20">
+            <span class="font-inter font-semibold text-[10px] text-on-surface-variant uppercase tracking-widest w-48 flex-shrink-0">Nome</span>
+            <span class="font-inter font-semibold text-[10px] text-on-surface-variant uppercase tracking-widest flex-1 min-w-0">Email</span>
+            <span class="font-inter font-semibold text-[10px] text-on-surface-variant uppercase tracking-widest w-28 flex-shrink-0">Categoria</span>
+            <span class="font-inter font-semibold text-[10px] text-on-surface-variant uppercase tracking-widest w-12 flex-shrink-0">Anno</span>
+            <span class="font-inter font-semibold text-[10px] text-on-surface-variant uppercase tracking-widest w-24 flex-shrink-0">Stato</span>
+            <span class="w-4 flex-shrink-0"></span>
           </div>
+
           @for (s of soci(); track s.id) {
-            <div class="grid grid-cols-[1fr_auto] lg:grid-cols-[1fr_1fr_auto_auto_auto] gap-4 items-center px-5 py-3.5 border-b border-outline-variant/10 last:border-0 hover:bg-surface-container/50 transition-colors">
-              <div class="flex items-center gap-3 min-w-0">
+            <div (click)="goToSocio(s.id)"
+                 class="flex items-center gap-4 px-5 py-3.5 border-b border-outline-variant/10 last:border-0 hover:bg-surface-container/50 transition-colors cursor-pointer">
+
+              <!-- Avatar + nome -->
+              <div class="flex items-center gap-3 w-48 flex-shrink-0 min-w-0">
                 <div class="w-8 h-8 rounded-full bg-surface-container flex items-center justify-center flex-shrink-0">
                   <span class="font-romania font-bold text-on-surface-variant text-xs">{{ s.firstName[0] }}</span>
                 </div>
@@ -70,17 +79,25 @@
                   <p class="lg:hidden font-inter text-on-surface-variant text-xs truncate">{{ s.email }}</p>
                 </div>
               </div>
-              <span class="hidden lg:block font-inter text-on-surface-variant text-sm truncate">{{ s.email }}</span>
-              <span class="hidden lg:inline-flex font-inter text-[11px] font-semibold px-2.5 py-1 rounded-full capitalize"
+
+              <!-- Email (desktop only) -->
+              <span class="hidden lg:block font-inter text-on-surface-variant text-sm flex-1 min-w-0 truncate">{{ s.email }}</span>
+
+              <!-- Categoria badge (desktop only) -->
+              <span class="hidden lg:inline-flex items-center font-inter text-[11px] font-semibold px-2.5 py-1 rounded-full w-28 flex-shrink-0 justify-center"
                     [class]="{
-                      'bg-primary/10 text-primary':                        s.category === 'sostenitore',
-                      'bg-blue-50 text-blue-700':                          s.category === 'under26',
-                      'bg-surface-container text-on-surface-variant':      s.category === 'ordinario'
+                      'bg-primary/10 text-primary':                   s.category === 'sostenitore',
+                      'bg-blue-100 text-blue-700':                    s.category === 'under26',
+                      'bg-surface-container text-on-surface-variant': s.category === 'ordinario'
                     }">
-                {{ s.category }}
+                {{ s.category === 'under26' ? 'Under 26' : s.category === 'sostenitore' ? 'Sostenitore' : 'Ordinario' }}
               </span>
-              <span class="hidden lg:block font-inter text-on-surface-variant text-sm">{{ s.membershipYear }}</span>
-              <span class="inline-flex items-center gap-1 font-inter text-[11px] font-semibold px-2.5 py-1 rounded-full"
+
+              <!-- Anno (desktop only) -->
+              <span class="hidden lg:block font-inter text-on-surface-variant text-sm w-12 flex-shrink-0">{{ s.membershipYear }}</span>
+
+              <!-- Stato badge -->
+              <span class="inline-flex items-center gap-1.5 font-inter text-[11px] font-semibold px-2.5 py-1 rounded-full ml-auto lg:ml-0 w-24 flex-shrink-0 justify-center"
                     [class]="{
                       'bg-green-100 text-green-700':   s.status === 'attivo',
                       'bg-yellow-100 text-yellow-700': s.status === 'in_attesa_pagamento',
@@ -95,9 +112,12 @@
                         'bg-red-500':    s.status === 'rifiutato'
                       }"></span>
                 {{ s.status === 'in_attesa_pagamento' ? 'In attesa' :
-                   s.status === 'pagamento_in_corso'  ? 'Pagamento' :
-                   s.status === 'attivo'              ? 'Attivo'    : 'Rifiutato' }}
+                   s.status === 'pagamento_in_corso'  ? 'Pag.' :
+                   s.status === 'attivo'              ? 'Attivo' : 'Rifiutato' }}
               </span>
+
+              <!-- Chevron -->
+              <span class="material-symbols-outlined text-on-surface-variant/40 text-base w-4 flex-shrink-0">chevron_right</span>
             </div>
           }
         </div>

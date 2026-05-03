@@ -53,6 +53,20 @@ export class AuthService {
     return this.http.post<InviteResponse>(`${API_URL}/auth/invite`, {});
   }
 
+  getProfile(): Observable<AuthUser> {
+    return this.http.get<AuthUser>(`${API_URL}/auth/me`);
+  }
+
+  updateProfile(dto: { name?: string; email?: string; password?: string; currentPassword?: string }): Observable<LoginResponse> {
+    return this.http.patch<LoginResponse>(`${API_URL}/auth/me`, dto).pipe(
+      tap(res => this.persist(res)),
+    );
+  }
+
+  deleteProfile(currentPassword: string): Observable<void> {
+    return this.http.delete<void>(`${API_URL}/auth/me`, { body: { currentPassword } });
+  }
+
   logout(): void {
     localStorage.removeItem(TOKEN_KEY);
     localStorage.removeItem(USER_KEY);
