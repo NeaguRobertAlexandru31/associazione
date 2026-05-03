@@ -40,4 +40,12 @@ export class ContactService {
   markRead(id: string): Observable<ContactMessage> {
     return this.http.patch<ContactMessage>(`${this.base}/${id}/read`, {});
   }
+
+  deleteMany(ids: string[]): Observable<void> {
+    return this.http.delete<void>(this.base, { body: { ids } });
+  }
+
+  reply(id: string, message: string): Observable<void> {
+    return this.http.post<void>(`${this.base}/${id}/reply`, { message });
+  }
 }

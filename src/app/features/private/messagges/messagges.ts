@@ -14,4 +14,8 @@ export class Messagges {
   onMessageRead(): void {
     this.unreadCount.decrement();
   }
+
+  onMessagesDeleted(): void {
+    this.unreadCount.load();
+  }
 }

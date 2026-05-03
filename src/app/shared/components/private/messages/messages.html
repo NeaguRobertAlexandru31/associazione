@@ -22,90 +22,128 @@
       <p class="font-inter text-on-surface-variant text-sm">Nessun messaggio ricevuto.</p>
     </div>
   } @else {
-    <div class="grid lg:grid-cols-[1fr_400px] gap-6 items-start">
+    <div class="bg-surface-container-lowest rounded-2xl shadow-sm overflow-hidden">
+      @for (msg of messages(); track msg.id) {
+        <button (click)="open(msg)"
+                class="w-full text-left px-5 py-4 border-b border-outline-variant/10 last:border-0 transition-colors flex items-center gap-3 hover:bg-surface-container/60">
 
-      <!-- Lista -->
-      <div class="bg-surface-container-lowest rounded-2xl shadow-sm overflow-hidden">
-        @for (msg of messages(); track msg.id) {
-          <button (click)="open(msg)"
-                  class="w-full text-left px-5 py-4 border-b border-outline-variant/10 last:border-0 transition-colors flex items-start gap-4"
-                  [class]="selected()?.id === msg.id ? 'bg-primary/5' : 'hover:bg-surface-container/60'">
+          <!-- Checkbox -->
+          <div (click)="toggleCheck(msg.id, $event)" class="flex-shrink-0 flex items-center justify-center w-5 h-5">
+            <input type="checkbox"
+                   [checked]="isChecked(msg.id)"
+                   (click)="$event.stopPropagation()"
+                   (change)="toggleCheck(msg.id, $event)"
+                   class="w-4 h-4 rounded accent-primary cursor-pointer" />
+          </div>
 
-            <!-- Avatar -->
-            <div class="w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0 font-romania font-bold text-sm"
-                 [class]="msg.read ? 'bg-surface-container text-on-surface-variant' : 'bg-primary text-on-primary'">
-              {{ msg.name[0].toUpperCase() }}
+          <!-- Avatar -->
+          <div class="w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0 font-romania font-bold text-sm"
+               [class]="msg.read ? 'bg-surface-container text-on-surface-variant' : 'bg-primary text-on-primary'">
+            {{ msg.name[0].toUpperCase() }}
+          </div>
+
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center justify-between gap-2">
+              <span class="font-inter text-sm truncate"
+                    [class]="msg.read ? 'font-normal text-on-surface-variant' : 'font-bold text-on-surface'">
+                {{ msg.name }}
+              </span>
+              <span class="font-inter text-[10px] text-on-surface-variant flex-shrink-0">
+                {{ formatDate(msg.createdAt) }}
+              </span>
             </div>
-
-            <div class="flex-1 min-w-0">
-              <div class="flex items-center justify-between gap-2">
-                <span class="font-inter text-sm truncate"
-                      [class]="msg.read ? 'font-normal text-on-surface-variant' : 'font-bold text-on-surface'">
-                  {{ msg.name }}
-                </span>
-                <span class="font-inter text-[10px] text-on-surface-variant flex-shrink-0">
-                  {{ formatDate(msg.createdAt) }}
-                </span>
-              </div>
-              @if (msg.subject) {
-                <p class="font-inter text-xs truncate mt-0.5"
-                   [class]="msg.read ? 'text-on-surface-variant' : 'text-on-surface font-semibold'">
-                  {{ msg.subject }}
-                </p>
-              }
-              <p class="font-inter text-xs text-on-surface-variant/70 truncate mt-0.5">{{ msg.message }}</p>
-            </div>
-
-            @if (!msg.read) {
-              <span class="w-2 h-2 rounded-full bg-secondary flex-shrink-0 mt-1.5"></span>
+            @if (msg.subject) {
+              <p class="font-inter text-xs truncate mt-0.5"
+                 [class]="msg.read ? 'text-on-surface-variant' : 'text-on-surface font-semibold'">
+                {{ msg.subject }}
+              </p>
             }
-          </button>
-        }
-      </div>
-
-      <!-- Dettaglio -->
-      @if (selected(); as msg) {
-        <div class="bg-surface-container-lowest rounded-2xl shadow-sm p-6 sticky top-6">
-          <div class="flex items-start justify-between mb-5">
-            <div class="flex items-center gap-3">
-              <div class="w-10 h-10 rounded-full bg-primary flex items-center justify-center font-romania font-bold text-on-primary">
-                {{ msg.name[0].toUpperCase() }}
-              </div>
-              <div>
-                <p class="font-inter font-semibold text-on-surface text-sm">{{ msg.name }}</p>
-                <a [href]="'mailto:' + msg.email"
-                   class="font-inter text-xs text-primary hover:underline">{{ msg.email }}</a>
-              </div>
-            </div>
-            <button (click)="close()"
-                    class="w-7 h-7 rounded-lg flex items-center justify-center hover:bg-surface-container transition-colors">
-              <span class="material-symbols-outlined text-on-surface-variant text-lg">close</span>
-            </button>
+            <p class="font-inter text-xs text-on-surface-variant/70 truncate mt-0.5">{{ msg.message }}</p>
           </div>
 
-          @if (msg.subject) {
-            <p class="font-inter font-bold text-on-surface text-base mb-3">{{ msg.subject }}</p>
+          @if (!msg.read) {
+            <span class="w-2 h-2 rounded-full bg-secondary flex-shrink-0"></span>
           }
-
-          <p class="font-inter text-xs text-on-surface-variant mb-4">{{ formatDate(msg.createdAt) }}</p>
-
-          <div class="bg-surface-container rounded-xl p-4">
-            <p class="font-inter text-sm text-on-surface leading-relaxed whitespace-pre-wrap">{{ msg.message }}</p>
-          </div>
-
-          <a [href]="'mailto:' + msg.email + '?subject=Re: ' + (msg.subject ?? '')"
-             class="mt-4 flex items-center justify-center gap-2 w-full py-2.5 rounded-xl bg-primary text-on-primary font-inter font-bold text-sm hover:opacity-90 transition-all">
-            <span class="material-symbols-outlined text-base" style="font-variation-settings:'FILL' 1">reply</span>
-            Rispondi
-          </a>
-        </div>
-      } @else {
-        <div class="hidden lg:flex flex-col items-center justify-center gap-3 py-20 text-center bg-surface-container-lowest rounded-2xl shadow-sm">
-          <span class="material-symbols-outlined text-on-surface-variant/30 text-5xl">mark_email_read</span>
-          <p class="font-inter text-on-surface-variant text-sm">Seleziona un messaggio per leggerlo.</p>
-        </div>
+        </button>
       }
-
     </div>
   }
 </div>
+
+<!-- Modal -->
+@if (selected(); as msg) {
+  <div class="fixed inset-0 z-40 flex items-center justify-center p-4">
+
+    <!-- Backdrop -->
+    <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" (click)="close()"></div>
+
+    <!-- Card -->
+    <div class="relative z-10 w-full max-w-lg bg-surface rounded-2xl shadow-2xl flex flex-col max-h-[90vh]">
+
+      <!-- Header -->
+      <div class="flex items-start justify-between p-6 border-b border-outline-variant/20">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-full bg-primary flex items-center justify-center font-romania font-bold text-on-primary flex-shrink-0">
+            {{ msg.name[0].toUpperCase() }}
+          </div>
+          <div>
+            <p class="font-inter font-semibold text-on-surface text-sm">{{ msg.name }}</p>
+            <a [href]="'mailto:' + msg.email" class="font-inter text-xs text-primary hover:underline">{{ msg.email }}</a>
+          </div>
+        </div>
+        <button (click)="close()" class="w-7 h-7 rounded-lg flex items-center justify-center hover:bg-surface-container transition-colors">
+          <span class="material-symbols-outlined text-on-surface-variant text-lg">close</span>
+        </button>
+      </div>
+
+      <!-- Body -->
+      <div class="flex-1 overflow-y-auto p-6">
+        @if (msg.subject) {
+          <p class="font-inter font-bold text-on-surface text-base mb-1">{{ msg.subject }}</p>
+        }
+        <p class="font-inter text-xs text-on-surface-variant mb-4">{{ formatDate(msg.createdAt) }}</p>
+        <div class="bg-surface-container rounded-xl p-4 mb-6">
+          <p class="font-inter text-sm text-on-surface leading-relaxed whitespace-pre-wrap">{{ msg.message }}</p>
+        </div>
+
+        <!-- Reply -->
+        <div class="border-t border-outline-variant/20 pt-5">
+          <p class="font-inter font-semibold text-on-surface text-sm mb-3">Rispondi</p>
+
+          @if (replySent()) {
+            <div class="flex items-center gap-2 p-3 bg-primary/8 rounded-xl">
+              <span class="material-symbols-outlined text-primary text-base" style="font-variation-settings:'FILL' 1">check_circle</span>
+              <p class="font-inter text-sm text-primary font-semibold">Risposta inviata con successo.</p>
+            </div>
+          } @else {
+            <textarea
+              [(ngModel)]="replyText"
+              placeholder="Scrivi la tua risposta..."
+              rows="4"
+              class="w-full bg-surface-container rounded-xl px-4 py-3 font-inter text-sm text-on-surface placeholder:text-on-surface-variant/50 resize-none outline-none focus:ring-2 focus:ring-primary/30 transition-all">
+            </textarea>
+
+            @if (replyError()) {
+              <p class="font-inter text-xs text-error mt-1.5">Errore durante l'invio. Riprova.</p>
+            }
+
+            <button
+              (click)="sendReply()"
+              [disabled]="replySending() || !replyText.trim()"
+              class="mt-3 flex items-center justify-center gap-2 w-full py-2.5 rounded-xl bg-primary text-on-primary font-inter font-bold text-sm hover:opacity-90 transition-all disabled:opacity-50 disabled:cursor-not-allowed">
+              @if (replySending()) {
+                <span class="material-symbols-outlined text-base spin">progress_activity</span>
+              } @else {
+                <span class="material-symbols-outlined text-base" style="font-variation-settings:'FILL' 1">send</span>
+              }
+              {{ replySending() ? 'Invio in corso...' : 'Invia risposta' }}
+            </button>
+          }
+        </div>
+      </div>
+
+    </div>
+  </div>
+}
+
+<app-toolbar [active]="checkedCount() > 0" [count]="checkedCount()" (delete)="onDelete()" />
