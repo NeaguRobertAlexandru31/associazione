@@ -1,0 +1,38 @@
+<div class="dash-content">
+  <div class="mb-8">
+    <h1 class="font-romania font-extrabold text-primary text-3xl mb-1">Panoramica</h1>
+    <p class="font-inter text-on-surface-variant text-sm">Benvenuto nel pannello di controllo.</p>
+  </div>
+
+  <!-- Stats -->
+  <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 mb-8">
+    @for (s of stats(); track s.label) {
+      <app-metric-card
+        [icon]="s.icon"
+        [label]="s.label"
+        [value]="s.value"
+        [delta]="s.delta"
+        [positive]="s.positive"
+        [loading]="s.loading" />
+    }
+  </div>
+
+  <!-- Activity + Quick actions -->
+  <div class="grid md:grid-cols-[1fr_300px] gap-6">
+
+    <app-recents [limit]="5" />
+
+    <div class="bg-surface-container-lowest rounded-2xl shadow-sm p-6 flex flex-col gap-3">
+      <h2 class="font-romania font-bold text-primary text-lg mb-2">Azioni Rapide</h2>
+      @for (link of quickLinks; track link.route) {
+        <a [routerLink]="link.route"
+          class="flex items-center gap-3 px-4 py-3 rounded-xl bg-surface-container hover:bg-surface-container-high transition-colors w-full">
+          <span class="material-symbols-outlined text-primary text-lg" style="font-variation-settings:'FILL' 1">{{ link.icon }}</span>
+          <span class="font-inter font-semibold text-on-surface text-sm">{{ link.label }}</span>
+          <span class="material-symbols-outlined text-on-surface-variant text-base ml-auto">chevron_right</span>
+        </a>
+      }
+    </div>
+
+  </div>
+</div>

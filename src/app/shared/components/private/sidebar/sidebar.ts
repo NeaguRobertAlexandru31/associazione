@@ -1,8 +1,8 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { RouterLink, RouterLinkActive } from '@angular/router';
 
 export interface SidebarItem {
-  id: string;
+  route: string;
   icon: string;
   label: string;
   badge?: number;
@@ -15,14 +15,13 @@ export interface SidebarUser {
 
 @Component({
   selector: 'app-sidebar',
-  imports: [RouterLink],
+  imports: [RouterLink, RouterLinkActive],
   templateUrl: './sidebar.html',
   styleUrl: './sidebar.css',
 })
 export class Sidebar {
   @Input() items: SidebarItem[] = [];
-  @Input() activeId = '';
   @Input() user: SidebarUser | null = null;
-  @Output() tabChange = new EventEmitter<string>();
   @Output() logoutClick = new EventEmitter<void>();
+  @Output() itemClick   = new EventEmitter<void>();
 }

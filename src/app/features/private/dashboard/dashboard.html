@@ -4,18 +4,14 @@
   <div class="hidden md:block sticky top-0 h-screen flex-shrink-0">
     <app-sidebar
       [items]="navItems()"
-      [activeId]="activeTab()"
       [user]="user()"
-      (tabChange)="setTab($event)"
       (logoutClick)="logout()" />
   </div>
 
-  <!-- Main -->
   <div class="flex-1 flex flex-col min-w-0">
 
     <!-- Mobile top bar -->
     <app-private-navbar
-      [title]="activeLabel"
       (menuClick)="sidebarOpen.set(true)"
       (logoutClick)="logout()" />
 
@@ -25,252 +21,18 @@
         <div class="sidebar-animate h-full">
           <app-sidebar
             [items]="navItems()"
-            [activeId]="activeTab()"
             [user]="user()"
-            (tabChange)="setTab($event)"
-            (logoutClick)="logout()" />
+            (logoutClick)="logout()"
+            (itemClick)="sidebarOpen.set(false)" />
         </div>
         <div class="flex-1 bg-black/40 backdrop-blur-sm" (click)="sidebarOpen.set(false)"></div>
       </div>
     }
 
-    <!-- Page content -->
+    <!-- Routed content -->
     <main class="flex-1 p-6 md:p-8">
-
-      @if (activeTab() === 'overview') {
-        <div class="dash-content">
-          <div class="mb-8">
-            <h1 class="font-romania font-extrabold text-primary text-3xl mb-1">Panoramica</h1>
-            <p class="font-inter text-on-surface-variant text-sm">Benvenuto, {{ user()?.name }}.</p>
-          </div>
-
-          <!-- Stats -->
-          <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 mb-8">
-            @for (s of stats(); track s.label) {
-              <app-metric-card
-                [icon]="s.icon"
-                [label]="s.label"
-                [value]="s.value"
-                [delta]="s.delta"
-                [positive]="s.positive"
-                [loading]="s.loading" />
-            }
-          </div>
-
-          <!-- Activity + Quick actions -->
-          <div class="grid md:grid-cols-[1fr_300px] gap-6">
-
-            <app-recents />
-
-            <div class="bg-surface-container-lowest rounded-2xl shadow-sm p-6 flex flex-col gap-3">
-              <h2 class="font-romania font-bold text-primary text-lg mb-2">Azioni Rapide</h2>
-              @for (item of navItems().slice(1); track item.id) {
-                <button (click)="setTab(item.id)"
-                  class="flex items-center gap-3 px-4 py-3 rounded-xl bg-surface-container hover:bg-surface-container-high transition-colors text-left w-full">
-                  <span class="material-symbols-outlined text-primary text-lg" style="font-variation-settings:'FILL' 1">{{ item.icon }}</span>
-                  <span class="font-inter font-semibold text-on-surface text-sm">{{ item.label }}</span>
-                  <span class="material-symbols-outlined text-on-surface-variant text-base ml-auto">chevron_right</span>
-                </button>
-              }
-            </div>
-
-          </div>
-        </div>
-      }
-
-      @if (activeTab() === 'members') {
-        <div class="dash-content">
-          <div class="mb-8">
-            <h1 class="font-romania font-extrabold text-primary text-3xl mb-1">Soci</h1>
-            <p class="font-inter text-on-surface-variant text-sm">Direttivo e soci dell'associazione.</p>
-          </div>
-
-          @if (membersLoading()) {
-            <div class="flex items-center justify-center min-h-[40vh]">
-              <span class="material-symbols-outlined text-primary text-4xl spin">progress_activity</span>
-            </div>
-          } @else if (membersError()) {
-            <div class="flex flex-col items-center justify-center min-h-[40vh] gap-3">
-              <span class="material-symbols-outlined text-secondary text-4xl">error</span>
-              <p class="font-inter text-on-surface-variant text-sm">Errore nel caricamento.</p>
-              <button (click)="setTab('members')" class="font-inter text-xs text-primary underline">Riprova</button>
-            </div>
-          } @else {
-
-            <!-- Direttivo -->
-            <section class="mb-8">
-              <div class="flex items-center gap-2 mb-4">
-                <span class="material-symbols-outlined text-primary text-lg" style="font-variation-settings:'FILL' 1">shield_person</span>
-                <h2 class="font-romania font-bold text-primary text-xl">Direttivo</h2>
-                <span class="ml-auto font-inter text-xs text-on-surface-variant bg-surface-container px-2 py-1 rounded-full">{{ direttivo().length }}</span>
-              </div>
-              <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3">
-                @for (m of direttivo(); track m.id) {
-                  <div class="bg-surface-container-lowest rounded-2xl p-4 shadow-sm flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-full bg-primary flex items-center justify-center flex-shrink-0">
-                      <span class="font-romania font-bold text-on-primary text-sm">{{ m.name[0] }}</span>
-                    </div>
-                    <div class="min-w-0">
-                      <p class="font-inter font-semibold text-on-surface text-sm truncate">{{ m.name }}</p>
-                      <p class="font-inter text-on-surface-variant text-xs truncate">{{ m.email }}</p>
-                    </div>
-                    <span class="ml-auto flex-shrink-0 font-inter text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded-full"
-                          [class]="m.role === 'SUPERADMIN' ? 'bg-primary/10 text-primary' : 'bg-surface-container text-on-surface-variant'">
-                      {{ m.role === 'SUPERADMIN' ? 'Presidente' : 'Admin' }}
-                    </span>
-                  </div>
-                }
-              </div>
-            </section>
-
-            <!-- Soci -->
-            <section>
-              <div class="flex items-center gap-2 mb-4">
-                <span class="material-symbols-outlined text-primary text-lg" style="font-variation-settings:'FILL' 1">group</span>
-                <h2 class="font-romania font-bold text-primary text-xl">Soci</h2>
-                <span class="ml-auto font-inter text-xs text-on-surface-variant bg-surface-container px-2 py-1 rounded-full">{{ soci().length }}</span>
-              </div>
-              @if (soci().length === 0) {
-                <p class="font-inter text-on-surface-variant text-sm italic">Nessun socio registrato.</p>
-              } @else {
-                <div class="bg-surface-container-lowest rounded-2xl shadow-sm overflow-hidden">
-                  <div class="hidden lg:grid grid-cols-[1fr_1fr_auto_auto_auto] gap-4 px-5 py-3 border-b border-outline-variant/20">
-                    <span class="font-inter font-semibold text-[10px] text-on-surface-variant uppercase tracking-widest">Nome</span>
-                    <span class="font-inter font-semibold text-[10px] text-on-surface-variant uppercase tracking-widest">Email</span>
-                    <span class="font-inter font-semibold text-[10px] text-on-surface-variant uppercase tracking-widest">Categoria</span>
-                    <span class="font-inter font-semibold text-[10px] text-on-surface-variant uppercase tracking-widest">Anno</span>
-                    <span class="font-inter font-semibold text-[10px] text-on-surface-variant uppercase tracking-widest">Stato</span>
-                  </div>
-                  @for (s of soci(); track s.id) {
-                    <div class="grid grid-cols-[1fr_auto] lg:grid-cols-[1fr_1fr_auto_auto_auto] gap-4 items-center px-5 py-3.5 border-b border-outline-variant/10 last:border-0 hover:bg-surface-container/50 transition-colors">
-
-                      <!-- Nome -->
-                      <div class="flex items-center gap-3 min-w-0">
-                        <div class="w-8 h-8 rounded-full bg-surface-container flex items-center justify-center flex-shrink-0">
-                          <span class="font-romania font-bold text-on-surface-variant text-xs">{{ s.firstName[0] }}</span>
-                        </div>
-                        <div class="min-w-0">
-                          <p class="font-inter text-on-surface text-sm truncate">{{ s.firstName }} {{ s.lastName }}</p>
-                          <p class="lg:hidden font-inter text-on-surface-variant text-xs truncate">{{ s.email }}</p>
-                        </div>
-                      </div>
-
-                      <!-- Email (desktop) -->
-                      <span class="hidden lg:block font-inter text-on-surface-variant text-sm truncate">{{ s.email }}</span>
-
-                      <!-- Categoria -->
-                      <span class="hidden lg:inline-flex font-inter text-[11px] font-semibold px-2.5 py-1 rounded-full capitalize"
-                            [class]="{
-                              'bg-primary/10 text-primary':            s.category === 'sostenitore',
-                              'bg-blue-50 text-blue-700':              s.category === 'under26',
-                              'bg-surface-container text-on-surface-variant': s.category === 'ordinario'
-                            }">
-                        {{ s.category }}
-                      </span>
-
-                      <!-- Anno -->
-                      <span class="hidden lg:block font-inter text-on-surface-variant text-sm">{{ s.membershipYear }}</span>
-
-                      <!-- Stato -->
-                      <span class="inline-flex items-center gap-1 font-inter text-[11px] font-semibold px-2.5 py-1 rounded-full"
-                            [class]="{
-                              'bg-green-100 text-green-700':   s.status === 'attivo',
-                              'bg-yellow-100 text-yellow-700': s.status === 'in_attesa_pagamento',
-                              'bg-blue-100 text-blue-700':     s.status === 'pagamento_in_corso',
-                              'bg-red-100 text-red-700':       s.status === 'rifiutato'
-                            }">
-                        <span class="w-1.5 h-1.5 rounded-full flex-shrink-0"
-                              [class]="{
-                                'bg-green-500':  s.status === 'attivo',
-                                'bg-yellow-500': s.status === 'in_attesa_pagamento',
-                                'bg-blue-500':   s.status === 'pagamento_in_corso',
-                                'bg-red-500':    s.status === 'rifiutato'
-                              }"></span>
-                        {{ s.status === 'in_attesa_pagamento' ? 'In attesa' :
-                           s.status === 'pagamento_in_corso'  ? 'Pagamento' :
-                           s.status === 'attivo'              ? 'Attivo'    : 'Rifiutato' }}
-                      </span>
-
-                    </div>
-                  }
-                </div>
-              }
-            </section>
-
-          }
-        </div>
-      }
-
-      @if (activeTab() === 'settings') {
-        <div class="dash-content max-w-lg">
-          <div class="mb-8">
-            <h1 class="font-romania font-extrabold text-primary text-3xl mb-1">Impostazioni</h1>
-            <p class="font-inter text-on-surface-variant text-sm">Gestione accessi e configurazione.</p>
-          </div>
-
-          @if (isSuperAdmin()) {
-            <div class="bg-surface-container-lowest rounded-2xl shadow-sm p-6">
-              <div class="flex items-center gap-3 mb-4">
-                <div class="w-10 h-10 rounded-xl bg-primary/8 flex items-center justify-center flex-shrink-0">
-                  <span class="material-symbols-outlined text-primary text-xl" style="font-variation-settings:'FILL' 1">person_add</span>
-                </div>
-                <div>
-                  <h2 class="font-romania font-bold text-on-surface text-base">Invita un Admin</h2>
-                  <p class="font-inter text-on-surface-variant text-xs mt-0.5">Genera un link monouso valido 7 giorni.</p>
-                </div>
-              </div>
-
-              <button (click)="generateInvite()" [disabled]="inviteLoading()"
-                      class="w-full py-3 bg-primary text-on-primary font-inter font-bold text-sm rounded-xl hover:opacity-90 transition-all uppercase tracking-wide flex items-center justify-center gap-2 disabled:opacity-60">
-                @if (inviteLoading()) {
-                  <span class="material-symbols-outlined text-base spin">progress_activity</span>
-                  Generazione in corso…
-                } @else {
-                  <span class="material-symbols-outlined text-base" style="font-variation-settings:'FILL' 1">link</span>
-                  Genera link di invito
-                }
-              </button>
-
-              @if (inviteLink()) {
-                <div class="mt-4 p-3 rounded-xl bg-surface-container border border-outline-variant/30 flex items-center gap-2">
-                  <span class="font-inter text-xs text-on-surface-variant truncate flex-1 select-all">{{ inviteLink() }}</span>
-                  <button (click)="copyLink()"
-                          class="flex-shrink-0 flex items-center gap-1 px-3 py-1.5 rounded-lg font-inter font-semibold text-xs transition-colors"
-                          [class]="copied() ? 'bg-green-100 text-green-700' : 'bg-primary/10 text-primary hover:bg-primary/20'">
-                    <span class="material-symbols-outlined text-sm" style="font-variation-settings:'FILL' 1">
-                      {{ copied() ? 'check' : 'content_copy' }}
-                    </span>
-                    {{ copied() ? 'Copiato!' : 'Copia' }}
-                  </button>
-                </div>
-              }
-            </div>
-          }
-        </div>
-      }
-
-      @if (activeTab() === 'events') {
-        <app-event-calendar />
-      }
-
-      @if (activeTab() === 'messages') {
-        <app-messages (messageRead)="onMessagesRead(1)" />
-      }
-
-      @if (activeTab() !== 'overview' && activeTab() !== 'settings' && activeTab() !== 'members' && activeTab() !== 'events' && activeTab() !== 'messages') {
-        <div class="dash-content flex flex-col items-center justify-center min-h-[60vh] text-center">
-          @for (item of navItems(); track item.id) {
-            @if (activeTab() === item.id) {
-              <div class="w-20 h-20 rounded-3xl bg-primary flex items-center justify-center mb-6">
-                <span class="material-symbols-outlined text-on-primary text-4xl" style="font-variation-settings:'FILL' 1">{{ item.icon }}</span>
-              </div>
-              <h2 class="font-romania font-extrabold text-primary text-3xl mb-3">{{ item.label }}</h2>
-              <p class="font-inter text-on-surface-variant text-sm max-w-sm leading-relaxed">Questa sezione è in sviluppo. Sarà presto disponibile.</p>
-            }
-          }
-        </div>
-      }
-
+      <router-outlet />
     </main>
+
   </div>
 </div>

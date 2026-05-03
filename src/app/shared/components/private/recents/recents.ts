@@ -1,4 +1,5 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, input, computed, signal } from '@angular/core';
+import { RouterLink } from '@angular/router';
 import { ActivityService } from '../../../../core/services/activity/activity';
 
 export interface ActivityItem {
@@ -10,16 +11,28 @@ export interface ActivityItem {
 
 @Component({
   selector: 'app-recents',
-  imports: [],
+  imports: [RouterLink],
   templateUrl: './recents.html',
   styleUrl: './recents.css',
 })
 export class Recents {
   private activityService = inject(ActivityService);
 
-  items   = signal<ActivityItem[]>([]);
-  loading = signal(false);
-  error   = signal(false);
+  limit = input<number | null>(null);
+
+  allItems = signal<ActivityItem[]>([]);
+  loading  = signal(false);
+  error    = signal(false);
+
+  readonly items = computed(() => {
+    const lim = this.limit();
+    return lim !== null ? this.allItems().slice(0, lim) : this.allItems();
+  });
+
+  readonly hasMore = computed(() => {
+    const lim = this.limit();
+    return lim !== null && this.allItems().length > lim;
+  });
 
   constructor() {
     this.load();
@@ -30,7 +43,7 @@ export class Recents {
     this.error.set(false);
     this.activityService.getRecent().subscribe({
       next: items => {
-        this.items.set(items);
+        this.allItems.set(items);
         this.loading.set(false);
       },
       error: () => {
