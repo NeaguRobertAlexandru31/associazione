@@ -1,7 +1,8 @@
-import { Component, HostListener, inject, signal } from '@angular/core';
+import { Component, HostListener, OnInit, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { TranslatePipe } from '../../../i18n/translate.pipe';
+import { SiteSettingsService } from '../../../core/services/site-settings/site-settings';
 
 export interface Plan {
   nameKey: string;
@@ -17,9 +18,12 @@ export interface Plan {
   templateUrl: './membership.html',
   styleUrl: './membership.css',
 })
-export class Membership {
-  private router = inject(Router);
+export class Membership implements OnInit {
+  private router        = inject(Router);
+  readonly siteSettings = inject(SiteSettingsService);
   parallaxOffset = 0;
+
+  ngOnInit(): void { this.siteSettings.load(); }
 
   // ── Piani ────────────────────────────────────────────────────────────
   readonly plans: Plan[] = [

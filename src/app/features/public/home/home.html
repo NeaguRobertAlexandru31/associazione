@@ -3,7 +3,7 @@
 
   <!-- Mobile hero background -->
   <div class="absolute inset-0 md:hidden z-0">
-    <img src="/img/hero.jpg" class="w-full h-full object-cover" alt="" aria-hidden="true" />
+    <img [src]="siteSettings.img('img_home_hero')" class="w-full h-full object-cover" alt="" aria-hidden="true" />
     <div class="absolute inset-0 bg-gradient-to-b from-surface/20 via-surface/60 to-surface"></div>
   </div>
 
@@ -38,7 +38,7 @@
 
     <div class="relative hidden md:block">
       <div class="animate-fade-in hero-image aspect-[4/5] rounded-[2rem] overflow-hidden shadow-2xl relative bg-surface-container">
-        <img src="/img/hero.jpg"
+        <img [src]="siteSettings.img('img_home_hero')"
              alt="Ricamo tradizionale rumeno"
              class="parallax-img w-full h-full object-cover scale-110"
              [style.transform]="'translateY(' + parallaxOffset + 'px) scale(1.1)'" />

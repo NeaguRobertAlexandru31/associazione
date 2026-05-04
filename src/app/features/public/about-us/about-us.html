@@ -2,7 +2,7 @@
 <section class="relative flex items-center overflow-hidden bg-surface" style="min-height: calc(100svh - var(--navbar-height)); scroll-snap-align: start">
   <!-- Mobile hero background -->
   <div class="absolute inset-0 md:hidden z-0">
-    <img src="/img/about-hero.jpg" class="w-full h-full object-cover" alt="" aria-hidden="true" />
+    <img [src]="siteSettings.img('img_about_hero')" class="w-full h-full object-cover" alt="" aria-hidden="true" />
     <div class="absolute inset-0 bg-gradient-to-b from-surface/20 via-surface/60 to-surface"></div>
   </div>
 
@@ -24,7 +24,7 @@
     </div>
     <div class="animate-fade-in hero-image relative hidden md:flex justify-center">
       <div class="relative rounded-3xl overflow-hidden shadow-2xl w-full max-w-lg aspect-[3/4] bg-surface-container">
-        <img src="/img/about-hero.jpg" alt="Ie românească brodată"
+        <img [src]="siteSettings.img('img_about_hero')" alt="Ie românească brodată"
              class="parallax-img w-full h-full object-cover scale-110"
              [style.transform]="'translateY(' + parallaxOffset + 'px) scale(1.1)'" />
         <div class="absolute bottom-0 left-0 right-0 px-6 py-5 bg-gradient-to-t from-primary/80 to-transparent">
@@ -138,7 +138,7 @@
     <div class="overflow-hidden">
       <div class="flex gap-6 transition-transform duration-500"
            [style.transform]="'translateX(calc(-' + boardOffset() + ' * (100% / 4 + 1.5rem)))'">
-        @for (m of members; track m.nameKey) {
+        @for (m of members(); track m.nameKey) {
           <div class="flex-none w-full md:w-[calc(25%-1.5rem*3/4)]" style="min-width: calc(25% - 1.125rem)">
             <div class="aspect-[3/4] rounded-2xl overflow-hidden bg-surface-container mb-4 grayscale">
               <img [src]="m.img" [alt]="m.nameKey | translate"

@@ -2,8 +2,9 @@ import { Component, OnInit, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../../core/services/auth/auth';
 import { LucideAngularModule } from 'lucide-angular';
+import { SiteSettingsService, SITE_IMAGE_KEYS } from '../../../core/services/site-settings/site-settings';
 
-type SettingsView = 'profile' | 'edit' | 'delete';
+type SettingsView = 'profile' | 'edit' | 'delete' | 'images';
 
 @Component({
   selector: 'app-settings',
@@ -12,7 +13,10 @@ type SettingsView = 'profile' | 'edit' | 'delete';
   styleUrl: './settings.css',
 })
 export class Settings implements OnInit {
-  private auth = inject(AuthService);
+  private auth          = inject(AuthService);
+  readonly siteSettings = inject(SiteSettingsService);
+  readonly imageKeys    = SITE_IMAGE_KEYS;
+  uploadingKey          = signal<string | null>(null);
 
   readonly isSuperAdmin = this.auth.isSuperAdmin;
   readonly user         = this.auth.user;
@@ -40,6 +44,7 @@ export class Settings implements OnInit {
   deleteError    = signal<string | null>(null);
 
   ngOnInit(): void {
+    this.siteSettings.load();
     this.auth.getProfile().subscribe({
       next: profile => {
         this.editName.set(profile.name);
@@ -99,6 +104,25 @@ export class Settings implements OnInit {
         this.deleteLoading.set(false);
         this.deleteError.set(err?.error?.message ?? 'Errore durante l\'eliminazione');
       },
+    });
+  }
+
+  onImageFileSelected(key: string, event: Event): void {
+    const file = (event.target as HTMLInputElement).files?.[0];
+    if (!file) return;
+    this.uploadingKey.set(key);
+    this.siteSettings.uploadImage(file).subscribe({
+      next: res => {
+        const url = res.urls[0];
+        this.siteSettings.set(key, url).subscribe({
+          next: () => {
+            this.siteSettings.settings.update(s => ({ ...s, [key]: url }));
+            this.uploadingKey.set(null);
+          },
+          error: () => this.uploadingKey.set(null),
+        });
+      },
+      error: () => this.uploadingKey.set(null),
     });
   }
 

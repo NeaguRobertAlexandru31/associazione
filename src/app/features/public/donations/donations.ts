@@ -1,6 +1,7 @@
-import { Component, signal } from '@angular/core';
+import { Component, OnInit, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { TranslatePipe } from '../../../i18n/translate.pipe';
+import { SiteSettingsService } from '../../../core/services/site-settings/site-settings';
 
 @Component({
   selector: 'app-donations',
@@ -8,7 +9,8 @@ import { TranslatePipe } from '../../../i18n/translate.pipe';
   templateUrl: './donations.html',
   styleUrl: './donations.css',
 })
-export class Donations {
+export class Donations implements OnInit {
+  readonly siteSettings = inject(SiteSettingsService);
   readonly amounts = [10, 25, 50, 100, 250];
   readonly impacts = [
     { iconKey: 'donations.impact_1_icon', titleKey: 'donations.impact_1_title', descKey: 'donations.impact_1_desc' },
@@ -16,6 +18,8 @@ export class Donations {
     { iconKey: 'donations.impact_3_icon', titleKey: 'donations.impact_3_title', descKey: 'donations.impact_3_desc' },
     { iconKey: 'donations.impact_4_icon', titleKey: 'donations.impact_4_title', descKey: 'donations.impact_4_desc' },
   ];
+
+  ngOnInit(): void { this.siteSettings.load(); }
 
   selectedAmount = signal<number | null>(25);
   customAmount = signal('');

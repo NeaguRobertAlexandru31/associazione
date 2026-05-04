@@ -86,7 +86,7 @@ export class News implements OnInit {
   onDragOver(event: DragEvent): void { event.preventDefault(); }
 
   private uploadFiles(files: File[]): void {
-    const MAX_SIZE = 5 * 1024 * 1024;
+    const MAX_SIZE = 15 * 1024 * 1024;
     files = files.filter(f => {
       if (f.size > MAX_SIZE) { alert(`"${f.name}" supera il limite di 5 MB.`); return false; }
       return true;

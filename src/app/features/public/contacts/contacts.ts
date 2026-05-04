@@ -1,7 +1,8 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, OnInit, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { TranslatePipe } from '../../../i18n/translate.pipe';
 import { ContactService } from '../../../core/services/contact/contact';
+import { SiteSettingsService } from '../../../core/services/site-settings/site-settings';
 
 @Component({
   selector: 'app-contacts',
@@ -9,8 +10,10 @@ import { ContactService } from '../../../core/services/contact/contact';
   templateUrl: './contacts.html',
   styleUrl: './contacts.css',
 })
-export class Contacts {
+export class Contacts implements OnInit {
   private contactService = inject(ContactService);
+  readonly siteSettings  = inject(SiteSettingsService);
+  ngOnInit(): void { this.siteSettings.load(); }
 
   // Form
   name = '';

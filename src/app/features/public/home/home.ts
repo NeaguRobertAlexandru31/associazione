@@ -5,6 +5,7 @@ import { CalendarEvent } from '../../../core/models/event.model';
 import { Article } from '../../../core/models/article.model';
 import { EventsService } from '../../../core/services/events/events';
 import { ArticlesService } from '../../../core/services/articles/articles';
+import { SiteSettingsService } from '../../../core/services/site-settings/site-settings';
 import { environment } from '../../../../environments/environment';
 
 const ACCENTS = ['border-secondary', 'border-[#f8bd2a]', 'border-primary/40'];
@@ -18,6 +19,7 @@ const ACCENTS = ['border-secondary', 'border-[#f8bd2a]', 'border-primary/40'];
 export class Home implements OnInit {
   private eventsService   = inject(EventsService);
   private articlesService = inject(ArticlesService);
+  readonly siteSettings   = inject(SiteSettingsService);
 
   parallaxOffset = 0;
 
@@ -36,6 +38,7 @@ export class Home implements OnInit {
   readonly latestNews = computed(() => this.allNews().slice(0, 3));
 
   ngOnInit(): void {
+    this.siteSettings.load();
     this.eventsService.getAll().subscribe({
       next: evts => this.allEvents.set(evts),
     });

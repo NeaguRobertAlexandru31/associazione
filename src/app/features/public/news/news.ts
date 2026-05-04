@@ -3,6 +3,7 @@ import { RouterLink } from '@angular/router';
 import { TranslatePipe } from '../../../i18n/translate.pipe';
 import { Article } from '../../../core/models/article.model';
 import { ArticlesService } from '../../../core/services/articles/articles';
+import { SiteSettingsService } from '../../../core/services/site-settings/site-settings';
 import { environment } from '../../../../environments/environment';
 
 
@@ -14,6 +15,7 @@ import { environment } from '../../../../environments/environment';
 })
 export class News implements OnInit {
   private articlesService = inject(ArticlesService);
+  readonly siteSettings   = inject(SiteSettingsService);
 
   articles     = signal<Article[]>([]);
   loading      = signal(true);
@@ -40,6 +42,7 @@ export class News implements OnInit {
   readonly grid     = computed(() => this.filtered().slice(1));
 
   ngOnInit(): void {
+    this.siteSettings.load();
     this.articlesService.getAll().subscribe({
       next: arts => { this.articles.set(arts); this.loading.set(false); },
       error: ()   => this.loading.set(false),

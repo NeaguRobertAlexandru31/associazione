@@ -1,6 +1,7 @@
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { TranslatePipe } from '../../../i18n/translate.pipe';
+import { SiteSettingsService } from '../../../core/services/site-settings/site-settings';
 import { Project } from '../../../core/models/project.model';
 import { ProjectsService } from '../../../core/services/projects/projects';
 import { environment } from '../../../../environments/environment';
@@ -14,6 +15,7 @@ import { environment } from '../../../../environments/environment';
 export class Projects implements OnInit {
   private projectsService = inject(ProjectsService);
   private router          = inject(Router);
+  readonly siteSettings   = inject(SiteSettingsService);
 
   allProjects  = signal<Project[]>([]);
   loading      = signal(true);
@@ -34,6 +36,7 @@ export class Projects implements OnInit {
   });
 
   ngOnInit(): void {
+    this.siteSettings.load();
     this.projectsService.getAll().subscribe({
       next: list => { this.allProjects.set(list); this.loading.set(false); },
       error: ()   => this.loading.set(false),

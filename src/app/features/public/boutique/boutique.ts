@@ -1,6 +1,7 @@
-import { Component, signal } from '@angular/core';
+import { Component, OnInit, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { TranslatePipe } from '../../../i18n/translate.pipe';
+import { SiteSettingsService } from '../../../core/services/site-settings/site-settings';
 
 export interface Product {
   img: string;
@@ -20,7 +21,10 @@ export interface Product {
   templateUrl: './boutique.html',
   styleUrl: './boutique.css',
 })
-export class Boutique {
+export class Boutique implements OnInit {
+  readonly siteSettings = inject(SiteSettingsService);
+  ngOnInit(): void { this.siteSettings.load(); }
+
   readonly featured: Product = {
     img: '/img/member2.jpg',
     categoryKey: 'boutique.p1_category',

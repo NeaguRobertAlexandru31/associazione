@@ -1,6 +1,7 @@
-import { Component, HostListener, signal } from '@angular/core';
+import { Component, HostListener, OnInit, computed, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { TranslatePipe } from '../../../i18n/translate.pipe';
+import { SiteSettingsService } from '../../../core/services/site-settings/site-settings';
 
 @Component({
   selector: 'app-about-us',
@@ -8,7 +9,8 @@ import { TranslatePipe } from '../../../i18n/translate.pipe';
   templateUrl: './about-us.html',
   styleUrl: './about-us.css',
 })
-export class AboutUs {
+export class AboutUs implements OnInit {
+  readonly siteSettings = inject(SiteSettingsService);
   parallaxOffset = 0;
   boardOffset = signal(0);
 
@@ -29,12 +31,14 @@ export class AboutUs {
     { icon: 'lightbulb',  titleKey: 'about-us.value_3_title', descKey: 'about-us.value_3_desc' },
   ];
 
-  readonly members = [
-    { img: '/img/member1.jpg', nameKey: 'about-us.member_1_name', roleKey: 'about-us.member_1_role', descKey: 'about-us.member_1_desc' },
-    { img: '/img/member2.jpg', nameKey: 'about-us.member_2_name', roleKey: 'about-us.member_2_role', descKey: 'about-us.member_2_desc' },
-    { img: '/img/member3.jpg', nameKey: 'about-us.member_3_name', roleKey: 'about-us.member_3_role', descKey: 'about-us.member_3_desc' },
-    { img: '/img/member4.jpg', nameKey: 'about-us.member_4_name', roleKey: 'about-us.member_4_role', descKey: 'about-us.member_4_desc' },
-  ];
+  readonly members = computed(() => [
+    { img: this.siteSettings.img('img_about_member_1'), nameKey: 'about-us.member_1_name', roleKey: 'about-us.member_1_role', descKey: 'about-us.member_1_desc' },
+    { img: this.siteSettings.img('img_about_member_2'), nameKey: 'about-us.member_2_name', roleKey: 'about-us.member_2_role', descKey: 'about-us.member_2_desc' },
+    { img: this.siteSettings.img('img_about_member_3'), nameKey: 'about-us.member_3_name', roleKey: 'about-us.member_3_role', descKey: 'about-us.member_3_desc' },
+    { img: this.siteSettings.img('img_about_member_4'), nameKey: 'about-us.member_4_name', roleKey: 'about-us.member_4_role', descKey: 'about-us.member_4_desc' },
+  ]);
+
+  ngOnInit(): void { this.siteSettings.load(); }
 
   prevBoard(): void {
     this.boardOffset.update(v => Math.max(0, v - 1));

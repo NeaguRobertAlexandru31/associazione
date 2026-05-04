@@ -3,6 +3,7 @@ import { RouterLink } from '@angular/router';
 import { TranslatePipe } from '../../../i18n/translate.pipe';
 import { CalendarEvent } from '../../../core/models/event.model';
 import { EventsService } from '../../../core/services/events/events';
+import { SiteSettingsService } from '../../../core/services/site-settings/site-settings';
 import { environment } from '../../../../environments/environment';
 
 @Component({
@@ -13,6 +14,7 @@ import { environment } from '../../../../environments/environment';
 })
 export class Events implements OnInit {
   private eventsService = inject(EventsService);
+  readonly siteSettings = inject(SiteSettingsService);
 
   events  = signal<CalendarEvent[]>([]);
   loading = signal(true);
@@ -34,6 +36,7 @@ export class Events implements OnInit {
   });
 
   ngOnInit(): void {
+    this.siteSettings.load();
     this.eventsService.getAll().subscribe({
       next: evts => { this.events.set(evts); this.loading.set(false); },
       error: ()   => this.loading.set(false),
@@ -41,7 +44,8 @@ export class Events implements OnInit {
   }
 
   resolveImg(path: string | undefined, fallback: string): string {
-    return path ? `${environment.apiUrl}${path}` : fallback;
+    if (!path) return fallback;
+    return path.startsWith('http') ? path : `${environment.apiUrl}${path}`;
   }
 
   formatDay(iso: string): string {
