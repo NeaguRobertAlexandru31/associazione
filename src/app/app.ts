@@ -11,6 +11,7 @@ import { Footer } from './shared/components/public/footer/footer';
   styleUrl: './app.css',
 })
 export class App {
+  
   private router = inject(Router);
   private url = signal(this.router.url);
 
