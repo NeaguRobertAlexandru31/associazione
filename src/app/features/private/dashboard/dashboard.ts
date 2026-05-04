@@ -28,6 +28,7 @@ export class Dashboard implements OnInit {
     { route: '/dashboard/messages',   icon: 'mail',               label: 'Messaggi',   badge: this.unreadCount.count() },
     { route: '/dashboard/activities', icon: 'history',            label: 'Attività'    },
     { route: '/dashboard/news',       icon: 'article',            label: 'Contenuti'   },
+    { route: '/dashboard/projects',  icon: 'folder_open',        label: 'Progetti'    },
     { route: '/dashboard/donations', icon: 'volunteer_activism', label: 'Donazioni'   },
     { route: '/dashboard/settings',  icon: 'settings',           label: 'Impostazioni'},
   ]);

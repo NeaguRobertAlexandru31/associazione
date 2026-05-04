@@ -1,25 +1,20 @@
 <!-- ── HERO ────────────────────────────────────────────────────────────── -->
 <section class="relative pt-20 pb-12 overflow-hidden bg-surface" style="scroll-snap-align: start">
-  <!-- Mobile hero background -->
   <div class="absolute inset-0 md:hidden z-0">
     <img src="/img/member1.jpg" class="w-full h-full object-cover" alt="" aria-hidden="true" />
     <div class="absolute inset-0 bg-gradient-to-b from-surface/20 via-surface/60 to-surface"></div>
   </div>
-
   <div class="absolute inset-0 z-0 pointer-events-none opacity-[0.04]"
        style="background-image: radial-gradient(circle at 2px 2px, #b6171e 1px, transparent 0); background-size: 28px 28px;"></div>
-
   <div class="container mx-auto px-8 relative z-10">
     <span class="animate-fade-in-up hero-badge inline-block py-1 px-3 mb-6 text-secondary font-inter font-bold text-xs tracking-widest uppercase bg-secondary-fixed rounded-full">
       {{ 'projects.hero_badge' | translate }}
     </span>
-
     <h1 class="animate-fade-in-up hero-title font-romania font-extrabold text-primary tracking-tighter leading-[0.95] mb-6"
         style="font-size: clamp(2.8rem, 7vw, 5.5rem)">
       {{ 'projects.hero_title_1' | translate }}<br>
       <span class="text-secondary italic">{{ 'projects.hero_title_2' | translate }}</span><span class="text-primary">.</span>
     </h1>
-
     <p class="animate-fade-in-up hero-sub font-inter text-on-surface-variant text-xl font-light leading-relaxed max-w-xl">
       {{ 'projects.hero_subtitle' | translate }}
     </p>
@@ -30,7 +25,6 @@
 <section class="py-12 bg-surface" style="scroll-snap-align: start">
   <div class="container mx-auto px-8">
 
-    <!-- Filter tabs -->
     <div class="flex flex-wrap gap-2 mb-10">
       @for (f of filters; track f.value) {
         <button (click)="setFilter(f.value)"
@@ -38,57 +32,55 @@
                 [class]="activeFilter() === f.value
                   ? 'bg-primary text-on-primary shadow-sm'
                   : 'bg-surface-container text-on-surface-variant hover:bg-surface-container-high'">
-          {{ f.labelKey | translate }}
+          {{ f.label | translate }}
         </button>
       }
     </div>
 
-    <!-- Projects grid -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-      @for (p of filteredProjects(); track p.titleKey) {
-        <article class="bg-surface-container-lowest rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-all group flex flex-col">
+    @if (loading()) {
+      <div class="flex items-center justify-center py-20">
+        <span class="material-symbols-outlined text-primary text-4xl spin">progress_activity</span>
+      </div>
+    } @else if (filteredProjects().length === 0) {
+      <div class="flex flex-col items-center gap-3 py-20 text-center">
+        <span class="material-symbols-outlined text-on-surface-variant/40 text-5xl">folder_open</span>
+        <p class="font-inter text-on-surface-variant text-sm">Nessun progetto trovato.</p>
+      </div>
+    } @else {
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        @for (p of filteredProjects(); track p.id) {
+          <article (click)="goToDetail(p)" class="bg-surface-container-lowest rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-all group flex flex-col cursor-pointer">
 
-          <!-- Image -->
-          <div class="relative aspect-[4/3] overflow-hidden bg-surface-container">
-            <img [src]="p.img" [alt]="p.titleKey | translate"
-                 class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+            <div class="relative aspect-[4/3] overflow-hidden bg-surface-container">
+              <img [src]="coverImage(p)" [alt]="p.title"
+                   class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+              <div class="absolute top-3 left-3 flex gap-2">
+                <span class="font-inter font-bold text-[10px] uppercase tracking-wider px-2.5 py-1 rounded-full"
+                      [class]="categoryColor(p.category)">
+                  {{ p.category }}
+                </span>
+                <span class="font-inter font-bold text-[10px] uppercase tracking-wider px-2.5 py-1 rounded-full"
+                      [class]="p.status === 'ongoing' ? 'bg-[#d4edda] text-[#155724]' : 'bg-surface/90 text-on-surface-variant backdrop-blur-sm'">
+                  {{ p.status === 'ongoing' ? ('projects.status_ongoing' | translate) : ('projects.status_completed' | translate) }}
+                </span>
+              </div>
+            </div>
 
-            <!-- Badges -->
-            <div class="absolute top-3 left-3 flex gap-2">
-              <span class="font-inter font-bold text-[10px] uppercase tracking-wider px-2.5 py-1 rounded-full"
-                    [class]="p.category === 'cultura'    ? 'bg-primary text-on-primary'      :
-                             p.category === 'tradizione' ? 'bg-secondary text-on-primary'    :
-                             p.category === 'sociale'    ? 'bg-[#0d6e6e] text-white'         :
-                                                           'bg-[#6750a4] text-white'">
-                {{ p.categoryKey | translate }}
-              </span>
-              <span class="font-inter font-bold text-[10px] uppercase tracking-wider px-2.5 py-1 rounded-full"
-                    [class]="p.status === 'ongoing'
-                      ? 'bg-[#d4edda] text-[#155724]'
-                      : 'bg-surface-container text-on-surface-variant'">
-                {{ (p.status === 'ongoing' ? 'projects.status_ongoing' : 'projects.status_completed') | translate }}
+            <div class="p-6 flex flex-col flex-1">
+              <h3 class="font-romania font-bold text-primary text-xl mb-2">{{ p.title }}</h3>
+              <p class="font-inter text-on-surface-variant text-sm leading-relaxed flex-1 mb-4 line-clamp-3">
+                {{ p.description }}
+              </p>
+              <span class="font-inter font-semibold text-sm text-primary flex items-center gap-1 group-hover:gap-2 transition-all">
+                Scopri di più
+                <span class="material-symbols-outlined text-base">arrow_forward</span>
               </span>
             </div>
-          </div>
 
-          <!-- Content -->
-          <div class="p-6 flex flex-col flex-1">
-            <h3 class="font-romania font-bold text-primary text-xl mb-2">
-              {{ p.titleKey | translate }}
-            </h3>
-            <p class="font-inter text-on-surface-variant text-sm leading-relaxed flex-1 mb-4">
-              {{ p.descKey | translate }}
-            </p>
-            <a routerLink="/projects"
-               class="inline-flex items-center gap-1 font-inter font-semibold text-sm text-secondary hover:gap-2 transition-all">
-              {{ 'projects.read_more' | translate }}
-              <span class="material-symbols-outlined text-base">chevron_right</span>
-            </a>
-          </div>
-
-        </article>
-      }
-    </div>
+          </article>
+        }
+      </div>
+    }
 
   </div>
 </section>

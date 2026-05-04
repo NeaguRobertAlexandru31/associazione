@@ -1,0 +1,159 @@
+@if (loading()) {
+  <div class="flex items-center justify-center min-h-[60vh]">
+    <span class="material-symbols-outlined text-primary text-5xl spin">progress_activity</span>
+  </div>
+}
+
+@if (!loading() && notFound()) {
+  <div class="flex flex-col items-center justify-center min-h-[60vh] gap-4 text-center px-8">
+    <span class="material-symbols-outlined text-on-surface-variant/40 text-6xl">folder_open</span>
+    <h1 class="font-romania font-extrabold text-primary text-3xl">Progetto non trovato</h1>
+    <p class="font-inter text-on-surface-variant">Il progetto che cerchi non esiste o è stato rimosso.</p>
+    <a routerLink="/projects" class="mt-2 font-inter font-semibold text-sm text-primary underline underline-offset-4">
+      ← Torna ai progetti
+    </a>
+  </div>
+}
+
+@if (!loading() && project(); as p) {
+
+  <!-- Hero -->
+  <section class="relative h-[55vh] min-h-[360px] overflow-hidden bg-surface-container">
+    @if (p.images.length > 0) {
+      <img [src]="resolveImg(p.images[0])" [alt]="p.title" class="w-full h-full object-cover" />
+      <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent"></div>
+    } @else {
+      <div class="absolute inset-0 opacity-5"
+           style="background-image: radial-gradient(circle at 2px 2px, #b6171e 1px, transparent 0); background-size: 28px 28px;"></div>
+      <div class="absolute inset-0 flex items-center justify-center">
+        <span class="material-symbols-outlined text-primary/20" style="font-size: 8rem; font-variation-settings:'FILL' 1">folder_open</span>
+      </div>
+    }
+    <div class="absolute bottom-0 left-0 right-0 p-8 md:p-12">
+      <nav class="flex items-center gap-2 font-inter text-white/70 text-xs mb-3">
+        <a routerLink="/projects" class="hover:text-white transition-colors">Progetti</a>
+        <span class="material-symbols-outlined text-xs">chevron_right</span>
+        <span class="text-white truncate">{{ p.title }}</span>
+      </nav>
+      <div class="flex flex-wrap gap-2 mb-3">
+        <span class="font-inter font-bold text-[10px] uppercase tracking-widest px-3 py-1 rounded-full"
+              [class]="categoryColor(p.category)">
+          {{ categoryLabel(p.category) }}
+        </span>
+        <span class="font-inter font-bold text-[10px] uppercase tracking-widest px-3 py-1 rounded-full"
+              [class]="p.status === 'ongoing' ? 'bg-[#d4edda] text-[#155724]' : 'bg-white/20 text-white'">
+          {{ p.status === 'ongoing' ? 'In corso' : 'Completato' }}
+        </span>
+      </div>
+      <h1 class="font-romania font-extrabold text-white leading-tight"
+          style="font-size: clamp(2rem, 5vw, 3.5rem)">{{ p.title }}</h1>
+    </div>
+  </section>
+
+  <!-- Content -->
+  <div class="container mx-auto px-8 py-12">
+    <div class="grid md:grid-cols-[1fr_280px] gap-10 items-start">
+
+      <!-- Left: description + gallery -->
+      <div>
+        <p class="font-inter text-on-surface text-base leading-relaxed mb-10 max-w-2xl whitespace-pre-wrap">
+          {{ p.description }}
+        </p>
+
+        @if (p.images.length > 1) {
+          <h2 class="font-romania font-bold text-primary text-xl mb-4">Galleria</h2>
+          <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
+            @for (img of p.images; track img; let i = $index) {
+              @if (i > 0) {
+                <button (click)="openLightbox(i)"
+                        class="aspect-square rounded-2xl overflow-hidden bg-surface-container hover:opacity-90 transition-opacity focus:outline-none focus:ring-2 focus:ring-primary/40">
+                  <img [src]="resolveImg(img)" [alt]="p.title" class="w-full h-full object-cover" />
+                </button>
+              }
+            }
+          </div>
+        }
+      </div>
+
+      <!-- Right: meta card -->
+      <div class="bg-surface-container-lowest rounded-2xl shadow-sm p-6 flex flex-col gap-4 sticky top-6">
+
+        <div class="flex items-start gap-3">
+          <div class="w-10 h-10 rounded-xl bg-primary/8 flex items-center justify-center flex-shrink-0">
+            <span class="material-symbols-outlined text-primary" style="font-variation-settings:'FILL' 1">calendar_month</span>
+          </div>
+          <div>
+            <p class="font-inter text-xs text-on-surface-variant uppercase tracking-wider font-semibold">Pubblicato</p>
+            <p class="font-inter text-on-surface text-sm mt-0.5">{{ formatDate(p.createdAt) }}</p>
+          </div>
+        </div>
+
+        <div class="flex items-start gap-3">
+          <div class="w-10 h-10 rounded-xl bg-primary/8 flex items-center justify-center flex-shrink-0">
+            <span class="material-symbols-outlined text-primary" style="font-variation-settings:'FILL' 1">label</span>
+          </div>
+          <div>
+            <p class="font-inter text-xs text-on-surface-variant uppercase tracking-wider font-semibold">Categoria</p>
+            <span class="inline-block font-inter text-xs font-semibold mt-1 px-2 py-0.5 rounded-full"
+                  [class]="categoryColor(p.category)">
+              {{ categoryLabel(p.category) }}
+            </span>
+          </div>
+        </div>
+
+        <div class="flex items-start gap-3">
+          <div class="w-10 h-10 rounded-xl bg-primary/8 flex items-center justify-center flex-shrink-0">
+            <span class="material-symbols-outlined text-primary" style="font-variation-settings:'FILL' 1">info</span>
+          </div>
+          <div>
+            <p class="font-inter text-xs text-on-surface-variant uppercase tracking-wider font-semibold">Stato</p>
+            <span class="inline-block font-inter text-xs font-semibold mt-1 px-2 py-0.5 rounded-full"
+                  [class]="p.status === 'ongoing' ? 'bg-[#d4edda] text-[#155724]' : 'bg-surface-container text-on-surface-variant'">
+              {{ p.status === 'ongoing' ? 'In corso' : 'Completato' }}
+            </span>
+          </div>
+        </div>
+
+        <div class="border-t border-outline-variant/20 pt-4 mt-2">
+          <a routerLink="/projects"
+             class="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl border border-outline-variant font-inter font-semibold text-sm text-primary hover:bg-surface-container transition-colors">
+            <span class="material-symbols-outlined text-base">arrow_back</span>
+            Tutti i progetti
+          </a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+}
+
+<!-- Lightbox -->
+@if (lightboxIndex() !== null && project(); as p) {
+  <div class="fixed inset-0 z-50 bg-black/90 flex items-center justify-center p-4"
+       (click)="closeLightbox()">
+
+    <button (click)="$event.stopPropagation(); prev(p.images)"
+            class="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-white hover:bg-white/20 transition-colors">
+      <span class="material-symbols-outlined">chevron_left</span>
+    </button>
+
+    <button (click)="$event.stopPropagation(); next(p.images)"
+            class="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-white hover:bg-white/20 transition-colors">
+      <span class="material-symbols-outlined">chevron_right</span>
+    </button>
+
+    <button (click)="closeLightbox()"
+            class="absolute top-4 right-4 w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-white hover:bg-white/20 transition-colors">
+      <span class="material-symbols-outlined">close</span>
+    </button>
+
+    <span class="absolute bottom-4 left-1/2 -translate-x-1/2 font-inter text-white/60 text-xs">
+      {{ lightboxIndex()! + 1 }} / {{ p.images.length }}
+    </span>
+
+    <img [src]="resolveImg(p.images[lightboxIndex()!])" [alt]="p.title"
+         class="max-w-full max-h-full rounded-2xl object-contain"
+         (click)="$event.stopPropagation()" />
+  </div>
+}

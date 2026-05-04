@@ -1,20 +1,9 @@
-import { Component, computed, signal } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { Component, OnInit, computed, inject, signal } from '@angular/core';
+import { Router, RouterLink } from '@angular/router';
 import { TranslatePipe } from '../../../i18n/translate.pipe';
-
-export interface Project {
-  img: string;
-  category: 'cultura' | 'tradizione' | 'sociale' | 'educazione';
-  categoryKey: string;
-  status: 'ongoing' | 'completed';
-  titleKey: string;
-  descKey: string;
-}
-
-export interface Filter {
-  value: string;
-  labelKey: string;
-}
+import { Project } from '../../../core/models/project.model';
+import { ProjectsService } from '../../../core/services/projects/projects';
+import { environment } from '../../../../environments/environment';
 
 @Component({
   selector: 'app-projects',
@@ -22,33 +11,52 @@ export interface Filter {
   templateUrl: './projects.html',
   styleUrl: './projects.css',
 })
-export class Projects {
-  readonly filters: Filter[] = [
-    { value: 'all',        labelKey: 'projects.filter_all'        },
-    { value: 'cultura',    labelKey: 'projects.filter_cultura'    },
-    { value: 'tradizione', labelKey: 'projects.filter_tradizione' },
-    { value: 'sociale',    labelKey: 'projects.filter_sociale'    },
-    { value: 'educazione', labelKey: 'projects.filter_educazione' },
-  ];
+export class Projects implements OnInit {
+  private projectsService = inject(ProjectsService);
+  private router          = inject(Router);
 
-  readonly allProjects: Project[] = [
-    { img: '/img/hero.jpg',        category: 'cultura',    categoryKey: 'projects.filter_cultura',    status: 'ongoing',   titleKey: 'projects.p1_title', descKey: 'projects.p1_desc' },
-    { img: '/img/about-hero.jpg',  category: 'tradizione', categoryKey: 'projects.filter_tradizione', status: 'completed', titleKey: 'projects.p2_title', descKey: 'projects.p2_desc' },
-    { img: '/img/member1.jpg',     category: 'educazione', categoryKey: 'projects.filter_educazione', status: 'ongoing',   titleKey: 'projects.p3_title', descKey: 'projects.p3_desc' },
-    { img: '/img/member3.jpg',     category: 'sociale',    categoryKey: 'projects.filter_sociale',    status: 'ongoing',   titleKey: 'projects.p4_title', descKey: 'projects.p4_desc' },
-    { img: '/img/member2.jpg',     category: 'cultura',    categoryKey: 'projects.filter_cultura',    status: 'completed', titleKey: 'projects.p5_title', descKey: 'projects.p5_desc' },
-    { img: '/img/member4.jpg',     category: 'tradizione', categoryKey: 'projects.filter_tradizione', status: 'ongoing',   titleKey: 'projects.p6_title', descKey: 'projects.p6_desc' },
-  ];
-
+  allProjects  = signal<Project[]>([]);
+  loading      = signal(true);
   activeFilter = signal('all');
 
-  filteredProjects = computed(() =>
-    this.activeFilter() === 'all'
-      ? this.allProjects
-      : this.allProjects.filter(p => p.category === this.activeFilter())
-  );
+  readonly filters = [
+    { value: 'all',        label: 'projects.filter_all'        },
+    { value: 'cultura',    label: 'projects.filter_cultura'    },
+    { value: 'tradizione', label: 'projects.filter_tradizione' },
+    { value: 'sociale',    label: 'projects.filter_sociale'    },
+    { value: 'educazione', label: 'projects.filter_educazione' },
+  ];
 
-  setFilter(value: string): void {
-    this.activeFilter.set(value);
+  readonly filteredProjects = computed(() => {
+    const f = this.activeFilter();
+    if (f === 'all') return this.allProjects();
+    return this.allProjects().filter(p => p.category === f);
+  });
+
+  ngOnInit(): void {
+    this.projectsService.getAll().subscribe({
+      next: list => { this.allProjects.set(list); this.loading.set(false); },
+      error: ()   => this.loading.set(false),
+    });
+  }
+
+  setFilter(value: string): void { this.activeFilter.set(value); }
+
+  goToDetail(p: Project): void { this.router.navigate(['/projects', p.id]); }
+
+  coverImage(p: Project): string {
+    const img = p.images[0];
+    if (!img) return '/img/hero.jpg';
+    return img.startsWith('http') ? img : `${environment.apiUrl}${img}`;
+  }
+
+  categoryColor(cat: string): string {
+    const map: Record<string, string> = {
+      cultura:    'bg-primary text-on-primary',
+      tradizione: 'bg-secondary text-on-primary',
+      sociale:    'bg-[#0d6e6e] text-white',
+      educazione: 'bg-[#6750a4] text-white',
+    };
+    return map[cat] ?? 'bg-surface-container text-on-surface-variant';
   }
 }

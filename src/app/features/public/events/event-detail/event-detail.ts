@@ -14,10 +14,10 @@ export class EventDetail implements OnInit {
   private route  = inject(ActivatedRoute);
   private svc    = inject(EventsService);
 
-  event      = signal<CalendarEvent | null>(null);
-  loading    = signal(true);
-  notFound   = signal(false);
-  lightbox   = signal<string | null>(null); // URL dell'immagine aperta
+  event           = signal<CalendarEvent | null>(null);
+  loading         = signal(true);
+  notFound        = signal(false);
+  lightboxIndex   = signal<number | null>(null);
 
   ngOnInit(): void {
     const slug = this.route.snapshot.paramMap.get('slug')!;
@@ -27,10 +27,21 @@ export class EventDetail implements OnInit {
     });
   }
 
-  resolveImg(path: string): string { return `${environment.apiUrl}${path}`; }
+  resolveImg(path: string): string {
+    if (path.startsWith('http')) return path;
+    return `${environment.apiUrl}${path}`;
+  }
 
-  openLightbox(url: string): void  { this.lightbox.set(url); }
-  closeLightbox(): void             { this.lightbox.set(null); }
+  openLightbox(index: number): void { this.lightboxIndex.set(index); }
+  closeLightbox(): void              { this.lightboxIndex.set(null); }
+
+  prev(images: string[]): void {
+    this.lightboxIndex.update(i => i !== null ? (i - 1 + images.length) % images.length : 0);
+  }
+
+  next(images: string[]): void {
+    this.lightboxIndex.update(i => i !== null ? (i + 1) % images.length : 0);
+  }
 
   formatDate(iso: string): string {
     return new Date(iso).toLocaleDateString('it-IT', {
