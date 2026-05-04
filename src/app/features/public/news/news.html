@@ -1,111 +1,115 @@
 <!-- ── HERO ────────────────────────────────────────────────────────────── -->
 <section class="relative pt-20 pb-10 overflow-hidden bg-surface" style="scroll-snap-align: start">
-  <!-- Mobile hero background -->
   <div class="absolute inset-0 md:hidden z-0">
     <img src="/img/member4.jpg" class="w-full h-full object-cover" alt="" aria-hidden="true" />
     <div class="absolute inset-0 bg-gradient-to-b from-surface/20 via-surface/60 to-surface"></div>
   </div>
-
   <div class="absolute inset-0 z-0 pointer-events-none opacity-[0.04]"
        style="background-image: radial-gradient(circle at 2px 2px, #b6171e 1px, transparent 0); background-size: 28px 28px;"></div>
-
   <div class="container mx-auto px-8 relative z-10">
     <span class="animate-fade-in-up hero-badge inline-block py-1 px-3 mb-5 text-secondary font-inter font-bold text-xs tracking-widest uppercase bg-secondary-fixed rounded-full">
       {{ 'news.hero_badge' | translate }}
     </span>
-
     <h1 class="animate-fade-in-up hero-title font-romania font-extrabold tracking-tighter text-primary leading-none mb-4"
         style="font-size: clamp(3rem, 8vw, 5.5rem)">
       {{ 'news.hero_title_1' | translate }}
       <span class="text-on-surface-variant font-light"> {{ 'news.hero_title_2' | translate }}</span>
     </h1>
-
     <p class="animate-fade-in-up hero-sub font-inter text-on-surface-variant leading-relaxed max-w-md">
       {{ 'news.hero_subtitle' | translate }}
     </p>
   </div>
 </section>
 
-<!-- ── FEATURED + GRID ─────────────────────────────────────────────────── -->
+<!-- ── CONTENT ──────────────────────────────────────────────────────────── -->
 <section class="py-10 bg-surface" style="scroll-snap-align: start">
   <div class="container mx-auto px-8">
 
     <!-- Filter pills -->
     <div class="flex flex-wrap gap-2 mb-8">
       @for (f of filters; track f.value) {
-        <button
-          (click)="setFilter(f.value)"
-          [class]="activeFilter() === f.value
-            ? 'px-4 py-1.5 rounded-full font-inter font-semibold text-sm bg-primary text-on-primary transition-all'
-            : 'px-4 py-1.5 rounded-full font-inter font-semibold text-sm bg-surface-container text-on-surface-variant hover:bg-surface-container-high transition-all'">
-          {{ f.labelKey | translate }}
+        <button (click)="setFilter(f.value)"
+                [class]="activeFilter() === f.value
+                  ? 'px-4 py-1.5 rounded-full font-inter font-semibold text-sm bg-primary text-on-primary transition-all'
+                  : 'px-4 py-1.5 rounded-full font-inter font-semibold text-sm bg-surface-container text-on-surface-variant hover:bg-surface-container-high transition-all'">
+          {{ f.label }}
         </button>
       }
     </div>
 
-    <!-- Featured (shown only when filter = all) -->
-    @if (activeFilter() === 'all') {
-      <div class="bg-surface-container-lowest rounded-3xl overflow-hidden shadow-sm flex flex-col md:flex-row mb-8">
-        <div class="relative w-full md:w-80 flex-shrink-0 aspect-[4/3] md:aspect-auto overflow-hidden bg-surface-container">
-          <img [src]="featured.img" [alt]="featured.titleKey | translate"
-               class="w-full h-full object-cover" />
-          <span class="absolute top-3 left-3 font-inter font-bold text-[10px] uppercase tracking-widest px-3 py-1 rounded-full bg-secondary text-on-primary">
-            {{ featured.categoryKey | translate }}
-          </span>
-        </div>
-        <div class="p-8 flex flex-col flex-1">
-          <p class="font-inter font-bold text-on-surface-variant text-[10px] uppercase tracking-widest mb-3">
-            {{ 'news.featured_label' | translate }}
-          </p>
-          <p class="font-inter text-on-surface-variant text-xs mb-3">{{ featured.dateKey | translate }}</p>
-          <h2 class="font-romania font-extrabold text-primary text-3xl mb-4 leading-tight">
-            {{ featured.titleKey | translate }}
-          </h2>
-          <p class="font-inter text-on-surface-variant text-sm leading-relaxed flex-1 mb-6">
-            {{ featured.descKey | translate }}
-          </p>
-          <a routerLink="/news"
-             class="inline-flex items-center gap-2 font-inter font-semibold text-sm text-secondary hover:underline underline-offset-4">
-            {{ 'news.read_more' | translate }}
-            <span class="material-symbols-outlined text-base">arrow_forward</span>
-          </a>
-        </div>
+    @if (loading()) {
+      <div class="flex items-center justify-center py-20">
+        <span class="material-symbols-outlined text-primary text-4xl spin">progress_activity</span>
       </div>
-    }
+    } @else if (filtered().length === 0) {
+      <div class="flex flex-col items-center gap-3 py-20 text-center">
+        <span class="material-symbols-outlined text-on-surface-variant/40 text-5xl">newspaper</span>
+        <p class="font-inter text-on-surface-variant text-sm">Nessun articolo trovato.</p>
+      </div>
+    } @else {
 
-    <!-- Articles grid -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-      @for (n of grid(); track n.titleKey) {
-        <article class="bg-surface-container-lowest rounded-2xl overflow-hidden shadow-sm flex flex-col">
-          <div class="aspect-[4/3] overflow-hidden bg-surface-container relative">
-            <img [src]="n.img" [alt]="n.titleKey | translate"
-                 class="w-full h-full object-cover hover:scale-105 transition-transform duration-500" />
-            <span class="absolute top-3 left-3 font-inter font-bold text-[10px] uppercase tracking-widest px-3 py-1 rounded-full bg-surface/90 text-on-surface-variant backdrop-blur-sm">
-              {{ n.categoryKey | translate }}
+      <!-- Featured -->
+      @if (featured(); as feat) {
+        <a [routerLink]="['/news', feat.id]" class="block bg-surface-container-lowest rounded-3xl overflow-hidden shadow-sm flex flex-col md:flex-row mb-8 hover:shadow-md transition-shadow">
+          <div class="relative w-full md:w-80 flex-shrink-0 aspect-[4/3] md:aspect-auto overflow-hidden bg-surface-container">
+            <img [src]="coverImage(feat)" [alt]="feat.name" class="w-full h-full object-cover" />
+            @if (firstCategory(feat)) {
+              <span class="absolute top-3 left-3 font-inter font-bold text-[10px] uppercase tracking-widest px-3 py-1 rounded-full bg-secondary text-on-primary">
+                {{ firstCategory(feat) }}
+              </span>
+            }
+          </div>
+          <div class="p-8 flex flex-col flex-1">
+            <p class="font-inter font-bold text-on-surface-variant text-[10px] uppercase tracking-widest mb-3">
+              {{ 'news.featured_label' | translate }}
+            </p>
+            <p class="font-inter text-on-surface-variant text-xs mb-3">{{ formatDate(feat.createdAt) }}</p>
+            <h2 class="font-romania font-extrabold text-primary text-3xl mb-4 leading-tight">{{ feat.name }}</h2>
+            <p class="font-inter text-on-surface-variant text-sm leading-relaxed flex-1 mb-6 line-clamp-4">
+              {{ feat.description }}
+            </p>
+            <span class="inline-flex items-center gap-2 font-inter font-semibold text-sm text-secondary hover:underline underline-offset-4">
+              Leggi di più
+              <span class="material-symbols-outlined text-base">arrow_forward</span>
             </span>
           </div>
-          <div class="p-5 flex flex-col flex-1">
-            <p class="font-inter text-on-surface-variant text-xs mb-2">{{ n.dateKey | translate }}</p>
-            <h3 class="font-romania font-bold text-primary text-lg mb-2 leading-tight">
-              {{ n.titleKey | translate }}
-            </h3>
-            <p class="font-inter text-on-surface-variant text-sm leading-relaxed flex-1 mb-4">
-              {{ n.descKey | translate }}
-            </p>
-            <a routerLink="/news"
-               class="inline-flex items-center gap-1 font-inter font-semibold text-xs text-secondary hover:underline underline-offset-4 mt-auto">
-              {{ 'news.read_more' | translate }}
-              <span class="material-symbols-outlined text-sm">arrow_forward</span>
-            </a>
-          </div>
-        </article>
+        </a>
       }
-    </div>
+
+      <!-- Grid -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        @for (a of grid(); track a.id) {
+          <a [routerLink]="['/news', a.id]" class="bg-surface-container-lowest rounded-2xl overflow-hidden shadow-sm flex flex-col hover:shadow-md transition-shadow">
+            <div class="aspect-[4/3] overflow-hidden bg-surface-container relative">
+              <img [src]="coverImage(a)" [alt]="a.name"
+                   class="w-full h-full object-cover hover:scale-105 transition-transform duration-500" />
+              @if (firstCategory(a)) {
+                <span class="absolute top-3 left-3 font-inter font-bold text-[10px] uppercase tracking-widest px-3 py-1 rounded-full bg-surface/90 text-on-surface-variant backdrop-blur-sm">
+                  {{ firstCategory(a) }}
+                </span>
+              }
+            </div>
+            <div class="p-5 flex flex-col flex-1">
+              <p class="font-inter text-on-surface-variant text-xs mb-2">{{ formatDate(a.createdAt) }}</p>
+              <h3 class="font-romania font-bold text-primary text-lg mb-2 leading-tight">{{ a.name }}</h3>
+              <p class="font-inter text-on-surface-variant text-sm leading-relaxed flex-1 line-clamp-3">
+                {{ a.description }}
+              </p>
+              <span class="mt-4 inline-flex items-center gap-1 font-inter font-semibold text-xs text-secondary hover:underline underline-offset-4 mt-auto">
+                Leggi di più
+                <span class="material-symbols-outlined text-sm">arrow_forward</span>
+              </span>
+            </div>
+          </a>
+        }
+      </div>
+
+    }
 
   </div>
 </section>
 
-<!-- ── NEWSLETTER ─────────────────────────────────────────────────────── -->
+<!-- ── NEWSLETTER ────────────────────────────────────────────────────────── -->
 <section class="py-20 bg-primary" style="scroll-snap-align: start">
   <div class="container mx-auto px-8 text-center max-w-2xl">
     <h2 class="font-romania font-extrabold text-on-primary text-3xl mb-3">

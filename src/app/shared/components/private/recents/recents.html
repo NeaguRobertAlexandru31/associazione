@@ -42,9 +42,20 @@
     </div>
   } @else {
     <div class="flex flex-col divide-y divide-outline-variant/20">
-      @for (a of items(); track a.text) {
-        <div class="flex items-start gap-3 py-4 first:pt-0 last:pb-0">
-          <div class="w-8 h-8 rounded-full bg-surface-container flex items-center justify-center flex-shrink-0 mt-0.5">
+      @for (a of items(); track a.id) {
+        <div class="flex items-center gap-3 py-4 first:pt-0 last:pb-0">
+
+          @if (allowSelection()) {
+            <div (click)="toggleCheck(a.id, $event)" class="flex-shrink-0 flex items-center justify-center w-5 h-5">
+              <input type="checkbox"
+                     [checked]="isChecked(a.id)"
+                     (click)="$event.stopPropagation()"
+                     (change)="toggleCheck(a.id, $event)"
+                     class="w-4 h-4 rounded accent-primary cursor-pointer" />
+            </div>
+          }
+
+          <div class="w-8 h-8 rounded-full bg-surface-container flex items-center justify-center flex-shrink-0">
             <span class="material-symbols-outlined text-sm" [class]="a.color" style="font-variation-settings:'FILL' 1">{{ a.icon }}</span>
           </div>
           <div class="flex-1 min-w-0">
@@ -56,3 +67,7 @@
     </div>
   }
 </div>
+
+@if (allowSelection()) {
+  <app-toolbar [active]="checkedCount() > 0" [count]="checkedCount()" (delete)="onDismiss()" />
+}

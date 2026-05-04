@@ -7,6 +7,7 @@ export const routes: Routes = [
 	{ path: 'about-us', 		loadComponent: () => import('./features/public/about-us/about-us').then(m => m.AboutUs) },
 	{ path: 'projects', 		loadComponent: () => import('./features/public/projects/projects').then(m => m.Projects) },
 	{ path: 'news', 			loadComponent: () => import('./features/public/news/news').then(m => m.News) },
+	{ path: 'news/:id', 		loadComponent: () => import('./features/public/news/news-detail/news-detail').then(m => m.NewsDetail) },
 	{ path: 'events', 			loadComponent: () => import('./features/public/events/events').then(m => m.Events) },
 	{ path: 'events/:slug', 	loadComponent: () => import('./features/public/events/event-detail/event-detail').then(m => m.EventDetail) },
 	{ path: 'donations', 		loadComponent: () => import('./features/public/donations/donations').then(m => m.Donations) },

@@ -5,11 +5,12 @@ import { environment } from '../../../../environments/environment';
 import { ActivityItem } from '../../../../app/shared/components/private/recents/recents';
 
 interface ActivityDto {
-  type: string;
-  icon: string;
-  text: string;
+  id:    string;
+  type:  string;
+  icon:  string;
+  text:  string;
   color: string;
-  date: string;
+  date:  string;
 }
 
 function formatTime(date: Date): string {
@@ -34,6 +35,7 @@ export class ActivityService {
       .pipe(
         map(items =>
           items.map(item => ({
+            id:    item.id,
             icon:  item.icon,
             text:  item.text,
             color: item.color,
