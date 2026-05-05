@@ -84,29 +84,7 @@
         @if (upcoming().length > 1) {
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             @for (ev of upcoming().slice(1); track ev.id) {
-              <div class="bg-surface-container-lowest rounded-2xl p-6 shadow-sm flex flex-col gap-3"
-               [routerLink]="ev.slug ? ['/events', ev.slug] : null" [class.cursor-pointer]="ev.slug">
-                <div class="aspect-[16/9] rounded-xl overflow-hidden bg-surface-container -mx-2 -mt-2 mb-3">
-                  <img [src]="resolveImg(ev.images[0], '/img/hero.jpg')" [alt]="ev.name" class="w-full h-full object-cover" />
-                </div>
-                <div class="flex items-start justify-between">
-                  <div>
-                    <div class="font-romania font-extrabold text-primary text-3xl leading-none">{{ formatDay(ev.date) }}</div>
-                    <div class="font-inter text-on-surface-variant text-xs uppercase tracking-wider">{{ formatMonth(ev.date) }}</div>
-                  </div>
-                </div>
-                <h3 class="font-romania font-bold text-primary text-lg">{{ ev.name }}</h3>
-                @if (ev.description) {
-                  <p class="font-inter text-on-surface-variant text-sm leading-relaxed flex-1">{{ ev.description }}</p>
-                }
-                <div class="flex items-center justify-between pt-2 border-t border-outline-variant/20">
-                  <span class="font-inter text-xs text-on-surface-variant flex items-center gap-1">
-                    <span class="material-symbols-outlined text-xs" style="font-variation-settings:'FILL' 1">location_on</span>
-                    {{ ev.location }}
-                  </span>
-                  <span class="font-inter text-xs text-on-surface-variant">{{ ev.time }}</span>
-                </div>
-              </div>
+              <app-event [event]="ev" />
             }
           </div>
         }

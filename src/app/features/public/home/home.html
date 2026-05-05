@@ -92,32 +92,7 @@
 		} @else {
 		<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
 			@for (a of latestNews(); track a.id) {
-			<a [routerLink]="['/news', a.id]"
-				class="bg-surface-container-lowest rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-shadow flex flex-col">
-				<div class="aspect-[16/10] overflow-hidden bg-surface-container">
-					<img [src]="coverImage(a)" [alt]="a.name"
-						class="w-full h-full object-cover hover:scale-105 transition-transform duration-500" />
-				</div>
-				<div class="p-6 flex flex-col flex-1">
-					<div class="flex items-center gap-3 mb-3">
-						@if (firstCategory(a)) {
-						<span class="font-inter font-bold text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary">
-							{{ firstCategory(a) }}
-						</span>
-						}
-						<span class="font-inter text-xs text-on-surface-variant">{{ formatNewsDate(a.createdAt) }}</span>
-					</div>
-					<h3 class="font-romania font-bold text-primary text-lg leading-snug mb-2">{{ a.name }}</h3>
-					<p class="font-inter text-sm text-on-surface-variant leading-relaxed flex-1 line-clamp-3">
-						{{ a.description }}
-					</p>
-					<span
-						class="mt-4 inline-flex items-center gap-1 font-inter font-semibold text-sm text-secondary group-hover:gap-2 transition-all">
-						{{ 'home.read_more' | translate }}
-						<span class="material-symbols-outlined text-base">chevron_right</span>
-					</span>
-				</div>
-			</a>
+				<app-article [article]="a" />
 			}
 		</div>
 		}
@@ -149,37 +124,7 @@
 		} @else {
 		<div class="flex flex-col gap-4">
 			@for (ev of upcoming(); track ev.id; let i = $index) {
-			<a [routerLink]="ev.slug ? ['/events', ev.slug] : ['/events']"
-				class="flex flex-col sm:flex-row sm:items-center gap-4 bg-surface-container-lowest rounded-2xl px-5 py-5 shadow-sm border-l-4 hover:shadow-md transition-shadow"
-				[class]="accent(i)">
-				<div class="flex items-center gap-4 flex-1 min-w-0">
-					<!-- Date -->
-					<div class="text-center min-w-[3rem] flex-shrink-0">
-						<div class="font-romania font-extrabold text-primary text-3xl leading-none">{{ formatDay(ev.date) }}</div>
-						<div class="font-inter font-semibold text-on-surface-variant text-xs uppercase tracking-wider mt-0.5">{{
-							formatMonth(ev.date) }}</div>
-					</div>
-					<!-- Info -->
-					<div class="flex-1 min-w-0">
-						<h3 class="font-romania font-bold text-primary text-lg leading-tight">{{ ev.name }}</h3>
-						<div class="flex flex-wrap items-center gap-x-4 gap-y-1 mt-1 text-on-surface-variant font-inter text-sm">
-							<span class="flex items-center gap-1">
-								<span class="material-symbols-outlined text-sm">location_on</span>
-								{{ ev.location }}
-							</span>
-							<span class="flex items-center gap-1">
-								<span class="material-symbols-outlined text-sm">schedule</span>
-								{{ ev.time }}
-							</span>
-						</div>
-					</div>
-				</div>
-				<span
-					class="self-start sm:self-center flex items-center gap-1 font-inter font-semibold text-sm text-primary flex-shrink-0">
-					{{ 'home.event_1_btn' | translate }}
-					<span class="material-symbols-outlined text-base">arrow_forward</span>
-				</span>
-			</a>
+				<app-event-short [event]="ev" [accentClass]="accent(i)" />
 			}
 		</div>
 		}

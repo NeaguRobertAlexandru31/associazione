@@ -5,10 +5,11 @@ import { CalendarEvent } from '../../../core/models/event.model';
 import { EventsService } from '../../../core/services/events/events';
 import { SiteSettingsService } from '../../../core/services/site-settings/site-settings';
 import { environment } from '../../../../environments/environment';
+import { EventCard } from '../../../shared/components/public/event/event';
 
 @Component({
   selector: 'app-events',
-  imports: [RouterLink, TranslatePipe],
+  imports: [RouterLink, TranslatePipe, EventCard],
   templateUrl: './events.html',
   styleUrl: './events.css',
 })

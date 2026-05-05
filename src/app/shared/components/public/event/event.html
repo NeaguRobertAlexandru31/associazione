@@ -1,1 +1,22 @@
-<p>event works!</p>
+<div class="bg-surface-container-lowest rounded-2xl p-6 shadow-sm flex flex-col gap-3 h-full"
+     [routerLink]="event().slug ? ['/events', event().slug] : null"
+     [class.cursor-pointer]="event().slug">
+  <div class="aspect-[16/9] rounded-xl overflow-hidden bg-surface-container -mx-2 -mt-2 mb-3">
+    <img [src]="img()" [alt]="event().name" class="w-full h-full object-cover" />
+  </div>
+  <div>
+    <div class="font-romania font-extrabold text-primary text-3xl leading-none">{{ day() }}</div>
+    <div class="font-inter text-on-surface-variant text-xs uppercase tracking-wider">{{ month() }}</div>
+  </div>
+  <h3 class="font-romania font-bold text-primary text-lg">{{ event().name }}</h3>
+  @if (event().description) {
+    <p class="font-inter text-on-surface-variant text-sm leading-relaxed flex-1">{{ event().description }}</p>
+  }
+  <div class="flex items-center justify-between pt-2 border-t border-outline-variant/20">
+    <span class="font-inter text-xs text-on-surface-variant flex items-center gap-1">
+      <span class="material-symbols-outlined text-xs" style="font-variation-settings:'FILL' 1">location_on</span>
+      {{ event().location }}
+    </span>
+    <span class="font-inter text-xs text-on-surface-variant">{{ event().time }}</span>
+  </div>
+</div>

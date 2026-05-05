@@ -1,0 +1,27 @@
+<a [routerLink]="event().slug ? ['/events', event().slug] : ['/events']"
+   class="flex flex-col sm:flex-row sm:items-center gap-4 bg-surface-container-lowest rounded-2xl px-5 py-5 shadow-sm border-l-4 hover:shadow-md transition-shadow"
+   [class]="accentClass()">
+  <div class="flex items-center gap-4 flex-1 min-w-0">
+    <div class="text-center min-w-[3rem] flex-shrink-0">
+      <div class="font-romania font-extrabold text-primary text-3xl leading-none">{{ day() }}</div>
+      <div class="font-inter font-semibold text-on-surface-variant text-xs uppercase tracking-wider mt-0.5">{{ month() }}</div>
+    </div>
+    <div class="flex-1 min-w-0">
+      <h3 class="font-romania font-bold text-primary text-lg leading-tight">{{ event().name }}</h3>
+      <div class="flex flex-wrap items-center gap-x-4 gap-y-1 mt-1 text-on-surface-variant font-inter text-sm">
+        <span class="flex items-center gap-1">
+          <span class="material-symbols-outlined text-sm">location_on</span>
+          {{ event().location }}
+        </span>
+        <span class="flex items-center gap-1">
+          <span class="material-symbols-outlined text-sm">schedule</span>
+          {{ event().time }}
+        </span>
+      </div>
+    </div>
+  </div>
+  <span class="self-start sm:self-center flex items-center gap-1 font-inter font-semibold text-sm text-primary flex-shrink-0">
+    {{ 'home.event_1_btn' | translate }}
+    <span class="material-symbols-outlined text-base">arrow_forward</span>
+  </span>
+</a>

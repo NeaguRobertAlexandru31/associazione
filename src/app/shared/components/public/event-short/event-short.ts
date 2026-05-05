@@ -1,16 +1,17 @@
 import { Component, computed, input } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { TranslatePipe } from '../../../../i18n/translate.pipe';
 import { CalendarEvent } from '../../../../core/models/event.model';
-import { environment } from '../../../../../environments/environment';
 
 @Component({
-  selector: 'app-event',
-  imports: [RouterLink],
-  templateUrl: './event.html',
-  styleUrl: './event.css',
+  selector: 'app-event-short',
+  imports: [RouterLink, TranslatePipe],
+  templateUrl: './event-short.html',
+  styleUrl: './event-short.css',
 })
-export class EventCard {
-  event = input.required<CalendarEvent>();
+export class EventShort {
+  event       = input.required<CalendarEvent>();
+  accentClass = input<string>('border-secondary');
 
   readonly day   = computed(() =>
     new Date(this.event().date).toLocaleDateString('it-IT', { day: '2-digit' })
@@ -19,10 +20,4 @@ export class EventCard {
   readonly month = computed(() =>
     new Date(this.event().date).toLocaleDateString('it-IT', { month: 'short' }).toUpperCase()
   );
-
-  readonly img = computed(() => {
-    const path = this.event().images[0];
-    if (!path) return '/img/hero.jpg';
-    return path.startsWith('http') ? path : `${environment.apiUrl}${path}`;
-  });
 }

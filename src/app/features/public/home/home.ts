@@ -6,13 +6,15 @@ import { Article } from '../../../core/models/article.model';
 import { EventsService } from '../../../core/services/events/events';
 import { ArticlesService } from '../../../core/services/articles/articles';
 import { SiteSettingsService } from '../../../core/services/site-settings/site-settings';
-import { environment } from '../../../../environments/environment';
+import { ArticleCard } from '../../../shared/components/public/article/article';
+import { EventShort } from '../../../shared/components/public/event-short/event-short';
+
 
 const ACCENTS = ['border-secondary', 'border-[#f8bd2a]', 'border-primary/40'];
 
 @Component({
   selector: 'app-home',
-  imports: [RouterLink, TranslatePipe],
+  imports: [RouterLink, TranslatePipe, ArticleCard, EventShort],
   templateUrl: './home.html',
   styleUrl: './home.css',
 })
@@ -51,31 +53,7 @@ export class Home implements OnInit {
     return ACCENTS[index % ACCENTS.length];
   }
 
-  coverImage(a: Article): string {
-    const img = a.images[0];
-    if (!img) return '/img/hero.jpg';
-    return img.startsWith('http') ? img : `${environment.apiUrl}${img}`;
-  }
-
-  firstCategory(a: Article): string {
-    return a.categories[0] ?? '';
-  }
-
-  formatDay(iso: string): string {
-    return new Date(iso).toLocaleDateString('it-IT', { day: '2-digit' });
-  }
-
-  formatMonth(iso: string): string {
-    return new Date(iso).toLocaleDateString('it-IT', { month: 'short' }).toUpperCase();
-  }
-
   formatHeroDate(iso: string): string {
-    return new Date(iso).toLocaleDateString('it-IT', {
-      day: 'numeric', month: 'long', year: 'numeric',
-    });
-  }
-
-  formatNewsDate(iso: string): string {
     return new Date(iso).toLocaleDateString('it-IT', {
       day: 'numeric', month: 'long', year: 'numeric',
     });

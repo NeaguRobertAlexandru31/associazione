@@ -5,11 +5,12 @@ import { Article } from '../../../core/models/article.model';
 import { ArticlesService } from '../../../core/services/articles/articles';
 import { SiteSettingsService } from '../../../core/services/site-settings/site-settings';
 import { environment } from '../../../../environments/environment';
+import { ArticleCard } from '../../../shared/components/public/article/article';
 
 
 @Component({
   selector: 'app-news',
-  imports: [RouterLink, TranslatePipe],
+  imports: [RouterLink, TranslatePipe, ArticleCard],
   templateUrl: './news.html',
   styleUrl: './news.css',
 })

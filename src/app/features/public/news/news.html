@@ -79,28 +79,7 @@
       <!-- Grid -->
       <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
         @for (a of grid(); track a.id) {
-          <a [routerLink]="['/news', a.id]" class="bg-surface-container-lowest rounded-2xl overflow-hidden shadow-sm flex flex-col hover:shadow-md transition-shadow">
-            <div class="aspect-[4/3] overflow-hidden bg-surface-container relative">
-              <img [src]="coverImage(a)" [alt]="a.name"
-                   class="w-full h-full object-cover hover:scale-105 transition-transform duration-500" />
-              @if (firstCategory(a)) {
-                <span class="absolute top-3 left-3 font-inter font-bold text-[10px] uppercase tracking-widest px-3 py-1 rounded-full bg-surface/90 text-on-surface-variant backdrop-blur-sm">
-                  {{ firstCategory(a) }}
-                </span>
-              }
-            </div>
-            <div class="p-5 flex flex-col flex-1">
-              <p class="font-inter text-on-surface-variant text-xs mb-2">{{ formatDate(a.createdAt) }}</p>
-              <h3 class="font-romania font-bold text-primary text-lg mb-2 leading-tight">{{ a.name }}</h3>
-              <p class="font-inter text-on-surface-variant text-sm leading-relaxed flex-1 line-clamp-3">
-                {{ a.description }}
-              </p>
-              <span class="mt-4 inline-flex items-center gap-1 font-inter font-semibold text-xs text-secondary hover:underline underline-offset-4 mt-auto">
-                Leggi di più
-                <span class="material-symbols-outlined text-sm">arrow_forward</span>
-              </span>
-            </div>
-          </a>
+          <app-article [article]="a" />
         }
       </div>
 
