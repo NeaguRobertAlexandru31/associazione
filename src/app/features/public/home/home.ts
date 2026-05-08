@@ -1,4 +1,4 @@
-import { Component, HostListener, OnInit, computed, inject, signal } from '@angular/core';
+import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { TranslatePipe } from '../../../i18n/translate.pipe';
 import { CalendarEvent } from '../../../core/models/event.model';
@@ -23,21 +23,19 @@ export class Home implements OnInit {
   private articlesService = inject(ArticlesService);
   readonly siteSettings   = inject(SiteSettingsService);
 
-  parallaxOffset = 0;
-
-  allEvents = signal<CalendarEvent[]>([]);
-  allNews   = signal<Article[]>([]);
+  allEvents = signal<CalendarEvent[] | null>(null);
+  allNews   = signal<Article[] | null>(null);
 
   readonly upcoming = computed(() => {
+    const events = this.allEvents();
+    if (events === null) return null;
     const now = new Date();
-    return this.allEvents()
-      .filter(e => new Date(e.date) >= now)
-      .slice(0, 3);
+    return events.filter(e => new Date(e.date) >= now).slice(0, 3);
   });
 
-  readonly nextEvent = computed(() => this.upcoming()[0] ?? null);
+  readonly nextEvent = computed(() => this.upcoming()?.[0] ?? null);
 
-  readonly latestNews = computed(() => this.allNews().slice(0, 3));
+  readonly latestNews = computed(() => this.allNews()?.slice(0, 3) ?? null);
 
   ngOnInit(): void {
     this.siteSettings.load();
@@ -59,8 +57,4 @@ export class Home implements OnInit {
     });
   }
 
-  @HostListener('window:scroll')
-  onScroll(): void {
-    this.parallaxOffset = window.scrollY * 0.25;
-  }
 }

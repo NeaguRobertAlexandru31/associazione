@@ -4,8 +4,3 @@
 .hero-cta    { animation-delay: 0.65s; }
 .hero-image  { animation-delay: 0.4s; }
 .hero-card   { animation-delay: 0.75s; }
-
-.parallax-img {
-  will-change: transform;
-  transition: transform 0.05s linear;
-}

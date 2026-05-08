@@ -7,7 +7,7 @@ export const PLACEHOLDER_KEYS = [
   {
     key:         'placeholder_page_hero',
     label:       'Hero pagine',
-    description: 'Sfondo di default per Home, News, Eventi, Progetti, Donazioni, Contatti, Tesseramento, Boutique',
+    description: 'Sfondo di default per Home, Chi siamo, News, Eventi, Progetti, Donazioni, Contatti, Tesseramento, Boutique',
   },
   {
     key:         'placeholder_member',

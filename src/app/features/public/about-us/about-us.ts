@@ -1,4 +1,4 @@
-import { Component, HostListener, OnInit, computed, inject, signal } from '@angular/core';
+import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { TranslatePipe } from '../../../i18n/translate.pipe';
 import { SiteSettingsService } from '../../../core/services/site-settings/site-settings';
@@ -11,7 +11,6 @@ import { SiteSettingsService } from '../../../core/services/site-settings/site-s
 })
 export class AboutUs implements OnInit {
   readonly siteSettings = inject(SiteSettingsService);
-  parallaxOffset = 0;
   boardOffset = signal(0);
 
   readonly pillars = [
@@ -45,11 +44,7 @@ export class AboutUs implements OnInit {
   }
 
   nextBoard(): void {
-    this.boardOffset.update(v => Math.min(this.members.length - 1, v + 1));
+    this.boardOffset.update(v => Math.min(this.members().length - 1, v + 1));
   }
 
-  @HostListener('window:scroll')
-  onScroll(): void {
-    this.parallaxOffset = window.scrollY * 0.25;
-  }
 }

@@ -1,4 +1,4 @@
-import { Component, HostListener, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { TranslatePipe } from '../../../i18n/translate.pipe';
@@ -21,8 +21,6 @@ export interface Plan {
 export class Membership implements OnInit {
   private router        = inject(Router);
   readonly siteSettings = inject(SiteSettingsService);
-  parallaxOffset = 0;
-
   ngOnInit(): void { this.siteSettings.load(); }
 
   // ── Piani ────────────────────────────────────────────────────────────
@@ -97,8 +95,4 @@ export class Membership implements OnInit {
     console.log('Donation:', { amount, name: this.donorName, email: this.donorEmail });
   }
 
-  @HostListener('window:scroll')
-  onScroll(): void {
-    this.parallaxOffset = window.scrollY * 0.25;
-  }
 }
