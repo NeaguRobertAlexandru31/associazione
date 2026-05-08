@@ -1,6 +1,7 @@
-import { Component, computed, input } from '@angular/core';
+import { Component, computed, inject, input } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { Article as ArticleModel } from '../../../../core/models/article.model';
+import { SiteSettingsService } from '../../../../core/services/site-settings/site-settings';
 import { environment } from '../../../../../environments/environment';
 
 @Component({
@@ -10,11 +11,12 @@ import { environment } from '../../../../../environments/environment';
   styleUrl: './article.css',
 })
 export class ArticleCard {
+  private siteSettings = inject(SiteSettingsService);
   article = input.required<ArticleModel>();
 
   readonly coverImage = computed(() => {
     const img = this.article().images[0];
-    if (!img) return '/img/hero.jpg';
+    if (!img) return this.siteSettings.placeholder('placeholder_page_hero');
     return img.startsWith('http') ? img : `${environment.apiUrl}${img}`;
   });
 

@@ -26,7 +26,7 @@ export class Boutique implements OnInit {
   ngOnInit(): void { this.siteSettings.load(); }
 
   readonly featured: Product = {
-    img: '/img/member2.jpg',
+    img: '',
     categoryKey: 'boutique.p1_category',
     titleKey: 'boutique.p1_title',
     authorKey: 'boutique.p1_author',
@@ -37,7 +37,7 @@ export class Boutique implements OnInit {
   };
 
   readonly sideProduct: Product = {
-    img: '/img/member3.jpg',
+    img: '',
     categoryKey: 'boutique.p2_category',
     titleKey: 'boutique.p2_title',
     authorKey: 'boutique.p2_author',
@@ -47,7 +47,7 @@ export class Boutique implements OnInit {
   };
 
   readonly categories = [
-    { img: '/img/hero.jpg',        titleKey: 'boutique.cat_craft_title',  descKey: 'boutique.cat_craft_desc',  bg: '',         large: true  },
+    { img: '',                      titleKey: 'boutique.cat_craft_title',  descKey: 'boutique.cat_craft_desc',  bg: '',         large: true  },
     { img: '',                     titleKey: 'boutique.cat_books_title',   descKey: 'boutique.cat_books_desc',  bg: 'primary',  large: false, icon: 'menu_book' },
     { img: '',                     titleKey: 'boutique.cat_fashion_title', descKey: 'boutique.cat_fashion_desc', bg: 'secondary', large: false, icon: 'apparel'  },
   ];

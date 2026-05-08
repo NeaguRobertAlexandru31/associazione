@@ -44,8 +44,8 @@ export class Events implements OnInit {
     });
   }
 
-  resolveImg(path: string | undefined, fallback: string): string {
-    if (!path) return fallback;
+  resolveImg(path: string | undefined): string {
+    if (!path) return this.siteSettings.placeholder('placeholder_page_hero');
     return path.startsWith('http') ? path : `${environment.apiUrl}${path}`;
   }
 

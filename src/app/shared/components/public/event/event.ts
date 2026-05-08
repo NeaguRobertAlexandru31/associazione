@@ -1,6 +1,7 @@
-import { Component, computed, input } from '@angular/core';
+import { Component, computed, inject, input } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { CalendarEvent } from '../../../../core/models/event.model';
+import { SiteSettingsService } from '../../../../core/services/site-settings/site-settings';
 import { environment } from '../../../../../environments/environment';
 
 @Component({
@@ -10,6 +11,7 @@ import { environment } from '../../../../../environments/environment';
   styleUrl: './event.css',
 })
 export class EventCard {
+  private siteSettings = inject(SiteSettingsService);
   event = input.required<CalendarEvent>();
 
   readonly day   = computed(() =>
@@ -22,7 +24,7 @@ export class EventCard {
 
   readonly img = computed(() => {
     const path = this.event().images[0];
-    if (!path) return '/img/hero.jpg';
+    if (!path) return this.siteSettings.placeholder('placeholder_page_hero');
     return path.startsWith('http') ? path : `${environment.apiUrl}${path}`;
   });
 }

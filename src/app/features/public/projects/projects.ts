@@ -49,7 +49,7 @@ export class Projects implements OnInit {
 
   coverImage(p: Project): string {
     const img = p.images[0];
-    if (!img) return '/img/hero.jpg';
+    if (!img) return this.siteSettings.placeholder('placeholder_page_hero');
     return img.startsWith('http') ? img : `${environment.apiUrl}${img}`;
   }
 

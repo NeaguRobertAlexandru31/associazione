@@ -2,9 +2,9 @@ import { Component, OnInit, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../../core/services/auth/auth';
 import { LucideAngularModule } from 'lucide-angular';
-import { SiteSettingsService, SITE_IMAGE_KEYS } from '../../../core/services/site-settings/site-settings';
+import { SiteSettingsService, SITE_IMAGE_KEYS, PLACEHOLDER_KEYS } from '../../../core/services/site-settings/site-settings';
 
-type SettingsView = 'profile' | 'edit' | 'delete' | 'images';
+type SettingsView = 'profile' | 'edit' | 'delete' | 'images' | 'placeholders';
 
 @Component({
   selector: 'app-settings',
@@ -18,8 +18,10 @@ export class Settings implements OnInit {
   readonly imageKeys    = SITE_IMAGE_KEYS;
   uploadingKey          = signal<string | null>(null);
 
-  readonly isSuperAdmin = this.auth.isSuperAdmin;
-  readonly user         = this.auth.user;
+  readonly isSuperAdmin     = this.auth.isSuperAdmin;
+  readonly user             = this.auth.user;
+  readonly placeholderKeys  = PLACEHOLDER_KEYS;
+  uploadingPlaceholderKey   = signal<string | null>(null);
 
   // invite
   inviteLink    = signal<string | null>(null);
@@ -123,6 +125,25 @@ export class Settings implements OnInit {
         });
       },
       error: () => this.uploadingKey.set(null),
+    });
+  }
+
+  onPlaceholderFileSelected(key: string, event: Event): void {
+    const file = (event.target as HTMLInputElement).files?.[0];
+    if (!file) return;
+    this.uploadingPlaceholderKey.set(key);
+    this.siteSettings.uploadPlaceholder(file).subscribe({
+      next: res => {
+        const url = res.urls[0];
+        this.siteSettings.set(key, url).subscribe({
+          next: () => {
+            this.siteSettings.settings.update(s => ({ ...s, [key]: url }));
+            this.uploadingPlaceholderKey.set(null);
+          },
+          error: () => this.uploadingPlaceholderKey.set(null),
+        });
+      },
+      error: () => this.uploadingPlaceholderKey.set(null),
     });
   }
 
