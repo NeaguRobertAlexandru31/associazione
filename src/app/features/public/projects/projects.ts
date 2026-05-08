@@ -48,7 +48,7 @@ export class Projects implements OnInit {
   goToDetail(p: Project): void { this.router.navigate(['/projects', p.id]); }
 
   coverImage(p: Project): string {
-    const img = p.images[0];
+    const img = p.cover ?? p.images[0];
     if (!img) return this.siteSettings.placeholder('placeholder_page_hero');
     return img.startsWith('http') ? img : `${environment.apiUrl}${img}`;
   }

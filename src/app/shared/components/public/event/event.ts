@@ -23,7 +23,7 @@ export class EventCard {
   );
 
   readonly img = computed(() => {
-    const path = this.event().images[0];
+    const path = this.event().cover ?? this.event().images[0];
     if (!path) return this.siteSettings.placeholder('placeholder_page_hero');
     return path.startsWith('http') ? path : `${environment.apiUrl}${path}`;
   });

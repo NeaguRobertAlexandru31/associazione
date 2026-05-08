@@ -21,8 +21,8 @@
 
   <!-- Hero -->
   <section class="relative h-[55vh] min-h-[360px] overflow-hidden bg-surface-container">
-    @if (ev.images.length > 0) {
-      <img [src]="resolveImg(ev.images[0])" [alt]="ev.name" class="w-full h-full object-cover" />
+    @if (ev.cover || ev.images.length > 0) {
+      <img [src]="resolveImg(ev.cover ?? ev.images[0])" [alt]="ev.name" class="w-full h-full object-cover" />
       <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent"></div>
     } @else {
       <div class="absolute inset-0 flex items-center justify-center opacity-5"

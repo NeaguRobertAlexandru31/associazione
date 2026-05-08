@@ -49,6 +49,10 @@ export class AuthService {
     );
   }
 
+  checkMember(email: string): Observable<{ isMember: boolean; name?: string }> {
+    return this.http.post<{ isMember: boolean; name?: string }>(`${API_URL}/auth/check-member`, { email });
+  }
+
   createInvite(): Observable<InviteResponse> {
     return this.http.post<InviteResponse>(`${API_URL}/auth/invite`, {});
   }

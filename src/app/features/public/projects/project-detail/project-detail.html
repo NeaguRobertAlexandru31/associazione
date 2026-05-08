@@ -19,8 +19,8 @@
 
   <!-- Hero -->
   <section class="relative h-[55vh] min-h-[360px] overflow-hidden bg-surface-container">
-    @if (p.images.length > 0) {
-      <img [src]="resolveImg(p.images[0])" [alt]="p.title" class="w-full h-full object-cover" />
+    @if (p.cover || p.images.length > 0) {
+      <img [src]="resolveImg(p.cover ?? p.images[0])" [alt]="p.title" class="w-full h-full object-cover" />
       <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent"></div>
     } @else {
       <div class="absolute inset-0 opacity-5"

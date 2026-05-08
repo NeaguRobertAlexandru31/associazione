@@ -5,18 +5,12 @@
   <div class="absolute -top-40 -right-40 w-96 h-96 bg-primary/5 rounded-full blur-3xl pointer-events-none"></div>
   <div class="absolute -bottom-40 -left-40 w-96 h-96 bg-secondary/5 rounded-full blur-3xl pointer-events-none"></div>
 
-  <div class="register-card relative z-10 w-full max-w-sm">
-
+  <div class="register-card relative z-10 w-full"
+       [class.max-w-sm]="phase() !== 'membership'"
+       [class.max-w-lg]="phase() === 'membership'">
     <div class="bg-surface-container-lowest rounded-3xl shadow-xl border border-outline-variant/20 p-8">
 
-      <div class="text-center mb-8">
-        <div class="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-primary mb-4">
-          <span class="material-symbols-outlined text-on-primary text-2xl" style="font-variation-settings:'FILL' 1">person_add</span>
-        </div>
-        <h1 class="font-romania font-extrabold text-primary text-2xl tracking-tight">A.C.R.</h1>
-        <p class="font-inter text-on-surface-variant text-sm mt-1">Crea il tuo account admin</p>
-      </div>
-
+      <!-- ── SUCCESS ───────────────────────────────────────────────────── -->
       @if (success()) {
         <div class="flex flex-col items-center gap-3 py-6">
           <div class="w-14 h-14 rounded-full bg-green-100 flex items-center justify-center">
@@ -25,7 +19,17 @@
           <p class="font-inter font-semibold text-on-surface text-sm">Registrazione completata!</p>
           <p class="font-inter text-on-surface-variant text-xs">Accesso in corso…</p>
         </div>
-      } @else {
+
+      <!-- ── PHASE: email-check ────────────────────────────────────────── -->
+      } @else if (phase() === 'email-check') {
+
+        <div class="text-center mb-8">
+          <div class="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-primary mb-4">
+            <span class="material-symbols-outlined text-on-primary text-2xl" style="font-variation-settings:'FILL' 1">person_add</span>
+          </div>
+          <h1 class="font-romania font-extrabold text-primary text-2xl tracking-tight">A.C.R.</h1>
+          <p class="font-inter text-on-surface-variant text-sm mt-1">Crea il tuo account admin</p>
+        </div>
 
         @if (error()) {
           <div class="register-error flex items-center gap-2 bg-secondary/10 text-secondary border border-secondary/20 rounded-xl px-4 py-3 mb-5 font-inter text-sm">
@@ -34,20 +38,395 @@
           </div>
         }
 
-        <form (ngSubmit)="submit()" class="flex flex-col gap-4">
+        <div class="bg-primary/5 border border-primary/10 rounded-2xl p-4 mb-6">
+          <p class="font-inter text-sm text-on-surface-variant leading-relaxed">
+            Per accedere al pannello di controllo devi essere un socio registrato di A.C.R.
+            Inserisci l'email con cui ti sei iscritto (o ti iscriverai) come socio.
+          </p>
+        </div>
+
+        <form (ngSubmit)="submitEmailCheck()" class="flex flex-col gap-4">
           <div>
-            <label class="font-inter font-semibold text-[10px] text-on-surface-variant uppercase tracking-widest block mb-2">Nome e Cognome</label>
-            <input type="text" [(ngModel)]="name" name="name" required placeholder="Mario Rossi"
+            <label class="font-inter font-semibold text-[10px] text-on-surface-variant uppercase tracking-widest block mb-2">La tua email</label>
+            <input type="email" [(ngModel)]="checkEmail" name="checkEmail" required placeholder="mario@example.com"
                    class="w-full px-4 py-3 rounded-xl border border-outline-variant bg-surface font-inter text-sm focus:outline-none focus:border-primary transition-colors placeholder:text-on-surface-variant/40" />
           </div>
+          <button type="submit" [disabled]="loading() || !checkEmail"
+                  class="mt-2 w-full py-3.5 bg-primary text-on-primary font-inter font-bold text-sm rounded-xl hover:opacity-90 transition-all uppercase tracking-wide flex items-center justify-center gap-2 disabled:opacity-60">
+            @if (loading()) {
+              <span class="material-symbols-outlined text-base spin">progress_activity</span>
+              Verifica in corso…
+            } @else {
+              Continua
+              <span class="material-symbols-outlined text-base">arrow_forward</span>
+            }
+          </button>
+        </form>
+
+      <!-- ── PHASE: membership ─────────────────────────────────────────── -->
+      } @else if (phase() === 'membership') {
+
+        <!-- Header -->
+        <div class="mb-6">
+          <div class="flex items-center gap-3 mb-1">
+            <button (click)="memberBack()" class="w-8 h-8 rounded-full flex items-center justify-center text-on-surface-variant hover:bg-surface-container transition-colors">
+              <span class="material-symbols-outlined text-base">arrow_back</span>
+            </button>
+            <h2 class="font-romania font-extrabold text-primary text-xl">Iscrizione come socio</h2>
+          </div>
+          <p class="font-inter text-on-surface-variant text-xs ml-11">{{ memberEmail }}</p>
+        </div>
+
+        <!-- Progress bar -->
+        <div class="mb-6">
+          <div class="flex justify-between mb-2">
+            @for (label of ['Categoria', 'Dati', 'Contatti', 'Tutore', 'Privacy']; track label; let i = $index) {
+              @if (i < memberTotalSteps()) {
+                <span class="font-inter text-[10px] uppercase tracking-wider"
+                      [class.text-primary]="memberStep() > i || (memberStep() === 1 && i === 0)"
+                      [class.font-bold]="memberStep() === i + 1"
+                      [class.text-on-surface-variant]="memberStep() <= i && !(memberStep() === 1 && i === 0)">
+                  {{ label }}
+                </span>
+              }
+            }
+          </div>
+          <div class="h-1 bg-surface-container rounded-full overflow-hidden">
+            <div class="h-full bg-primary rounded-full transition-all duration-300" [style.width]="memberProgressWidth()"></div>
+          </div>
+        </div>
+
+        @if (error()) {
+          <div class="register-error flex items-center gap-2 bg-secondary/10 text-secondary border border-secondary/20 rounded-xl px-4 py-3 mb-5 font-inter text-sm">
+            <span class="material-symbols-outlined text-base flex-shrink-0" style="font-variation-settings:'FILL' 1">error</span>
+            {{ error() }}
+          </div>
+        }
+
+        <!-- Step 1: Categoria -->
+        @if (memberStep() === 1) {
+          <div class="flex flex-col gap-4">
+            <p class="font-inter font-semibold text-on-surface-variant text-xs uppercase tracking-widest">Tipo di iscrizione</p>
+            <div class="flex flex-col gap-3">
+              @for (opt of categoryOptions; track opt.value) {
+                <label class="flex items-center justify-between px-4 py-3 rounded-xl border cursor-pointer transition-all"
+                       [class.border-primary]="category === opt.value"
+                       [class.bg-primary/5]="category === opt.value"
+                       [class.border-outline-variant]="category !== opt.value">
+                  <div class="flex items-center gap-3">
+                    <input type="radio" [(ngModel)]="category" [value]="opt.value" name="category" class="accent-primary" />
+                    <span class="font-inter font-semibold text-sm text-on-surface">{{ opt.label }}</span>
+                  </div>
+                  <span class="font-inter text-xs text-on-surface-variant">{{ opt.price }}</span>
+                </label>
+              }
+            </div>
+            <label class="flex items-center gap-3 px-4 py-3 rounded-xl border border-outline-variant cursor-pointer">
+              <input type="checkbox" [(ngModel)]="isMinor" name="isMinor" class="accent-primary" />
+              <span class="font-inter text-sm text-on-surface">Minore di età</span>
+            </label>
+            <button (click)="memberNext()" class="mt-2 w-full py-3 bg-primary text-on-primary font-inter font-bold text-sm rounded-xl hover:opacity-90 transition-all flex items-center justify-center gap-2">
+              Avanti
+              <span class="material-symbols-outlined text-base">arrow_forward</span>
+            </button>
+          </div>
+        }
+
+        <!-- Step 2: Dati personali -->
+        @if (memberStep() === 2) {
+          <div class="flex flex-col gap-4">
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="font-inter font-semibold text-[10px] text-on-surface-variant uppercase tracking-widest block mb-1.5">Nome</label>
+                <input type="text" [(ngModel)]="firstName" name="firstName" placeholder="Mario"
+                       class="w-full px-3 py-2.5 rounded-xl border border-outline-variant bg-surface font-inter text-sm focus:outline-none focus:border-primary transition-colors" />
+              </div>
+              <div>
+                <label class="font-inter font-semibold text-[10px] text-on-surface-variant uppercase tracking-widest block mb-1.5">Cognome</label>
+                <input type="text" [(ngModel)]="lastName" name="lastName" placeholder="Rossi"
+                       class="w-full px-3 py-2.5 rounded-xl border border-outline-variant bg-surface font-inter text-sm focus:outline-none focus:border-primary transition-colors" />
+              </div>
+            </div>
+            <div>
+              <label class="font-inter font-semibold text-[10px] text-on-surface-variant uppercase tracking-widest block mb-1.5">Codice Fiscale</label>
+              <input type="text" [(ngModel)]="fiscalCode" name="fiscalCode" placeholder="RSSMRA80A01H501U" maxlength="16"
+                     class="w-full px-3 py-2.5 rounded-xl border border-outline-variant bg-surface font-inter text-sm uppercase focus:outline-none focus:border-primary transition-colors" />
+            </div>
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="font-inter font-semibold text-[10px] text-on-surface-variant uppercase tracking-widest block mb-1.5">Data di nascita</label>
+                <input type="date" [(ngModel)]="birthDate" name="birthDate"
+                       class="w-full px-3 py-2.5 rounded-xl border border-outline-variant bg-surface font-inter text-sm focus:outline-none focus:border-primary transition-colors" />
+              </div>
+              <div>
+                <label class="font-inter font-semibold text-[10px] text-on-surface-variant uppercase tracking-widest block mb-1.5">Luogo di nascita</label>
+                <input type="text" [(ngModel)]="birthPlace" name="birthPlace" placeholder="Roma"
+                       class="w-full px-3 py-2.5 rounded-xl border border-outline-variant bg-surface font-inter text-sm focus:outline-none focus:border-primary transition-colors" />
+              </div>
+            </div>
+            <div>
+              <label class="font-inter font-semibold text-[10px] text-on-surface-variant uppercase tracking-widest block mb-1.5">Sesso</label>
+              <div class="flex gap-2">
+                @for (g of genderOptions; track g.value) {
+                  <label class="flex-1 flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl border cursor-pointer transition-all font-inter text-sm"
+                         [class.border-primary]="gender === g.value" [class.bg-primary/5]="gender === g.value"
+                         [class.border-outline-variant]="gender !== g.value">
+                    <input type="radio" [(ngModel)]="gender" [value]="g.value" name="gender" class="accent-primary" />
+                    {{ g.label }}
+                  </label>
+                }
+              </div>
+            </div>
+            <div class="flex gap-3 mt-2">
+              <button (click)="memberBack()" class="flex-1 py-3 border border-outline-variant text-on-surface-variant font-inter font-bold text-sm rounded-xl hover:bg-surface-container transition-all flex items-center justify-center gap-2">
+                <span class="material-symbols-outlined text-base">arrow_back</span>
+                Indietro
+              </button>
+              <button (click)="memberNext()" class="flex-1 py-3 bg-primary text-on-primary font-inter font-bold text-sm rounded-xl hover:opacity-90 transition-all flex items-center justify-center gap-2">
+                Avanti
+                <span class="material-symbols-outlined text-base">arrow_forward</span>
+              </button>
+            </div>
+          </div>
+        }
+
+        <!-- Step 3: Contatti e documento -->
+        @if (memberStep() === 3) {
+          <div class="flex flex-col gap-4">
+            <div>
+              <label class="font-inter font-semibold text-[10px] text-on-surface-variant uppercase tracking-widest block mb-1.5">Tipo documento</label>
+              <div class="flex gap-2">
+                @for (d of docTypeOptions; track d.value) {
+                  <label class="flex-1 flex items-center justify-center gap-1.5 px-2 py-2.5 rounded-xl border cursor-pointer transition-all font-inter text-xs text-center"
+                         [class.border-primary]="docType === d.value" [class.bg-primary/5]="docType === d.value"
+                         [class.border-outline-variant]="docType !== d.value">
+                    <input type="radio" [(ngModel)]="docType" [value]="d.value" name="docType" class="accent-primary sr-only" />
+                    {{ d.label }}
+                  </label>
+                }
+              </div>
+            </div>
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="font-inter font-semibold text-[10px] text-on-surface-variant uppercase tracking-widest block mb-1.5">Numero documento</label>
+                <input type="text" [(ngModel)]="docNumber" name="docNumber" placeholder="CA00000AA"
+                       class="w-full px-3 py-2.5 rounded-xl border border-outline-variant bg-surface font-inter text-sm focus:outline-none focus:border-primary transition-colors" />
+              </div>
+              <div>
+                <label class="font-inter font-semibold text-[10px] text-on-surface-variant uppercase tracking-widest block mb-1.5">Scadenza documento</label>
+                <input type="date" [(ngModel)]="docExpiry" name="docExpiry"
+                       class="w-full px-3 py-2.5 rounded-xl border border-outline-variant bg-surface font-inter text-sm focus:outline-none focus:border-primary transition-colors" />
+              </div>
+            </div>
+            <div>
+              <label class="font-inter font-semibold text-[10px] text-on-surface-variant uppercase tracking-widest block mb-1.5">Email</label>
+              <input type="email" [value]="memberEmail" readonly
+                     class="w-full px-3 py-2.5 rounded-xl border border-outline-variant bg-surface-container font-inter text-sm text-on-surface-variant cursor-not-allowed" />
+            </div>
+            <div>
+              <label class="font-inter font-semibold text-[10px] text-on-surface-variant uppercase tracking-widest block mb-1.5">Telefono</label>
+              <input type="tel" [(ngModel)]="phone" name="phone" placeholder="+39 333 1234567"
+                     class="w-full px-3 py-2.5 rounded-xl border border-outline-variant bg-surface font-inter text-sm focus:outline-none focus:border-primary transition-colors" />
+            </div>
+            <div>
+              <label class="font-inter font-semibold text-[10px] text-on-surface-variant uppercase tracking-widest block mb-1.5">Via e numero civico</label>
+              <input type="text" [(ngModel)]="addressStreet" name="addressStreet" placeholder="Via Roma 1"
+                     class="w-full px-3 py-2.5 rounded-xl border border-outline-variant bg-surface font-inter text-sm focus:outline-none focus:border-primary transition-colors" />
+            </div>
+            <div class="grid grid-cols-3 gap-3">
+              <div>
+                <label class="font-inter font-semibold text-[10px] text-on-surface-variant uppercase tracking-widest block mb-1.5">CAP</label>
+                <input type="text" [(ngModel)]="addressZip" name="addressZip" placeholder="00100" maxlength="5"
+                       class="w-full px-3 py-2.5 rounded-xl border border-outline-variant bg-surface font-inter text-sm focus:outline-none focus:border-primary transition-colors" />
+              </div>
+              <div class="col-span-2">
+                <label class="font-inter font-semibold text-[10px] text-on-surface-variant uppercase tracking-widest block mb-1.5">Città</label>
+                <input type="text" [(ngModel)]="addressCity" name="addressCity" placeholder="Roma"
+                       class="w-full px-3 py-2.5 rounded-xl border border-outline-variant bg-surface font-inter text-sm focus:outline-none focus:border-primary transition-colors" />
+              </div>
+            </div>
+            <div>
+              <label class="font-inter font-semibold text-[10px] text-on-surface-variant uppercase tracking-widest block mb-1.5">Provincia</label>
+              <input type="text" [(ngModel)]="addressProvince" name="addressProvince" placeholder="RM" maxlength="2"
+                     class="w-full px-3 py-2.5 rounded-xl border border-outline-variant bg-surface font-inter text-sm uppercase focus:outline-none focus:border-primary transition-colors" />
+            </div>
+            <div class="flex gap-3 mt-2">
+              <button (click)="memberBack()" class="flex-1 py-3 border border-outline-variant text-on-surface-variant font-inter font-bold text-sm rounded-xl hover:bg-surface-container transition-all flex items-center justify-center gap-2">
+                <span class="material-symbols-outlined text-base">arrow_back</span>
+                Indietro
+              </button>
+              <button (click)="memberNext()" class="flex-1 py-3 bg-primary text-on-primary font-inter font-bold text-sm rounded-xl hover:opacity-90 transition-all flex items-center justify-center gap-2">
+                Avanti
+                <span class="material-symbols-outlined text-base">arrow_forward</span>
+              </button>
+            </div>
+          </div>
+        }
+
+        <!-- Step 4: Tutore (solo minorenni) -->
+        @if (memberStep() === 4) {
+          <div class="flex flex-col gap-4">
+            <div class="bg-secondary/5 rounded-xl px-4 py-3 font-inter text-xs text-on-surface-variant">
+              Dati del genitore o tutore legale del minorenne
+            </div>
+            <div>
+              <label class="font-inter font-semibold text-[10px] text-on-surface-variant uppercase tracking-widest block mb-1.5">Relazione</label>
+              <div class="flex gap-2">
+                @for (r of relationOptions; track r.value) {
+                  <label class="flex-1 flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl border cursor-pointer transition-all font-inter text-sm"
+                         [class.border-primary]="guardian.relation === r.value" [class.bg-primary/5]="guardian.relation === r.value"
+                         [class.border-outline-variant]="guardian.relation !== r.value">
+                    <input type="radio" [(ngModel)]="guardian.relation" [value]="r.value" name="guardianRelation" class="accent-primary" />
+                    {{ r.label }}
+                  </label>
+                }
+              </div>
+            </div>
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="font-inter font-semibold text-[10px] text-on-surface-variant uppercase tracking-widest block mb-1.5">Nome tutore</label>
+                <input type="text" [(ngModel)]="guardian.firstName" name="guardianFirstName"
+                       class="w-full px-3 py-2.5 rounded-xl border border-outline-variant bg-surface font-inter text-sm focus:outline-none focus:border-primary transition-colors" />
+              </div>
+              <div>
+                <label class="font-inter font-semibold text-[10px] text-on-surface-variant uppercase tracking-widest block mb-1.5">Cognome tutore</label>
+                <input type="text" [(ngModel)]="guardian.lastName" name="guardianLastName"
+                       class="w-full px-3 py-2.5 rounded-xl border border-outline-variant bg-surface font-inter text-sm focus:outline-none focus:border-primary transition-colors" />
+              </div>
+            </div>
+            <div>
+              <label class="font-inter font-semibold text-[10px] text-on-surface-variant uppercase tracking-widest block mb-1.5">Codice fiscale tutore</label>
+              <input type="text" [(ngModel)]="guardian.fiscalCode" name="guardianFiscalCode" maxlength="16"
+                     class="w-full px-3 py-2.5 rounded-xl border border-outline-variant bg-surface font-inter text-sm uppercase focus:outline-none focus:border-primary transition-colors" />
+            </div>
+            <div>
+              <label class="font-inter font-semibold text-[10px] text-on-surface-variant uppercase tracking-widest block mb-1.5">Tipo documento tutore</label>
+              <div class="flex gap-2">
+                @for (d of docTypeOptions; track d.value) {
+                  <label class="flex-1 flex items-center justify-center gap-1.5 px-2 py-2.5 rounded-xl border cursor-pointer transition-all font-inter text-xs text-center"
+                         [class.border-primary]="guardian.docType === d.value" [class.bg-primary/5]="guardian.docType === d.value"
+                         [class.border-outline-variant]="guardian.docType !== d.value">
+                    <input type="radio" [(ngModel)]="guardian.docType" [value]="d.value" name="guardianDocType" class="accent-primary sr-only" />
+                    {{ d.label }}
+                  </label>
+                }
+              </div>
+            </div>
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="font-inter font-semibold text-[10px] text-on-surface-variant uppercase tracking-widest block mb-1.5">Numero documento</label>
+                <input type="text" [(ngModel)]="guardian.docNumber" name="guardianDocNumber"
+                       class="w-full px-3 py-2.5 rounded-xl border border-outline-variant bg-surface font-inter text-sm focus:outline-none focus:border-primary transition-colors" />
+              </div>
+              <div>
+                <label class="font-inter font-semibold text-[10px] text-on-surface-variant uppercase tracking-widest block mb-1.5">Scadenza documento</label>
+                <input type="date" [(ngModel)]="guardian.docExpiry" name="guardianDocExpiry"
+                       class="w-full px-3 py-2.5 rounded-xl border border-outline-variant bg-surface font-inter text-sm focus:outline-none focus:border-primary transition-colors" />
+              </div>
+            </div>
+            <div class="flex gap-3 mt-2">
+              <button (click)="memberBack()" class="flex-1 py-3 border border-outline-variant text-on-surface-variant font-inter font-bold text-sm rounded-xl hover:bg-surface-container transition-all flex items-center justify-center gap-2">
+                <span class="material-symbols-outlined text-base">arrow_back</span>
+                Indietro
+              </button>
+              <button (click)="memberNext()" class="flex-1 py-3 bg-primary text-on-primary font-inter font-bold text-sm rounded-xl hover:opacity-90 transition-all flex items-center justify-center gap-2">
+                Avanti
+                <span class="material-symbols-outlined text-base">arrow_forward</span>
+              </button>
+            </div>
+          </div>
+        }
+
+        <!-- Step 5: Privacy e pagamento -->
+        @if (memberStep() === 5) {
+          <form (ngSubmit)="submitMembership()" class="flex flex-col gap-4">
+            <div>
+              <p class="font-inter font-semibold text-[10px] text-on-surface-variant uppercase tracking-widest mb-3">Modalità di pagamento</p>
+              <div class="flex gap-3">
+                <label class="flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xl border cursor-pointer transition-all font-inter text-sm"
+                       [class.border-primary]="paymentMethod === 'contanti'" [class.bg-primary/5]="paymentMethod === 'contanti'"
+                       [class.border-outline-variant]="paymentMethod !== 'contanti'">
+                  <input type="radio" [(ngModel)]="paymentMethod" value="contanti" name="paymentMethod" class="accent-primary" />
+                  <span class="material-symbols-outlined text-base" style="font-variation-settings:'FILL' 1">payments</span>
+                  Contanti
+                </label>
+                <label class="flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xl border cursor-pointer transition-all font-inter text-sm"
+                       [class.border-primary]="paymentMethod === 'online'" [class.bg-primary/5]="paymentMethod === 'online'"
+                       [class.border-outline-variant]="paymentMethod !== 'online'">
+                  <input type="radio" [(ngModel)]="paymentMethod" value="online" name="paymentMethod" class="accent-primary" />
+                  <span class="material-symbols-outlined text-base" style="font-variation-settings:'FILL' 1">credit_card</span>
+                  Online
+                </label>
+              </div>
+            </div>
+            <div class="flex flex-col gap-3 mt-1">
+              <label class="flex items-start gap-3 cursor-pointer">
+                <input type="checkbox" [(ngModel)]="privacyBase" name="privacyBase" class="accent-primary mt-0.5 flex-shrink-0" />
+                <span class="font-inter text-xs text-on-surface-variant leading-relaxed">
+                  <span class="font-semibold text-on-surface">* Consenso obbligatorio:</span>
+                  acconsento al trattamento dei dati personali per la gestione dell'iscrizione.
+                </span>
+              </label>
+              <label class="flex items-start gap-3 cursor-pointer">
+                <input type="checkbox" [(ngModel)]="privacyNewsletter" name="privacyNewsletter" class="accent-primary mt-0.5 flex-shrink-0" />
+                <span class="font-inter text-xs text-on-surface-variant">Acconsento a ricevere comunicazioni e newsletter dell'associazione.</span>
+              </label>
+              <label class="flex items-start gap-3 cursor-pointer">
+                <input type="checkbox" [(ngModel)]="privacyThirdParties" name="privacyThirdParties" class="accent-primary mt-0.5 flex-shrink-0" />
+                <span class="font-inter text-xs text-on-surface-variant">Acconsento alla comunicazione dei dati a terzi partner dell'associazione.</span>
+              </label>
+            </div>
+            <div class="flex gap-3 mt-2">
+              <button type="button" (click)="memberBack()" class="flex-1 py-3 border border-outline-variant text-on-surface-variant font-inter font-bold text-sm rounded-xl hover:bg-surface-container transition-all flex items-center justify-center gap-2">
+                <span class="material-symbols-outlined text-base">arrow_back</span>
+                Indietro
+              </button>
+              <button type="submit" [disabled]="loading()"
+                      class="flex-1 py-3 bg-primary text-on-primary font-inter font-bold text-sm rounded-xl hover:opacity-90 transition-all flex items-center justify-center gap-2 disabled:opacity-60">
+                @if (loading()) {
+                  <span class="material-symbols-outlined text-base spin">progress_activity</span>
+                  Invio…
+                } @else {
+                  Completa iscrizione
+                  <span class="material-symbols-outlined text-base">check</span>
+                }
+              </button>
+            </div>
+          </form>
+        }
+
+      <!-- ── PHASE: account ─────────────────────────────────────────────── -->
+      } @else {
+
+        <div class="text-center mb-8">
+          <div class="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-primary mb-4">
+            <span class="material-symbols-outlined text-on-primary text-2xl" style="font-variation-settings:'FILL' 1">lock_person</span>
+          </div>
+          <h1 class="font-romania font-extrabold text-primary text-2xl tracking-tight">Crea account</h1>
+          <p class="font-inter text-on-surface-variant text-sm mt-1">{{ memberEmail }}</p>
+        </div>
+
+        <div class="flex items-center gap-2 bg-green-50 border border-green-200 rounded-xl px-4 py-3 mb-5">
+          <span class="material-symbols-outlined text-green-600 text-base flex-shrink-0" style="font-variation-settings:'FILL' 1">verified</span>
+          <p class="font-inter text-green-700 text-sm">Socio verificato. Imposta le credenziali di accesso.</p>
+        </div>
+
+        @if (error()) {
+          <div class="register-error flex items-center gap-2 bg-secondary/10 text-secondary border border-secondary/20 rounded-xl px-4 py-3 mb-5 font-inter text-sm">
+            <span class="material-symbols-outlined text-base flex-shrink-0" style="font-variation-settings:'FILL' 1">error</span>
+            {{ error() }}
+          </div>
+        }
+
+        <form (ngSubmit)="submitAccount()" class="flex flex-col gap-4">
           <div>
-            <label class="font-inter font-semibold text-[10px] text-on-surface-variant uppercase tracking-widest block mb-2">Email</label>
-            <input type="email" [(ngModel)]="email" name="email" required placeholder="mario@acr.it"
+            <label class="font-inter font-semibold text-[10px] text-on-surface-variant uppercase tracking-widest block mb-2">Nome e Cognome</label>
+            <input type="text" [(ngModel)]="accountName" name="accountName" required placeholder="Mario Rossi"
                    class="w-full px-4 py-3 rounded-xl border border-outline-variant bg-surface font-inter text-sm focus:outline-none focus:border-primary transition-colors placeholder:text-on-surface-variant/40" />
           </div>
           <div>
             <label class="font-inter font-semibold text-[10px] text-on-surface-variant uppercase tracking-widest block mb-2">Password</label>
-            <input type="password" [(ngModel)]="password" name="password" required placeholder="••••••••"
+            <input type="password" [(ngModel)]="password" name="password" required placeholder="••••••••" minlength="6"
                    class="w-full px-4 py-3 rounded-xl border border-outline-variant bg-surface font-inter text-sm focus:outline-none focus:border-primary transition-colors placeholder:text-on-surface-variant/40" />
           </div>
           <div>
@@ -62,7 +441,7 @@
               Registrazione in corso…
             } @else {
               <span class="material-symbols-outlined text-base" style="font-variation-settings:'FILL' 1">person_add</span>
-              Registrati
+              Crea account
             }
           </button>
         </form>
