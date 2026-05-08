@@ -4,6 +4,13 @@ import { Observable } from 'rxjs';
 import { environment } from '../../../../environments/environment';
 import { DirettivoMember, MembersResponse, SocioMemberDetail, UpdateSocioRequest } from '../../models/member.model';
 
+export interface DonationStats {
+  count: number;
+  total: number;
+  thisMonthCount: number;
+  thisMonthTotal: number;
+}
+
 const API = environment.apiUrl;
 
 @Injectable({ providedIn: 'root' })
@@ -12,6 +19,10 @@ export class MembersService {
 
   getAll(): Observable<MembersResponse> {
     return this.http.get<MembersResponse>(`${API}/members`);
+  }
+
+  getDonationStats(): Observable<DonationStats> {
+    return this.http.get<DonationStats>(`${API}/members/donation-stats`);
   }
 
   getSocio(id: string): Observable<SocioMemberDetail> {

@@ -49,15 +49,24 @@ export class AuthService {
   }
 
   login(dto: LoginRequest): Observable<LoginResponse> {
-    return this.http.post<LoginResponse>(`${API_URL}/auth/login`, dto).pipe(
+    return this.http.post<LoginResponse>(`${API_URL}/auth/login`, dto, { withCredentials: true }).pipe(
       tap(res => this.persist(res)),
     );
   }
 
   register(dto: RegisterRequest): Observable<RegisterResponse> {
-    return this.http.post<RegisterResponse>(`${API_URL}/auth/register`, dto).pipe(
+    return this.http.post<RegisterResponse>(`${API_URL}/auth/register`, dto, { withCredentials: true }).pipe(
       tap(res => this.persist(res)),
     );
+  }
+
+  refresh(): Observable<{ access_token: string }> {
+    return this.http.post<{ access_token: string }>(`${API_URL}/auth/refresh`, {}, { withCredentials: true });
+  }
+
+  persistToken(token: string): void {
+    localStorage.setItem(TOKEN_KEY, token);
+    this._token.set(token);
   }
 
   checkMember(email: string): Observable<{ isMember: boolean }> {
@@ -97,6 +106,7 @@ export class AuthService {
   }
 
   logout(): void {
+    this.http.post(`${API_URL}/auth/logout`, {}, { withCredentials: true }).subscribe({ error: () => {} });
     localStorage.removeItem(TOKEN_KEY);
     localStorage.removeItem(USER_KEY);
     this._token.set(null);
