@@ -71,3 +71,16 @@ html {
   opacity: 0;
   animation: fadeIn 0.9s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
+
+.form-label {
+  @apply block font-inter font-semibold text-[10px] text-on-surface-variant uppercase tracking-widest mb-1.5;
+}
+.form-input {
+  @apply w-full px-3 py-2.5 rounded-xl border border-outline-variant bg-surface font-inter text-sm focus:outline-none focus:border-primary transition-colors;
+}
+.form-dt {
+  @apply font-inter text-xs text-on-surface-variant uppercase tracking-wide;
+}
+.form-dd {
+  @apply font-inter text-sm text-on-surface;
+}

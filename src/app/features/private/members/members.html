@@ -21,22 +21,36 @@
         <span class="material-symbols-outlined text-primary text-lg" style="font-variation-settings:'FILL' 1">shield_person</span>
         <h2 class="font-romania font-bold text-primary text-xl">Direttivo</h2>
         <span class="ml-auto font-inter text-xs text-on-surface-variant bg-surface-container px-2 py-1 rounded-full">{{ direttivo().length }}</span>
+        <button (click)="togglePrivate()"
+                class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-inter text-xs font-semibold transition-colors"
+                [class.bg-primary]="showPrivate()" [class.text-on-primary]="showPrivate()"
+                [class.bg-surface-container]="!showPrivate()" [class.text-on-surface-variant]="!showPrivate()">
+          <span class="material-symbols-outlined text-base">{{ showPrivate() ? 'visibility' : 'visibility_off' }}</span>
+          {{ showPrivate() ? 'Nascondi dati' : 'Mostra dati' }}
+        </button>
       </div>
       <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3">
         @for (m of direttivo(); track m.id) {
-          <div (click)="goToAdmin(m.id)"
-               class="bg-surface-container-lowest rounded-2xl p-4 shadow-sm flex items-center gap-3 cursor-pointer hover:bg-surface-container transition-colors">
-            <div class="w-10 h-10 rounded-full bg-primary flex items-center justify-center flex-shrink-0">
-              <span class="font-romania font-bold text-on-primary text-sm">{{ m.name[0] }}</span>
-            </div>
-            <div class="min-w-0 flex-1">
-              <p class="font-inter font-semibold text-on-surface text-sm truncate">{{ m.name }}</p>
-              <p class="font-inter text-on-surface-variant text-xs truncate">{{ m.email }}</p>
+          <div class="bg-surface-container-lowest rounded-2xl p-4 shadow-sm flex items-center gap-3 group">
+            <div (click)="goToAdmin(m.id)" class="flex items-center gap-3 flex-1 min-w-0 cursor-pointer">
+              <div class="w-10 h-10 rounded-full bg-primary flex items-center justify-center flex-shrink-0">
+                <span class="font-romania font-bold text-on-primary text-sm">{{ m.name[0] }}</span>
+              </div>
+              <div class="min-w-0 flex-1">
+                <p class="font-inter font-semibold text-on-surface text-sm truncate">{{ m.name }}</p>
+                <p class="font-inter text-on-surface-variant text-xs truncate">{{ mask(m.email) }}</p>
+              </div>
             </div>
             <span class="flex-shrink-0 font-inter text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full"
                   [class]="m.role === 'SUPERADMIN' ? 'bg-primary/10 text-primary' : 'bg-surface-container text-on-surface-variant'">
               {{ m.role === 'SUPERADMIN' ? 'Presidente' : 'Admin' }}
             </span>
+            @if (isSuperAdmin()) {
+              <button (click)="askDelete(m.id, 'admin', $event)"
+                      class="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-on-surface-variant/40 hover:bg-red-50 hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100">
+                <span class="material-symbols-outlined text-base">delete</span>
+              </button>
+            }
           </div>
         }
       </div>
@@ -62,29 +76,33 @@
             <span class="font-inter font-semibold text-[10px] text-on-surface-variant uppercase tracking-widest w-28 flex-shrink-0">Categoria</span>
             <span class="font-inter font-semibold text-[10px] text-on-surface-variant uppercase tracking-widest w-12 flex-shrink-0">Anno</span>
             <span class="font-inter font-semibold text-[10px] text-on-surface-variant uppercase tracking-widest w-24 flex-shrink-0">Stato</span>
-            <span class="w-4 flex-shrink-0"></span>
+            <span class="w-8 flex-shrink-0"></span>
           </div>
 
           @for (s of soci(); track s.id) {
-            <div (click)="goToSocio(s.id)"
-                 class="flex items-center gap-4 px-5 py-3.5 border-b border-outline-variant/10 last:border-0 hover:bg-surface-container/50 transition-colors cursor-pointer">
+            <div class="flex items-center gap-4 px-5 py-3.5 border-b border-outline-variant/10 last:border-0 hover:bg-surface-container/50 transition-colors group">
 
-              <!-- Avatar + nome -->
-              <div class="flex items-center gap-3 w-48 flex-shrink-0 min-w-0">
+              <!-- Avatar + nome (cliccabile) -->
+              <div (click)="goToSocio(s.id)"
+                   class="flex items-center gap-3 w-48 flex-shrink-0 min-w-0 cursor-pointer">
                 <div class="w-8 h-8 rounded-full bg-surface-container flex items-center justify-center flex-shrink-0">
                   <span class="font-romania font-bold text-on-surface-variant text-xs">{{ s.firstName[0] }}</span>
                 </div>
                 <div class="min-w-0">
                   <p class="font-inter text-on-surface text-sm truncate">{{ s.firstName }} {{ s.lastName }}</p>
-                  <p class="lg:hidden font-inter text-on-surface-variant text-xs truncate">{{ s.email }}</p>
+                  <p class="lg:hidden font-inter text-on-surface-variant text-xs truncate">{{ mask(s.email) }}</p>
                 </div>
               </div>
 
-              <!-- Email (desktop only) -->
-              <span class="hidden lg:block font-inter text-on-surface-variant text-sm flex-1 min-w-0 truncate">{{ s.email }}</span>
+              <!-- Email (desktop, cliccabile) -->
+              <span (click)="goToSocio(s.id)"
+                    class="hidden lg:block font-inter text-on-surface-variant text-sm flex-1 min-w-0 truncate cursor-pointer">
+                {{ mask(s.email) }}
+              </span>
 
-              <!-- Categoria badge (desktop only) -->
-              <span class="hidden lg:inline-flex items-center font-inter text-[11px] font-semibold px-2.5 py-1 rounded-full w-28 flex-shrink-0 justify-center"
+              <!-- Categoria badge -->
+              <span (click)="goToSocio(s.id)"
+                    class="hidden lg:inline-flex items-center font-inter text-[11px] font-semibold px-2.5 py-1 rounded-full w-28 flex-shrink-0 justify-center cursor-pointer"
                     [class]="{
                       'bg-primary/10 text-primary':                   s.category === 'sostenitore',
                       'bg-blue-100 text-blue-700':                    s.category === 'under26',
@@ -93,11 +111,15 @@
                 {{ s.category === 'under26' ? 'Under 26' : s.category === 'sostenitore' ? 'Sostenitore' : 'Ordinario' }}
               </span>
 
-              <!-- Anno (desktop only) -->
-              <span class="hidden lg:block font-inter text-on-surface-variant text-sm w-12 flex-shrink-0">{{ s.membershipYear }}</span>
+              <!-- Anno -->
+              <span (click)="goToSocio(s.id)"
+                    class="hidden lg:block font-inter text-on-surface-variant text-sm w-12 flex-shrink-0 cursor-pointer">
+                {{ s.membershipYear }}
+              </span>
 
               <!-- Stato badge -->
-              <span class="inline-flex items-center gap-1.5 font-inter text-[11px] font-semibold px-2.5 py-1 rounded-full ml-auto lg:ml-0 w-24 flex-shrink-0 justify-center"
+              <span (click)="goToSocio(s.id)"
+                    class="inline-flex items-center gap-1.5 font-inter text-[11px] font-semibold px-2.5 py-1 rounded-full ml-auto lg:ml-0 w-24 flex-shrink-0 justify-center cursor-pointer"
                     [class]="{
                       'bg-green-100 text-green-700':   s.status === 'attivo',
                       'bg-yellow-100 text-yellow-700': s.status === 'in_attesa_pagamento',
@@ -116,8 +138,15 @@
                    s.status === 'attivo'              ? 'Attivo' : 'Rifiutato' }}
               </span>
 
-              <!-- Chevron -->
-              <span class="material-symbols-outlined text-on-surface-variant/40 text-base w-4 flex-shrink-0">chevron_right</span>
+              <!-- Delete (superadmin) o chevron -->
+              @if (isSuperAdmin()) {
+                <button (click)="askDelete(s.id, 'socio', $event)"
+                        class="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-on-surface-variant/40 hover:bg-red-50 hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100">
+                  <span class="material-symbols-outlined text-base">delete</span>
+                </button>
+              } @else {
+                <span class="material-symbols-outlined text-on-surface-variant/40 text-base w-4 flex-shrink-0">chevron_right</span>
+              }
             </div>
           }
         </div>
@@ -126,3 +155,35 @@
 
   }
 </div>
+
+<!-- ── Confirm delete dialog ─────────────────────────────────────────────── -->
+@if (confirmDeleteId()) {
+  <div class="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-4" (click)="cancelDelete()">
+    <div class="bg-surface-container-lowest rounded-2xl shadow-xl p-6 w-full max-w-xs" (click)="$event.stopPropagation()">
+      <div class="flex items-center gap-3 mb-4">
+        <div class="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center flex-shrink-0">
+          <span class="material-symbols-outlined text-red-500 text-xl" style="font-variation-settings:'FILL' 1">delete</span>
+        </div>
+        <div>
+          <p class="font-inter font-bold text-on-surface text-sm">Conferma eliminazione</p>
+          <p class="font-inter text-on-surface-variant text-xs mt-0.5">
+            {{ confirmDeleteType() === 'socio' ? 'Il socio verrà eliminato definitivamente.' : 'Il membro del direttivo verrà rimosso.' }}
+          </p>
+        </div>
+      </div>
+      <div class="flex gap-3">
+        <button (click)="cancelDelete()" class="flex-1 py-2.5 rounded-xl border border-outline-variant font-inter font-semibold text-sm text-on-surface-variant hover:bg-surface-container transition-colors">
+          Annulla
+        </button>
+        <button (click)="confirmDelete()" [disabled]="deleteLoading()"
+                class="flex-1 py-2.5 rounded-xl bg-red-500 text-white font-inter font-bold text-sm hover:bg-red-600 transition-colors disabled:opacity-60 flex items-center justify-center gap-2">
+          @if (deleteLoading()) {
+            <span class="material-symbols-outlined text-base spin">progress_activity</span>
+          } @else {
+            Elimina
+          }
+        </button>
+      </div>
+    </div>
+  </div>
+}

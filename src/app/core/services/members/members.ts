@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from '../../../../environments/environment';
-import { DirettivoMember, MembersResponse, SocioMemberDetail } from '../../models/member.model';
+import { DirettivoMember, MembersResponse, SocioMemberDetail, UpdateSocioRequest } from '../../models/member.model';
 
 const API = environment.apiUrl;
 
@@ -18,7 +18,19 @@ export class MembersService {
     return this.http.get<SocioMemberDetail>(`${API}/members/soci/${id}`);
   }
 
+  updateSocio(id: string, dto: UpdateSocioRequest): Observable<SocioMemberDetail> {
+    return this.http.patch<SocioMemberDetail>(`${API}/members/soci/${id}`, dto);
+  }
+
+  deleteSocio(id: string): Observable<void> {
+    return this.http.delete<void>(`${API}/members/soci/${id}`);
+  }
+
   getAdmin(id: string): Observable<DirettivoMember> {
     return this.http.get<DirettivoMember>(`${API}/members/admin/${id}`);
+  }
+
+  deleteAdmin(id: string): Observable<void> {
+    return this.http.delete<void>(`${API}/members/admin/${id}`);
   }
 }

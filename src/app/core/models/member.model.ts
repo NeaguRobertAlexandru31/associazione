@@ -33,6 +33,15 @@ export interface Guardian {
   phone: string;
 }
 
+export interface UpdateSocioRequest {
+  firstName?: string; lastName?: string; fiscalCode?: string;
+  birthDate?: string; birthPlace?: string; gender?: string;
+  docType?: string; docNumber?: string; docExpiry?: string;
+  email?: string; phone?: string;
+  addressStreet?: string; addressZip?: string; addressCity?: string; addressProvince?: string;
+  category?: MemberCategory; status?: MemberStatus; paymentMethod?: string; isMinor?: boolean;
+}
+
 export interface SocioMemberDetail extends SocioMember {
   fiscalCode: string;
   birthDate: string;
