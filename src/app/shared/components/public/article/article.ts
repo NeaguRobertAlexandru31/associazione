@@ -15,10 +15,13 @@ export class ArticleCard {
   article = input.required<ArticleModel>();
 
   readonly coverImage = computed(() => {
-    const img = this.article().images[0];
+    const a = this.article();
+    const img = a.cover ?? a.blocks?.[0]?.image ?? null;
     if (!img) return this.siteSettings.placeholder('placeholder_page_hero');
     return img.startsWith('http') ? img : `${environment.apiUrl}${img}`;
   });
+
+  readonly previewText = computed(() => this.article().blocks?.[0]?.paragraph ?? '');
 
   readonly firstCategory = computed(() => this.article().categories[0] ?? '');
 

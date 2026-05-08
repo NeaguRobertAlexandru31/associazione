@@ -35,12 +35,15 @@ export class Projects implements OnInit {
   readonly checkedCount = computed(() => this.checkedIds().size);
 
   imagePreviews = signal<ImagePreview[]>([]);
+  coverPreview  = signal<ImagePreview | null>(null);
+
   readonly allUploaded = computed(() =>
-    this.imagePreviews().every(p => p.url !== null || p.error),
+    this.imagePreviews().every(p => p.url !== null || p.error) &&
+    (this.coverPreview() === null || this.coverPreview()!.url !== null || this.coverPreview()!.error),
   );
 
   readonly categories = CATEGORIES;
-  form: CreateProjectDto = { title: '', description: '', category: 'cultura', status: 'ongoing', images: [] };
+  form: CreateProjectDto = { title: '', description: '', category: 'cultura', status: 'ongoing', images: [], cover: undefined };
 
   ngOnInit(): void {
     this.projectsService.getAll().subscribe({
@@ -50,7 +53,7 @@ export class Projects implements OnInit {
   }
 
   openCreate(): void {
-    this.form = { title: '', description: '', category: 'cultura', status: 'ongoing', images: [] };
+    this.form = { title: '', description: '', category: 'cultura', status: 'ongoing', images: [], cover: undefined };
     this.clearPreviews();
     this.showModal.set(true);
   }
@@ -59,6 +62,44 @@ export class Projects implements OnInit {
 
   openDetail(p: Project): void { this.detailProject.set(p); }
   closeDetail(): void          { this.detailProject.set(null); }
+
+  // ── Cover upload ──────────────────────────────────────────────────────
+
+  onCoverSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (!input.files?.length) return;
+    this.uploadCover(input.files[0]);
+    input.value = '';
+  }
+
+  onCoverDrop(event: DragEvent): void {
+    event.preventDefault();
+    const file = Array.from(event.dataTransfer?.files ?? []).find(f => f.type.startsWith('image/'));
+    if (file) this.uploadCover(file);
+  }
+
+  private uploadCover(file: File): void {
+    const MAX_SIZE = 15 * 1024 * 1024;
+    if (file.size > MAX_SIZE) { alert(`"${file.name}" supera il limite di 5 MB.`); return; }
+    const preview: ImagePreview = { file, preview: URL.createObjectURL(file), uploading: true, url: null, error: false };
+    const old = this.coverPreview();
+    if (old) URL.revokeObjectURL(old.preview);
+    this.coverPreview.set(preview);
+    this.projectsService.uploadImages([file]).subscribe({
+      next: ({ urls }) => {
+        this.coverPreview.update(cp => cp ? { ...cp, uploading: false, url: urls[0] ?? null } : cp);
+        this.syncFormImages();
+      },
+      error: () => this.coverPreview.update(cp => cp ? { ...cp, uploading: false, error: true } : cp),
+    });
+  }
+
+  removeCover(): void {
+    const cp = this.coverPreview();
+    if (cp) URL.revokeObjectURL(cp.preview);
+    this.coverPreview.set(null);
+    this.form.cover = undefined;
+  }
 
   // ── Image upload ──────────────────────────────────────────────────────
 
@@ -122,11 +163,15 @@ export class Projects implements OnInit {
 
   private syncFormImages(): void {
     this.form.images = this.imagePreviews().filter(p => p.url !== null).map(p => p.url!);
+    this.form.cover  = this.coverPreview()?.url ?? undefined;
   }
 
   private clearPreviews(): void {
     this.imagePreviews().forEach(p => URL.revokeObjectURL(p.preview));
     this.imagePreviews.set([]);
+    const cp = this.coverPreview();
+    if (cp) URL.revokeObjectURL(cp.preview);
+    this.coverPreview.set(null);
   }
 
   // ── Submit / Delete ───────────────────────────────────────────────────

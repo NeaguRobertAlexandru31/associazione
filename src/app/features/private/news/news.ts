@@ -1,6 +1,6 @@
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { Article, CreateArticleDto } from '../../../core/models/article.model';
+import { Article, CreateArticleDto, CreateArticleBlockDto } from '../../../core/models/article.model';
 import { ArticlesService } from '../../../core/services/articles/articles';
 import { Toolbar } from '../../../shared/components/private/toolbar/toolbar';
 import { environment } from '../../../../environments/environment';
@@ -11,6 +11,12 @@ interface ImagePreview {
   uploading: boolean;
   url:       string | null;
   error:     boolean;
+}
+
+interface FormBlock {
+  subtitle:     string;
+  paragraph:    string;
+  imagePreview: ImagePreview | null;
 }
 
 const CATEGORIES = ['cultura', 'letteratura', 'artigianato', 'comunita', 'educazione', 'tradizione', 'sociale'];
@@ -27,7 +33,6 @@ export class News implements OnInit {
   articles      = signal<Article[]>([]);
   loading       = signal(true);
   saving        = signal(false);
-  deleting      = signal<string | null>(null);
 
   showModal     = signal(false);
   detailArticle = signal<Article | null>(null);
@@ -35,13 +40,20 @@ export class News implements OnInit {
   checkedIds    = signal<Set<string>>(new Set());
   readonly checkedCount = computed(() => this.checkedIds().size);
 
-  imagePreviews = signal<ImagePreview[]>([]);
+  formBlocks   = signal<FormBlock[]>([{ subtitle: '', paragraph: '', imagePreview: null }]);
+  coverPreview = signal<ImagePreview | null>(null);
+
   readonly allUploaded = computed(() =>
-    this.imagePreviews().every(p => p.url !== null || p.error),
+    (this.coverPreview() === null || this.coverPreview()!.url !== null || this.coverPreview()!.error) &&
+    this.formBlocks().every(b => b.imagePreview === null || b.imagePreview.url !== null || b.imagePreview.error),
+  );
+
+  readonly hasValidBlock = computed(() =>
+    this.formBlocks().some(b => b.paragraph.trim().length > 0),
   );
 
   readonly categories = CATEGORIES;
-  form: CreateArticleDto = { name: '', description: '', categories: [], images: [] };
+  form: CreateArticleDto = { name: '', categories: [], blocks: [], cover: undefined };
 
   ngOnInit(): void {
     this.articlesService.getAll().subscribe({
@@ -51,7 +63,7 @@ export class News implements OnInit {
   }
 
   openCreate(): void {
-    this.form = { name: '', description: '', categories: [], images: [] };
+    this.form = { name: '', categories: [], blocks: [], cover: undefined };
     this.clearPreviews();
     this.showModal.set(true);
   }
@@ -68,82 +80,144 @@ export class News implements OnInit {
 
   hasCategory(cat: string): boolean { return this.form.categories.includes(cat); }
 
-  // ── Image upload ──────────────────────────────────────────────────────
+  // ── Blocks ────────────────────────────────────────────────────────────
 
-  onFilesSelected(event: Event): void {
+  addBlock(): void {
+    this.formBlocks.update(list => [...list, { subtitle: '', paragraph: '', imagePreview: null }]);
+  }
+
+  removeBlock(index: number): void {
+    this.formBlocks.update(list => {
+      const updated = [...list];
+      const ip = updated[index].imagePreview;
+      if (ip) URL.revokeObjectURL(ip.preview);
+      updated.splice(index, 1);
+      return updated;
+    });
+  }
+
+  updateBlockSubtitle(index: number, val: string): void {
+    this.formBlocks.update(list => {
+      const updated = [...list];
+      updated[index] = { ...updated[index], subtitle: val };
+      return updated;
+    });
+  }
+
+  updateBlockParagraph(index: number, val: string): void {
+    this.formBlocks.update(list => {
+      const updated = [...list];
+      updated[index] = { ...updated[index], paragraph: val };
+      return updated;
+    });
+  }
+
+  onBlockImageSelected(event: Event, blockIndex: number): void {
     const input = event.target as HTMLInputElement;
     if (!input.files?.length) return;
-    this.uploadFiles(Array.from(input.files));
+    this.uploadBlockImage(input.files[0], blockIndex);
     input.value = '';
   }
 
-  onDrop(event: DragEvent): void {
+  onBlockImageDrop(event: DragEvent, blockIndex: number): void {
     event.preventDefault();
-    const files = Array.from(event.dataTransfer?.files ?? []).filter(f => f.type.startsWith('image/'));
-    if (files.length) this.uploadFiles(files);
+    const file = Array.from(event.dataTransfer?.files ?? []).find(f => f.type.startsWith('image/'));
+    if (file) this.uploadBlockImage(file, blockIndex);
+  }
+
+  removeBlockImage(blockIndex: number): void {
+    this.formBlocks.update(list => {
+      const updated = [...list];
+      const old = updated[blockIndex].imagePreview;
+      if (old) URL.revokeObjectURL(old.preview);
+      updated[blockIndex] = { ...updated[blockIndex], imagePreview: null };
+      return updated;
+    });
+  }
+
+  private uploadBlockImage(file: File, blockIndex: number): void {
+    const MAX_SIZE = 15 * 1024 * 1024;
+    if (file.size > MAX_SIZE) { alert(`"${file.name}" supera il limite di 5 MB.`); return; }
+    const preview: ImagePreview = { file, preview: URL.createObjectURL(file), uploading: true, url: null, error: false };
+    this.formBlocks.update(list => {
+      const updated = [...list];
+      const old = updated[blockIndex].imagePreview;
+      if (old) URL.revokeObjectURL(old.preview);
+      updated[blockIndex] = { ...updated[blockIndex], imagePreview: preview };
+      return updated;
+    });
+    this.articlesService.uploadImages([file]).subscribe({
+      next: ({ urls }) => {
+        this.formBlocks.update(list => {
+          const updated = [...list];
+          if (updated[blockIndex]?.imagePreview === preview) {
+            updated[blockIndex] = { ...updated[blockIndex], imagePreview: { ...preview, uploading: false, url: urls[0] ?? null } };
+          }
+          return updated;
+        });
+      },
+      error: () => {
+        this.formBlocks.update(list => {
+          const updated = [...list];
+          if (updated[blockIndex]?.imagePreview === preview) {
+            updated[blockIndex] = { ...updated[blockIndex], imagePreview: { ...preview, uploading: false, error: true } };
+          }
+          return updated;
+        });
+      },
+    });
+  }
+
+  // ── Cover upload ──────────────────────────────────────────────────────
+
+  onCoverSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (!input.files?.length) return;
+    this.uploadCover(input.files[0]);
+    input.value = '';
+  }
+
+  onCoverDrop(event: DragEvent): void {
+    event.preventDefault();
+    const file = Array.from(event.dataTransfer?.files ?? []).find(f => f.type.startsWith('image/'));
+    if (file) this.uploadCover(file);
+  }
+
+  private uploadCover(file: File): void {
+    const MAX_SIZE = 15 * 1024 * 1024;
+    if (file.size > MAX_SIZE) { alert(`"${file.name}" supera il limite di 5 MB.`); return; }
+    const preview: ImagePreview = { file, preview: URL.createObjectURL(file), uploading: true, url: null, error: false };
+    const old = this.coverPreview();
+    if (old) URL.revokeObjectURL(old.preview);
+    this.coverPreview.set(preview);
+    this.articlesService.uploadImages([file]).subscribe({
+      next: ({ urls }) => this.coverPreview.update(cp => cp ? { ...cp, uploading: false, url: urls[0] ?? null } : cp),
+      error: ()        => this.coverPreview.update(cp => cp ? { ...cp, uploading: false, error: true } : cp),
+    });
+  }
+
+  removeCover(): void {
+    const cp = this.coverPreview();
+    if (cp) URL.revokeObjectURL(cp.preview);
+    this.coverPreview.set(null);
   }
 
   onDragOver(event: DragEvent): void { event.preventDefault(); }
 
-  private uploadFiles(files: File[]): void {
-    const MAX_SIZE = 15 * 1024 * 1024;
-    files = files.filter(f => {
-      if (f.size > MAX_SIZE) { alert(`"${f.name}" supera il limite di 5 MB.`); return false; }
-      return true;
-    });
-    if (!files.length) return;
-
-    const newPreviews: ImagePreview[] = files.map(file => ({
-      file, preview: URL.createObjectURL(file), uploading: true, url: null, error: false,
-    }));
-    this.imagePreviews.update(list => [...list, ...newPreviews]);
-
-    this.articlesService.uploadImages(files).subscribe({
-      next: ({ urls }) => {
-        this.imagePreviews.update(list => {
-          const updated = [...list];
-          newPreviews.forEach((p, i) => {
-            const idx = updated.indexOf(p);
-            if (idx !== -1) updated[idx] = { ...updated[idx], uploading: false, url: urls[i] ?? null };
-          });
-          return updated;
-        });
-        this.syncFormImages();
-      },
-      error: () => {
-        this.imagePreviews.update(list =>
-          list.map(p => newPreviews.includes(p) ? { ...p, uploading: false, error: true } : p),
-        );
-      },
-    });
-  }
-
-  removePreview(index: number): void {
-    this.imagePreviews.update(list => {
-      const updated = [...list];
-      URL.revokeObjectURL(updated[index].preview);
-      updated.splice(index, 1);
-      return updated;
-    });
-    this.syncFormImages();
-  }
-
-  private syncFormImages(): void {
-    this.form.images = this.imagePreviews().filter(p => p.url !== null).map(p => p.url!);
-  }
-
-  private clearPreviews(): void {
-    this.imagePreviews().forEach(p => URL.revokeObjectURL(p.preview));
-    this.imagePreviews.set([]);
-  }
-
   // ── Submit / Delete ───────────────────────────────────────────────────
 
   submit(): void {
-    if (!this.form.name || !this.form.description) return;
-    this.syncFormImages();
+    if (!this.form.name) return;
+    const blocks: CreateArticleBlockDto[] = this.formBlocks()
+      .filter(b => b.paragraph.trim())
+      .map(b => ({
+        subtitle:  b.subtitle.trim() || undefined,
+        paragraph: b.paragraph,
+        image:     b.imagePreview?.url ?? undefined,
+      }));
+    if (!blocks.length) return;
     this.saving.set(true);
-    this.articlesService.create(this.form).subscribe({
+    this.articlesService.create({ ...this.form, blocks, cover: this.coverPreview()?.url ?? undefined }).subscribe({
       next: article => {
         this.articles.update(list => [article, ...list]);
         this.saving.set(false);
@@ -151,6 +225,14 @@ export class News implements OnInit {
       },
       error: () => this.saving.set(false),
     });
+  }
+
+  private clearPreviews(): void {
+    this.formBlocks().forEach(b => { if (b.imagePreview) URL.revokeObjectURL(b.imagePreview.preview); });
+    this.formBlocks.set([{ subtitle: '', paragraph: '', imagePreview: null }]);
+    const cp = this.coverPreview();
+    if (cp) URL.revokeObjectURL(cp.preview);
+    this.coverPreview.set(null);
   }
 
   toggleCheck(id: string, event: Event): void {
@@ -179,6 +261,15 @@ export class News implements OnInit {
   resolveImg(path: string): string {
     if (path.startsWith('http')) return path;
     return `${environment.apiUrl}${path}`;
+  }
+
+  articleThumb(a: Article): string {
+    const img = a.cover ?? a.blocks?.[0]?.image ?? null;
+    return img ? this.resolveImg(img) : '';
+  }
+
+  articlePreview(a: Article): string {
+    return a.blocks?.[0]?.paragraph ?? '';
   }
 
   formatDate(iso: string): string {

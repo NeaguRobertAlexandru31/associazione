@@ -8,6 +8,7 @@ export interface Project {
   category:    ProjectCategory;
   status:      ProjectStatus;
   images:      string[];
+  cover?:      string;
   createdAt:   string;
   updatedAt:   string;
 }
@@ -18,4 +19,5 @@ export interface CreateProjectDto {
   category:    ProjectCategory;
   status:      ProjectStatus;
   images:      string[];
+  cover?:      string;
 }

@@ -169,7 +169,41 @@
         </div>
 
         <div class="flex flex-col gap-2">
-          <label class="font-inter font-semibold text-xs text-on-surface-variant uppercase tracking-wider">Immagini</label>
+          <label class="font-inter font-semibold text-xs text-on-surface-variant uppercase tracking-wider">Copertina</label>
+          @if (coverPreview(); as cp) {
+            <div class="relative rounded-xl overflow-hidden bg-surface-container aspect-video group">
+              <img [src]="cp.preview" alt="" class="w-full h-full object-cover" />
+              @if (cp.uploading) {
+                <div class="absolute inset-0 bg-black/40 flex items-center justify-center">
+                  <span class="material-symbols-outlined text-white text-xl spin">progress_activity</span>
+                </div>
+              } @else if (cp.error) {
+                <div class="absolute inset-0 bg-red-500/60 flex items-center justify-center">
+                  <span class="material-symbols-outlined text-white text-xl">error</span>
+                </div>
+              } @else {
+                <div class="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all"></div>
+              }
+              <button type="button" (click)="removeCover()"
+                      class="absolute top-2 right-2 w-6 h-6 rounded-full bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-500">
+                <span class="material-symbols-outlined text-white text-sm">close</span>
+              </button>
+            </div>
+          } @else {
+            <label (dragover)="onDragOver($event)" (drop)="onCoverDrop($event)"
+                   class="flex flex-col items-center gap-2 px-4 py-5 rounded-xl border-2 border-dashed border-outline-variant/40 bg-surface-container hover:border-primary/40 hover:bg-primary/4 transition-all cursor-pointer">
+              <span class="material-symbols-outlined text-on-surface-variant text-2xl">image</span>
+              <span class="font-inter text-xs text-on-surface-variant text-center">
+                Trascina la copertina o <span class="text-primary font-semibold">clicca per selezionare</span>
+              </span>
+              <span class="font-inter text-[10px] text-on-surface-variant/60">JPG, PNG, WebP · max 5 MB · 1 immagine</span>
+              <input type="file" accept="image/*" class="hidden" (change)="onCoverSelected($event)" />
+            </label>
+          }
+        </div>
+
+        <div class="flex flex-col gap-2">
+          <label class="font-inter font-semibold text-xs text-on-surface-variant uppercase tracking-wider">Galleria immagini</label>
           <label (dragover)="onDragOver($event)" (drop)="onDrop($event)"
                  class="flex flex-col items-center gap-2 px-4 py-5 rounded-xl border-2 border-dashed border-outline-variant/40 bg-surface-container hover:border-primary/40 hover:bg-primary/4 transition-all cursor-pointer">
             <span class="material-symbols-outlined text-on-surface-variant text-2xl">add_photo_alternate</span>

@@ -7,6 +7,7 @@ export interface CalendarEvent {
   location: string;
   description?: string;
   images: string[];
+  cover?: string;
 }
 
 export interface CreateEventDto {
@@ -16,4 +17,5 @@ export interface CreateEventDto {
   location: string;
   description?: string;
   images?: string[];
+  cover?: string;
 }

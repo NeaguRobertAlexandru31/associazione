@@ -53,9 +53,13 @@ export class News implements OnInit {
   setFilter(value: string): void { this.activeFilter.set(value); }
 
   coverImage(a: Article): string {
-    const img = a.images[0];
+    const img = a.cover ?? a.blocks?.[0]?.image ?? null;
     if (!img) return this.siteSettings.placeholder('placeholder_page_hero');
     return img.startsWith('http') ? img : `${environment.apiUrl}${img}`;
+  }
+
+  previewText(a: Article): string {
+    return a.blocks?.[0]?.paragraph ?? '';
   }
 
   formatDate(iso: string): string {

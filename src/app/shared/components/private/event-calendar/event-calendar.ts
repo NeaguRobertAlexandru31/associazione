@@ -29,10 +29,12 @@ export class EventCalendar implements OnInit {
   detailEvent     = signal<CalendarEvent | null>(null);
 
   imagePreviews = signal<ImagePreview[]>([]);
-  form: CreateEventDto = { name: '', date: '', time: '', location: '', description: '', images: [] };
+  coverPreview  = signal<ImagePreview | null>(null);
+  form: CreateEventDto = { name: '', date: '', time: '', location: '', description: '', images: [], cover: undefined };
 
   readonly allUploaded = computed(() =>
-    this.imagePreviews().every(p => p.url !== null || p.error),
+    this.imagePreviews().every(p => p.url !== null || p.error) &&
+    (this.coverPreview() === null || this.coverPreview()!.url !== null || this.coverPreview()!.error),
   );
 
   ngOnInit(): void { this.load(); }
@@ -46,7 +48,7 @@ export class EventCalendar implements OnInit {
   }
 
   openCreate(): void {
-    this.form = { name: '', date: '', time: '', location: '', description: '', images: [] };
+    this.form = { name: '', date: '', time: '', location: '', description: '', images: [], cover: undefined };
     this.clearPreviews();
     this.showCreateModal.set(true);
   }
@@ -58,6 +60,44 @@ export class EventCalendar implements OnInit {
 
   openDetail(evt: CalendarEvent): void { this.detailEvent.set(evt); }
   closeDetail(): void { this.detailEvent.set(null); }
+
+  // ── Cover upload ──────────────────────────────────────────────────────
+
+  onCoverSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (!input.files?.length) return;
+    this.uploadCover(input.files[0]);
+    input.value = '';
+  }
+
+  onCoverDrop(event: DragEvent): void {
+    event.preventDefault();
+    const file = Array.from(event.dataTransfer?.files ?? []).find(f => f.type.startsWith('image/'));
+    if (file) this.uploadCover(file);
+  }
+
+  private uploadCover(file: File): void {
+    const MAX_SIZE = 15 * 1024 * 1024;
+    if (file.size > MAX_SIZE) { alert(`"${file.name}" supera il limite di 5 MB.`); return; }
+    const preview: ImagePreview = { file, preview: URL.createObjectURL(file), uploading: true, url: null, error: false };
+    const old = this.coverPreview();
+    if (old) URL.revokeObjectURL(old.preview);
+    this.coverPreview.set(preview);
+    this.eventsService.uploadImages([file]).subscribe({
+      next: ({ urls }) => {
+        this.coverPreview.update(cp => cp ? { ...cp, uploading: false, url: urls[0] ?? null } : cp);
+        this.syncFormImages();
+      },
+      error: () => this.coverPreview.update(cp => cp ? { ...cp, uploading: false, error: true } : cp),
+    });
+  }
+
+  removeCover(): void {
+    const cp = this.coverPreview();
+    if (cp) URL.revokeObjectURL(cp.preview);
+    this.coverPreview.set(null);
+    this.form.cover = undefined;
+  }
 
   // ── Image upload ──────────────────────────────────────────────────────
 
@@ -121,11 +161,15 @@ export class EventCalendar implements OnInit {
 
   private syncFormImages(): void {
     this.form.images = this.imagePreviews().filter(p => p.url !== null).map(p => p.url!);
+    this.form.cover  = this.coverPreview()?.url ?? undefined;
   }
 
   private clearPreviews(): void {
     this.imagePreviews().forEach(p => URL.revokeObjectURL(p.preview));
     this.imagePreviews.set([]);
+    const cp = this.coverPreview();
+    if (cp) URL.revokeObjectURL(cp.preview);
+    this.coverPreview.set(null);
   }
 
   // ── Submit / Delete ───────────────────────────────────────────────────

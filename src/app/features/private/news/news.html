@@ -27,17 +27,15 @@
         <button (click)="openDetail(a)"
                 class="w-full text-left px-5 py-4 border-b border-outline-variant/10 last:border-0 transition-colors flex items-center gap-4 hover:bg-surface-container/60">
 
-          <!-- Checkbox -->
           <div (click)="toggleCheck(a.id, $event)" class="flex-shrink-0 w-5 h-5 flex items-center justify-center">
             <input type="checkbox" [checked]="isChecked(a.id)"
                    (click)="$event.stopPropagation()" (change)="toggleCheck(a.id, $event)"
                    class="w-4 h-4 rounded accent-primary cursor-pointer" />
           </div>
 
-          <!-- Thumbnail -->
           <div class="w-14 h-14 rounded-xl overflow-hidden bg-surface-container flex-shrink-0">
-            @if (a.images.length > 0) {
-              <img [src]="resolveImg(a.images[0])" alt="" class="w-full h-full object-cover" />
+            @if (articleThumb(a)) {
+              <img [src]="articleThumb(a)" alt="" class="w-full h-full object-cover" />
             } @else {
               <div class="w-full h-full flex items-center justify-center">
                 <span class="material-symbols-outlined text-on-surface-variant/40 text-2xl">newspaper</span>
@@ -47,7 +45,7 @@
 
           <div class="flex-1 min-w-0">
             <p class="font-inter font-semibold text-on-surface text-sm truncate">{{ a.name }}</p>
-            <p class="font-inter text-xs text-on-surface-variant truncate mt-0.5">{{ a.description }}</p>
+            <p class="font-inter text-xs text-on-surface-variant truncate mt-0.5">{{ articlePreview(a) }}</p>
             <div class="flex items-center gap-2 mt-1.5 flex-wrap">
               @for (cat of a.categories; track cat) {
                 <span class="font-inter text-[10px] font-semibold uppercase tracking-wide px-2 py-0.5 rounded-full bg-primary/8 text-primary">
@@ -84,13 +82,9 @@
 
       <div class="flex-1 overflow-y-auto p-6 flex flex-col gap-4">
 
-        @if (a.images.length > 0) {
-          <div class="grid grid-cols-3 gap-2">
-            @for (img of a.images; track img) {
-              <div class="aspect-square rounded-xl overflow-hidden bg-surface-container">
-                <img [src]="resolveImg(img)" alt="" class="w-full h-full object-cover" />
-              </div>
-            }
+        @if (a.cover) {
+          <div class="rounded-xl overflow-hidden aspect-video bg-surface-container">
+            <img [src]="resolveImg(a.cover)" alt="" class="w-full h-full object-cover" />
           </div>
         }
 
@@ -102,9 +96,26 @@
           </div>
         }
 
-        <div class="bg-surface-container rounded-xl p-4">
-          <p class="font-inter text-sm text-on-surface leading-relaxed whitespace-pre-wrap">{{ a.description }}</p>
-        </div>
+        @if (a.blocks.length > 0) {
+          <div class="flex flex-col gap-4">
+            @for (block of a.blocks; track $index; let last = $last) {
+              <div class="flex flex-col gap-2">
+                @if (block.image) {
+                  <div class="rounded-xl overflow-hidden aspect-video bg-surface-container">
+                    <img [src]="resolveImg(block.image)" alt="" class="w-full h-full object-cover" />
+                  </div>
+                }
+                @if (block.subtitle) {
+                  <p class="font-romania font-bold text-primary text-base">{{ block.subtitle }}</p>
+                }
+                <p class="font-inter text-sm text-on-surface leading-relaxed whitespace-pre-wrap">{{ block.paragraph }}</p>
+              </div>
+              @if (!last) {
+                <div class="border-t border-outline-variant/20"></div>
+              }
+            }
+          </div>
+        }
 
         <button (click)="onDelete(a.id)"
                 class="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl border border-error/30 text-error font-inter font-bold text-sm hover:bg-error/8 transition-all">
@@ -132,18 +143,14 @@
 
       <div class="flex-1 overflow-y-auto p-6 flex flex-col gap-4">
 
+        <!-- Titolo -->
         <div class="flex flex-col gap-1">
           <label class="font-inter font-semibold text-xs text-on-surface-variant uppercase tracking-wider">Titolo *</label>
           <input [(ngModel)]="form.name" type="text" placeholder="Es. Serata di poesia"
                  class="w-full px-3 py-2.5 rounded-xl bg-surface-container border border-outline-variant/30 font-inter text-sm text-on-surface placeholder:text-on-surface-variant/50 outline-none focus:ring-2 focus:ring-primary/30 transition-all" />
         </div>
 
-        <div class="flex flex-col gap-1">
-          <label class="font-inter font-semibold text-xs text-on-surface-variant uppercase tracking-wider">Descrizione *</label>
-          <textarea [(ngModel)]="form.description" rows="5" placeholder="Testo dell'articolo..."
-                    class="w-full px-3 py-2.5 rounded-xl bg-surface-container border border-outline-variant/30 font-inter text-sm text-on-surface placeholder:text-on-surface-variant/50 outline-none focus:ring-2 focus:ring-primary/30 transition-all resize-none"></textarea>
-        </div>
-
+        <!-- Categorie -->
         <div class="flex flex-col gap-2">
           <label class="font-inter font-semibold text-xs text-on-surface-variant uppercase tracking-wider">Categorie</label>
           <div class="flex flex-wrap gap-2">
@@ -157,45 +164,109 @@
           </div>
         </div>
 
+        <!-- Copertina -->
         <div class="flex flex-col gap-2">
-          <label class="font-inter font-semibold text-xs text-on-surface-variant uppercase tracking-wider">Immagini</label>
-          <label (dragover)="onDragOver($event)" (drop)="onDrop($event)"
-                 class="flex flex-col items-center gap-2 px-4 py-5 rounded-xl border-2 border-dashed border-outline-variant/40 bg-surface-container hover:border-primary/40 hover:bg-primary/4 transition-all cursor-pointer">
-            <span class="material-symbols-outlined text-on-surface-variant text-2xl">add_photo_alternate</span>
-            <span class="font-inter text-xs text-on-surface-variant text-center">
-              Trascina qui le foto o <span class="text-primary font-semibold">clicca per selezionare</span>
-            </span>
-            <span class="font-inter text-[10px] text-on-surface-variant/60">JPG, PNG, WebP · max 5 MB cad.</span>
-            <input type="file" accept="image/*" multiple class="hidden" (change)="onFilesSelected($event)" />
-          </label>
+          <label class="font-inter font-semibold text-xs text-on-surface-variant uppercase tracking-wider">Copertina</label>
+          @if (coverPreview(); as cp) {
+            <div class="relative rounded-xl overflow-hidden bg-surface-container aspect-video group">
+              <img [src]="cp.preview" alt="" class="w-full h-full object-cover" />
+              @if (cp.uploading) {
+                <div class="absolute inset-0 bg-black/40 flex items-center justify-center">
+                  <span class="material-symbols-outlined text-white text-xl spin">progress_activity</span>
+                </div>
+              } @else if (cp.error) {
+                <div class="absolute inset-0 bg-red-500/60 flex items-center justify-center">
+                  <span class="material-symbols-outlined text-white text-xl">error</span>
+                </div>
+              } @else {
+                <div class="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all"></div>
+              }
+              <button type="button" (click)="removeCover()"
+                      class="absolute top-2 right-2 w-6 h-6 rounded-full bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-500">
+                <span class="material-symbols-outlined text-white text-sm">close</span>
+              </button>
+            </div>
+          } @else {
+            <label (dragover)="onDragOver($event)" (drop)="onCoverDrop($event)"
+                   class="flex flex-col items-center gap-2 px-4 py-5 rounded-xl border-2 border-dashed border-outline-variant/40 bg-surface-container hover:border-primary/40 hover:bg-primary/4 transition-all cursor-pointer">
+              <span class="material-symbols-outlined text-on-surface-variant text-2xl">image</span>
+              <span class="font-inter text-xs text-on-surface-variant text-center">
+                Trascina la copertina o <span class="text-primary font-semibold">clicca per selezionare</span>
+              </span>
+              <span class="font-inter text-[10px] text-on-surface-variant/60">JPG, PNG, WebP · max 5 MB · 1 immagine</span>
+              <input type="file" accept="image/*" class="hidden" (change)="onCoverSelected($event)" />
+            </label>
+          }
+        </div>
 
-          @if (imagePreviews().length > 0) {
-            <div class="grid grid-cols-3 gap-2 mt-1">
-              @for (p of imagePreviews(); track p.preview; let i = $index) {
-                <div class="relative aspect-square rounded-xl overflow-hidden bg-surface-container group">
-                  <img [src]="p.preview" alt="" class="w-full h-full object-cover" />
-                  @if (p.uploading) {
+        <!-- Box contenuto -->
+        <div class="flex flex-col gap-3">
+          <label class="font-inter font-semibold text-xs text-on-surface-variant uppercase tracking-wider">Contenuto *</label>
+
+          @for (block of formBlocks(); track $index; let i = $index) {
+            <div class="flex flex-col gap-3 p-4 bg-surface-container rounded-2xl border border-outline-variant/20">
+
+              <div class="flex items-center justify-between">
+                <span class="font-inter font-semibold text-xs text-on-surface-variant/70 uppercase tracking-wider">Box {{ i + 1 }}</span>
+                @if (formBlocks().length > 1) {
+                  <button type="button" (click)="removeBlock(i)"
+                          class="w-6 h-6 rounded-lg flex items-center justify-center text-error hover:bg-error/10 transition-colors">
+                    <span class="material-symbols-outlined text-sm">delete</span>
+                  </button>
+                }
+              </div>
+
+              <input [value]="block.subtitle"
+                     (input)="updateBlockSubtitle(i, $any($event.target).value)"
+                     type="text" placeholder="Sottotitolo (opzionale)"
+                     class="w-full px-3 py-2.5 rounded-xl bg-surface border border-outline-variant/30 font-inter text-sm text-on-surface placeholder:text-on-surface-variant/50 outline-none focus:ring-2 focus:ring-primary/30 transition-all" />
+
+              <textarea [value]="block.paragraph"
+                        (input)="updateBlockParagraph(i, $any($event.target).value)"
+                        rows="4" placeholder="Testo del paragrafo *"
+                        class="w-full px-3 py-2.5 rounded-xl bg-surface border border-outline-variant/30 font-inter text-sm text-on-surface placeholder:text-on-surface-variant/50 outline-none focus:ring-2 focus:ring-primary/30 transition-all resize-none"></textarea>
+
+              @if (block.imagePreview; as ip) {
+                <div class="relative rounded-xl overflow-hidden bg-surface-container aspect-video group">
+                  <img [src]="ip.preview" alt="" class="w-full h-full object-cover" />
+                  @if (ip.uploading) {
                     <div class="absolute inset-0 bg-black/40 flex items-center justify-center">
                       <span class="material-symbols-outlined text-white text-xl spin">progress_activity</span>
                     </div>
-                  } @else if (p.error) {
+                  } @else if (ip.error) {
                     <div class="absolute inset-0 bg-red-500/60 flex items-center justify-center">
                       <span class="material-symbols-outlined text-white text-xl">error</span>
                     </div>
                   } @else {
                     <div class="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all"></div>
                   }
-                  <button type="button" (click)="removePreview(i)"
-                          class="absolute top-1 right-1 w-5 h-5 rounded-full bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-500">
-                    <span class="material-symbols-outlined text-white text-xs">close</span>
+                  <button type="button" (click)="removeBlockImage(i)"
+                          class="absolute top-2 right-2 w-6 h-6 rounded-full bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-500">
+                    <span class="material-symbols-outlined text-white text-sm">close</span>
                   </button>
                 </div>
+              } @else {
+                <label (dragover)="onDragOver($event)" (drop)="onBlockImageDrop($event, i)"
+                       class="flex items-center gap-2 px-4 py-3 rounded-xl border border-dashed border-outline-variant/40 bg-surface hover:border-primary/40 hover:bg-primary/4 transition-all cursor-pointer">
+                  <span class="material-symbols-outlined text-on-surface-variant text-lg">add_photo_alternate</span>
+                  <span class="font-inter text-xs text-on-surface-variant">
+                    Immagine <span class="text-primary font-semibold">opzionale</span>
+                  </span>
+                  <input type="file" accept="image/*" class="hidden" (change)="onBlockImageSelected($event, i)" />
+                </label>
               }
+
             </div>
           }
+
+          <button type="button" (click)="addBlock()"
+                  class="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl border border-dashed border-outline-variant/40 font-inter font-semibold text-sm text-on-surface-variant hover:border-primary/60 hover:text-primary hover:bg-primary/4 transition-all">
+            <span class="material-symbols-outlined text-base" style="font-variation-settings:'FILL' 1">add</span>
+            Aggiungi box
+          </button>
         </div>
 
-        <button (click)="submit()" [disabled]="saving() || !allUploaded() || !form.name || !form.description"
+        <button (click)="submit()" [disabled]="saving() || !allUploaded() || !form.name || !hasValidBlock()"
                 class="w-full py-3 bg-primary text-on-primary font-inter font-bold text-sm rounded-xl hover:opacity-90 transition-all flex items-center justify-center gap-2 disabled:opacity-50">
           @if (saving()) {
             <span class="material-symbols-outlined text-base spin">progress_activity</span>
@@ -212,5 +283,3 @@
 }
 
 <app-toolbar [active]="checkedCount() > 0" [count]="checkedCount()" (delete)="onDelete()" />
-
-  
