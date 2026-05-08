@@ -2,11 +2,31 @@ export type MemberCategory = 'ordinario' | 'under26' | 'sostenitore';
 export type MemberStatus  = 'in_attesa_pagamento' | 'pagamento_in_corso' | 'attivo' | 'rifiutato';
 export type AdminRole     = 'SUPERADMIN' | 'ADMIN';
 
+export type BoardRole =
+  | 'presidente'
+  | 'vicepresidente'
+  | 'segretario'
+  | 'tesoriere'
+  | 'consigliere'
+  | 'revisore_dei_conti'
+  | 'responsabile_eventi';
+
+export const BOARD_ROLE_LABELS: Record<BoardRole, string> = {
+  presidente:          'Presidente',
+  vicepresidente:      'Vicepresidente',
+  segretario:          'Segretario',
+  tesoriere:           'Tesoriere',
+  consigliere:         'Consigliere',
+  revisore_dei_conti:  'Revisore dei conti',
+  responsabile_eventi: 'Responsabile eventi',
+};
+
 export interface DirettivoMember {
   id: string;
   name: string;
   email: string;
   role: AdminRole;
+  boardRoles?: BoardRole[];
   createdAt: string;
 }
 

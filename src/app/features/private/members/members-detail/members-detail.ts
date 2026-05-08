@@ -3,7 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../../../core/services/auth/auth';
-import { DirettivoMember, SocioMemberDetail, UpdateSocioRequest } from '../../../../core/models/member.model';
+import { BOARD_ROLE_LABELS, BoardRole, DirettivoMember, SocioMemberDetail, UpdateSocioRequest } from '../../../../core/models/member.model';
 import { MembersService } from '../../../../core/services/members/members';
 
 @Component({
@@ -43,6 +43,20 @@ export class MembersDetail implements OnInit {
   editCategory        = ''; editStatus          = ''; editPaymentMethod = '';
   editIsMinor         = false;
 
+  readonly boardRoleOptions: { value: BoardRole; label: string }[] = [
+    { value: 'presidente',          label: 'Presidente' },
+    { value: 'vicepresidente',      label: 'Vicepresidente' },
+    { value: 'segretario',          label: 'Segretario' },
+    { value: 'tesoriere',           label: 'Tesoriere' },
+    { value: 'consigliere',         label: 'Consigliere' },
+    { value: 'revisore_dei_conti',  label: 'Revisore dei conti' },
+    { value: 'responsabile_eventi', label: 'Responsabile eventi' },
+  ];
+
+  boardRolesSelected = signal<string[]>([]);
+  boardRoleSaving    = signal(false);
+  boardRoleSuccess   = signal(false);
+
   readonly categoryOptions  = [{ value: 'ordinario', label: 'Ordinario' }, { value: 'under26', label: 'Under 26' }, { value: 'sostenitore', label: 'Sostenitore' }];
   readonly statusOptions    = [{ value: 'in_attesa_pagamento', label: 'In attesa pagamento' }, { value: 'pagamento_in_corso', label: 'Pagamento in corso' }, { value: 'attivo', label: 'Attivo' }, { value: 'rifiutato', label: 'Rifiutato' }];
   readonly genderOptions    = [{ value: 'm', label: 'Maschio' }, { value: 'f', label: 'Femmina' }, { value: 'altro', label: 'Altro' }];
@@ -57,7 +71,11 @@ export class MembersDetail implements OnInit {
 
     if (isAdmin) {
       this.service.getAdmin(id).subscribe({
-        next: d  => { this.admin.set(d); this.loading.set(false); },
+        next: d  => {
+          this.admin.set(d);
+          this.boardRolesSelected.set(d.boardRoles ?? []);
+          this.loading.set(false);
+        },
         error: () => { this.error.set(true); this.loading.set(false); },
       });
     } else {
@@ -69,6 +87,27 @@ export class MembersDetail implements OnInit {
   }
 
   back(): void { this.router.navigate(['/dashboard/members']); }
+
+  saveBoardRole(): void {
+    const id = this.admin()?.id;
+    if (!id) return;
+    this.boardRoleSaving.set(true);
+    this.service.updateAdminBoardRoles(id, this.boardRolesSelected()).subscribe({
+      next: updated => {
+        this.admin.set(updated);
+        this.boardRoleSaving.set(false);
+        this.boardRoleSuccess.set(true);
+        setTimeout(() => this.boardRoleSuccess.set(false), 2000);
+      },
+      error: () => this.boardRoleSaving.set(false),
+    });
+  }
+
+  toggleBoardRole(value: string): void {
+    this.boardRolesSelected.update(roles =>
+      roles.includes(value) ? roles.filter(r => r !== value) : [...roles, value]
+    );
+  }
 
   togglePrivate(): void { this.showPrivate.update(v => !v); }
 
@@ -162,6 +201,16 @@ export class MembersDetail implements OnInit {
   }
 
   // ── Labels ────────────────────────────────────────────────────────────
+  boardRoleLabel(r: string | null | undefined): string {
+    if (!r) return '—';
+    return BOARD_ROLE_LABELS[r as BoardRole] ?? r;
+  }
+
+  boardRolesLabel(roles: BoardRole[] | undefined): string {
+    if (!roles?.length) return '—';
+    return roles.map(r => BOARD_ROLE_LABELS[r] ?? r).join(', ');
+  }
+
   categoryLabel(c: string): string {
     return c === 'under26' ? 'Under 26' : c === 'sostenitore' ? 'Sostenitore' : 'Ordinario';
   }

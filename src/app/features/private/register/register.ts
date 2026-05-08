@@ -93,7 +93,6 @@ export class Register implements OnInit {
         this.loading.set(false);
         this.memberEmail = this.checkEmail;
         if (res.isMember) {
-          this.accountName = res.name ?? '';
           this.phase.set('account');
         } else {
           this.phase.set('membership');

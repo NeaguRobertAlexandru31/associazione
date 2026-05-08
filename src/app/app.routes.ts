@@ -21,6 +21,7 @@ export const routes: Routes = [
 	// ── Auth ──────────────────────────────────────────────────────────────
 	{ path: 'login', 			loadComponent: () => import('./features/private/auth/auth').then(m => m.Auth) },
 	{ path: 'register', 		loadComponent: () => import('./features/private/register/register').then(m => m.Register) },
+	{ path: 'area-socio',       loadComponent: () => import('./features/private/personal/personal').then(m => m.Personal) },
 	// ── Dashboard (shell + children) ──────────────────────────────────────
 	{
 		path: 'dashboard',

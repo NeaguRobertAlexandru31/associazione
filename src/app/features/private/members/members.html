@@ -41,10 +41,27 @@
                 <p class="font-inter text-on-surface-variant text-xs truncate">{{ mask(m.email) }}</p>
               </div>
             </div>
-            <span class="flex-shrink-0 font-inter text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full"
-                  [class]="m.role === 'SUPERADMIN' ? 'bg-primary/10 text-primary' : 'bg-surface-container text-on-surface-variant'">
-              {{ m.role === 'SUPERADMIN' ? 'Presidente' : 'Admin' }}
-            </span>
+            <div class="flex flex-col items-end gap-1 flex-shrink-0">
+              <span class="font-inter text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full"
+                    [class]="m.role === 'SUPERADMIN' ? 'bg-primary/10 text-primary' : 'bg-surface-container text-on-surface-variant'">
+                {{ m.role === 'SUPERADMIN' ? 'Presidente' : 'Admin' }}
+              </span>
+              @if (m.boardRoles?.length) {
+                <span class="flex flex-wrap gap-1 justify-end max-w-[140px]">
+                  @for (r of m.boardRoles!; track r) {
+                    <span class="font-inter text-[9px] font-semibold text-on-surface-variant/70 bg-surface-container px-1.5 py-0.5 rounded-full truncate">
+                      {{ r === 'vicepresidente' ? 'Vicepres.' :
+                         r === 'segretario' ? 'Segretario' :
+                         r === 'tesoriere' ? 'Tesoriere' :
+                         r === 'consigliere' ? 'Consigliere' :
+                         r === 'revisore_dei_conti' ? 'Revisore' :
+                         r === 'responsabile_eventi' ? 'Resp. eventi' :
+                         r === 'presidente' ? 'Presidente' : r }}
+                    </span>
+                  }
+                </span>
+              }
+            </div>
             @if (isSuperAdmin()) {
               <button (click)="askDelete(m.id, 'admin', $event)"
                       class="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-on-surface-variant/40 hover:bg-red-50 hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100">

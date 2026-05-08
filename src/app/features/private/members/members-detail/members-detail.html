@@ -47,16 +47,63 @@
         </div>
       </div>
 
-      <dl class="divide-y divide-outline-variant/20">
+      <dl class="divide-y divide-outline-variant/20 mb-5">
         <div class="flex justify-between py-3">
           <dt class="font-inter text-xs text-on-surface-variant uppercase tracking-wide">Email</dt>
           <dd class="font-inter text-sm text-on-surface">{{ mask(admin()!.email) }}</dd>
+        </div>
+        <div class="flex justify-between py-3">
+          <dt class="font-inter text-xs text-on-surface-variant uppercase tracking-wide">Ruoli direttivo</dt>
+          <dd class="font-inter text-sm text-on-surface font-semibold">
+            @if (admin()!.boardRoles?.length) {
+              <span class="flex flex-wrap gap-1 justify-end">
+                @for (r of admin()!.boardRoles!; track r) {
+                  <span class="font-inter text-[10px] font-bold uppercase tracking-wider bg-primary/10 text-primary px-2 py-0.5 rounded-full">
+                    {{ boardRoleLabel(r) }}
+                  </span>
+                }
+              </span>
+            } @else {
+              <span class="text-on-surface-variant">—</span>
+            }
+          </dd>
         </div>
         <div class="flex justify-between py-3">
           <dt class="font-inter text-xs text-on-surface-variant uppercase tracking-wide">Membro dal</dt>
           <dd class="font-inter text-sm text-on-surface">{{ admin()!.createdAt | date:'dd/MM/yyyy' }}</dd>
         </div>
       </dl>
+
+      @if (isSuperAdmin()) {
+        <div class="border-t border-outline-variant/20 pt-4">
+          <p class="font-inter font-semibold text-[10px] text-on-surface-variant uppercase tracking-widest mb-3">Ruoli direttivo</p>
+          <div class="grid grid-cols-2 gap-2 mb-3">
+            @for (opt of boardRoleOptions; track opt.value) {
+              <label class="flex items-center gap-2 cursor-pointer select-none group">
+                <input type="checkbox"
+                       [checked]="boardRolesSelected().includes(opt.value)"
+                       (change)="toggleBoardRole(opt.value)"
+                       class="accent-primary w-4 h-4 cursor-pointer" />
+                <span class="font-inter text-sm text-on-surface group-hover:text-primary transition-colors">{{ opt.label }}</span>
+              </label>
+            }
+          </div>
+          <button (click)="saveBoardRole()" [disabled]="boardRoleSaving()"
+                  class="w-full py-2.5 rounded-xl font-inter font-bold text-sm transition-all flex items-center justify-center gap-2 disabled:opacity-60"
+                  [class.bg-green-100]="boardRoleSuccess()" [class.text-green-700]="boardRoleSuccess()"
+                  [class.bg-primary]="!boardRoleSuccess()" [class.text-on-primary]="!boardRoleSuccess()">
+            @if (boardRoleSaving()) {
+              <span class="material-symbols-outlined text-base spin">progress_activity</span>
+            } @else if (boardRoleSuccess()) {
+              <span class="material-symbols-outlined text-base" style="font-variation-settings:'FILL' 1">check_circle</span>
+              Salvato
+            } @else {
+              <span class="material-symbols-outlined text-base">save</span>
+              Salva ruoli
+            }
+          </button>
+        </div>
+      }
     </div>
 
   } @else if (type() === 'socio' && socio()) {

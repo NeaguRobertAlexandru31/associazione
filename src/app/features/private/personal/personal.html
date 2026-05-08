@@ -1,0 +1,433 @@
+<!-- ── Header ──────────────────────────────────────────────────────────────── -->
+<header class="sticky top-0 z-40 bg-surface border-b border-outline-variant/20 px-4 py-3 flex items-center justify-between">
+  <button (click)="goToSite()"
+          class="flex items-center gap-2 font-romania font-bold text-primary text-lg hover:opacity-80 transition-opacity">
+    <span class="material-symbols-outlined text-base text-on-surface-variant">arrow_back</span>
+    A.C.R.
+  </button>
+  @if (phase() === 'data') {
+    <button (click)="logout()"
+            class="flex items-center gap-1.5 font-inter text-xs text-on-surface-variant hover:text-primary transition-colors px-3 py-2 rounded-xl hover:bg-surface-container">
+      <span class="material-symbols-outlined text-base">logout</span>
+      Esci
+    </button>
+  }
+</header>
+
+<!-- ── Main ────────────────────────────────────────────────────────────────── -->
+<main class="min-h-screen bg-surface-container/30 py-10 px-4">
+  <div class="max-w-md mx-auto">
+
+    @if (loading() && phase() !== 'data') {
+      <div class="flex items-center justify-center min-h-[50vh]">
+        <span class="material-symbols-outlined text-primary text-4xl spin">progress_activity</span>
+      </div>
+
+    } @else if (phase() === 'email') {
+    <!-- ── FASE 1: email ───────────────────────────────────────────────────── -->
+      <div class="text-center mb-8">
+        <div class="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
+          <span class="material-symbols-outlined text-primary text-3xl" style="font-variation-settings:'FILL' 1">badge</span>
+        </div>
+        <h1 class="font-romania font-extrabold text-primary text-2xl mb-1">Area Socio</h1>
+        <p class="font-inter text-on-surface-variant text-sm">Inserisci la tua email per accedere ai tuoi dati.</p>
+      </div>
+
+      <div class="bg-surface-container-lowest rounded-2xl shadow-sm p-6">
+        @if (error()) {
+          <div class="flex items-center gap-2 bg-secondary/10 text-secondary border border-secondary/20 rounded-xl px-4 py-3 mb-4 font-inter text-sm">
+            <span class="material-symbols-outlined text-base flex-shrink-0" style="font-variation-settings:'FILL' 1">error</span>
+            <span>{{ error() }}</span>
+          </div>
+        }
+        <div class="mb-4">
+          <label class="form-label">Email</label>
+          <input type="email" [(ngModel)]="emailInput" name="email"
+                 (keyup.enter)="submitEmail()"
+                 placeholder="la-tua@email.it"
+                 class="form-input" />
+        </div>
+        <button (click)="submitEmail()" [disabled]="loading() || !emailInput.trim()"
+                class="w-full py-3 bg-primary text-on-primary font-inter font-bold text-sm rounded-xl hover:opacity-90 transition-all flex items-center justify-center gap-2 disabled:opacity-50">
+          @if (loading()) {
+            <span class="material-symbols-outlined text-base spin">progress_activity</span>
+          } @else {
+            Continua
+            <span class="material-symbols-outlined text-base">arrow_forward</span>
+          }
+        </button>
+        <p class="font-inter text-xs text-center text-on-surface-variant mt-4">
+          Non sei ancora socio?
+          <button (click)="goToMembership()" class="text-primary font-semibold hover:underline">Iscriviti</button>
+        </p>
+      </div>
+
+    } @else if (phase() === 'set-password') {
+    <!-- ── FASE 2: imposta password ───────────────────────────────────────── -->
+      <div class="text-center mb-8">
+        <div class="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
+          <span class="material-symbols-outlined text-primary text-3xl" style="font-variation-settings:'FILL' 1">lock</span>
+        </div>
+        <h1 class="font-romania font-extrabold text-primary text-2xl mb-1">Imposta password</h1>
+        <p class="font-inter text-on-surface-variant text-sm">
+          È il tuo primo accesso. Crea una password per <strong>{{ emailInput }}</strong>.
+        </p>
+      </div>
+
+      <div class="bg-surface-container-lowest rounded-2xl shadow-sm p-6">
+        @if (error()) {
+          <div class="flex items-center gap-2 bg-secondary/10 text-secondary border border-secondary/20 rounded-xl px-4 py-3 mb-4 font-inter text-sm">
+            <span class="material-symbols-outlined text-base flex-shrink-0" style="font-variation-settings:'FILL' 1">error</span>
+            <span>{{ error() }}</span>
+          </div>
+        }
+        <div class="mb-3">
+          <label class="form-label">Password (min. 8 caratteri)</label>
+          <input type="password" [(ngModel)]="newPassword" name="newPwd"
+                 class="form-input" />
+        </div>
+        <div class="mb-5">
+          <label class="form-label">Conferma password</label>
+          <input type="password" [(ngModel)]="confirmPassword" name="confirmPwd"
+                 (keyup.enter)="submitSetPassword()"
+                 class="form-input" />
+        </div>
+        <button (click)="submitSetPassword()" [disabled]="loading()"
+                class="w-full py-3 bg-primary text-on-primary font-inter font-bold text-sm rounded-xl hover:opacity-90 transition-all flex items-center justify-center gap-2 disabled:opacity-50">
+          @if (loading()) {
+            <span class="material-symbols-outlined text-base spin">progress_activity</span>
+          } @else {
+            Imposta e accedi
+          }
+        </button>
+        <button (click)="backToEmail()" class="w-full mt-2 py-2.5 font-inter text-xs text-on-surface-variant hover:text-primary transition-colors">
+          ← Cambia email
+        </button>
+      </div>
+
+    } @else if (phase() === 'login') {
+    <!-- ── FASE 3: accedi ─────────────────────────────────────────────────── -->
+      <div class="text-center mb-8">
+        <div class="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
+          <span class="material-symbols-outlined text-primary text-3xl" style="font-variation-settings:'FILL' 1">lock_open</span>
+        </div>
+        <h1 class="font-romania font-extrabold text-primary text-2xl mb-1">Bentornato</h1>
+        <p class="font-inter text-on-surface-variant text-sm">Inserisci la password per <strong>{{ emailInput }}</strong>.</p>
+      </div>
+
+      <div class="bg-surface-container-lowest rounded-2xl shadow-sm p-6">
+        @if (error()) {
+          <div class="flex items-center gap-2 bg-secondary/10 text-secondary border border-secondary/20 rounded-xl px-4 py-3 mb-4 font-inter text-sm">
+            <span class="material-symbols-outlined text-base flex-shrink-0" style="font-variation-settings:'FILL' 1">error</span>
+            <span>{{ error() }}</span>
+          </div>
+        }
+        <div class="mb-5">
+          <label class="form-label">Password</label>
+          <input type="password" [(ngModel)]="loginPassword" name="loginPwd"
+                 (keyup.enter)="submitLogin()"
+                 class="form-input" />
+        </div>
+        <button (click)="submitLogin()" [disabled]="loading() || !loginPassword"
+                class="w-full py-3 bg-primary text-on-primary font-inter font-bold text-sm rounded-xl hover:opacity-90 transition-all flex items-center justify-center gap-2 disabled:opacity-50">
+          @if (loading()) {
+            <span class="material-symbols-outlined text-base spin">progress_activity</span>
+          } @else {
+            Accedi
+          }
+        </button>
+        <button (click)="backToEmail()" class="w-full mt-2 py-2.5 font-inter text-xs text-on-surface-variant hover:text-primary transition-colors">
+          ← Cambia email
+        </button>
+      </div>
+
+    } @else if (phase() === 'data') {
+    <!-- ── FASE 4: dati ───────────────────────────────────────────────────── -->
+
+      <!-- Header card -->
+      <div class="bg-surface-container-lowest rounded-2xl shadow-sm p-5 mb-4">
+        <div class="flex items-center gap-4">
+          <div class="w-14 h-14 rounded-full bg-surface-container flex items-center justify-center flex-shrink-0">
+            <span class="font-romania font-bold text-on-surface-variant text-xl">{{ member()!.firstName[0] }}</span>
+          </div>
+          <div class="flex-1 min-w-0">
+            <h2 class="font-romania font-bold text-on-surface text-xl">{{ member()!.firstName }} {{ member()!.lastName }}</h2>
+            <div class="flex flex-wrap gap-2 mt-1">
+              <span class="font-inter text-[11px] font-semibold px-2.5 py-1 rounded-full"
+                    [class]="{
+                      'bg-primary/10 text-primary':                   member()!.category === 'sostenitore',
+                      'bg-blue-100 text-blue-700':                    member()!.category === 'under26',
+                      'bg-surface-container text-on-surface-variant': member()!.category === 'ordinario'
+                    }">{{ categoryLabel(member()!.category) }}</span>
+              <span class="font-inter text-[11px] font-semibold px-2.5 py-1 rounded-full inline-flex items-center gap-1.5"
+                    [class]="{
+                      'bg-green-100 text-green-700':   member()!.status === 'attivo',
+                      'bg-yellow-100 text-yellow-700': member()!.status === 'in_attesa_pagamento',
+                      'bg-blue-100 text-blue-700':     member()!.status === 'pagamento_in_corso',
+                      'bg-red-100 text-red-700':       member()!.status === 'rifiutato'
+                    }">
+                <span class="w-1.5 h-1.5 rounded-full"
+                      [class]="{
+                        'bg-green-500':  member()!.status === 'attivo',
+                        'bg-yellow-500': member()!.status === 'in_attesa_pagamento',
+                        'bg-blue-500':   member()!.status === 'pagamento_in_corso',
+                        'bg-red-500':    member()!.status === 'rifiutato'
+                      }"></span>
+                {{ statusLabel(member()!.status) }}
+              </span>
+            </div>
+          </div>
+          <button (click)="togglePrivate()"
+                  class="flex items-center gap-1.5 px-3 py-2 rounded-xl font-inter text-xs font-semibold transition-colors flex-shrink-0"
+                  [class.bg-primary]="showPrivate()" [class.text-on-primary]="showPrivate()"
+                  [class.bg-surface-container]="!showPrivate()" [class.text-on-surface-variant]="!showPrivate()">
+            <span class="material-symbols-outlined text-base">{{ showPrivate() ? 'visibility' : 'visibility_off' }}</span>
+          </button>
+        </div>
+      </div>
+
+      @if (editMode()) {
+      <!-- edit mode -->
+        @if (saveError()) {
+          <div class="flex items-center gap-2 bg-secondary/10 text-secondary border border-secondary/20 rounded-xl px-4 py-3 mb-4 font-inter text-sm">
+            <span class="material-symbols-outlined text-base flex-shrink-0" style="font-variation-settings:'FILL' 1">error</span>
+            {{ saveError() }}
+          </div>
+        }
+        <div class="flex flex-col gap-4">
+
+          <!-- Anagrafica -->
+          <div class="bg-surface-container-lowest rounded-2xl shadow-sm p-5">
+            <h3 class="font-romania font-bold text-on-surface text-base mb-4">Dati anagrafici</h3>
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="form-label">Nome</label>
+                <input type="text" [(ngModel)]="editFirstName" name="eFirstName" class="form-input" />
+              </div>
+              <div>
+                <label class="form-label">Cognome</label>
+                <input type="text" [(ngModel)]="editLastName" name="eLastName" class="form-input" />
+              </div>
+              <div class="col-span-2">
+                <label class="form-label">Codice fiscale</label>
+                <input type="text" [(ngModel)]="editFiscalCode" name="eFiscalCode" class="form-input uppercase" maxlength="16" />
+              </div>
+              <div>
+                <label class="form-label">Data di nascita</label>
+                <input type="date" [(ngModel)]="editBirthDate" name="eBirthDate" class="form-input" />
+              </div>
+              <div>
+                <label class="form-label">Luogo di nascita</label>
+                <input type="text" [(ngModel)]="editBirthPlace" name="eBirthPlace" class="form-input" />
+              </div>
+              <div class="col-span-2">
+                <label class="form-label">Sesso</label>
+                <select [(ngModel)]="editGender" name="eGender" class="form-input">
+                  @for (g of genderOptions; track g.value) {
+                    <option [value]="g.value">{{ g.label }}</option>
+                  }
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- Documento -->
+          <div class="bg-surface-container-lowest rounded-2xl shadow-sm p-5">
+            <h3 class="font-romania font-bold text-on-surface text-base mb-4">Documento</h3>
+            <div class="grid grid-cols-2 gap-3">
+              <div class="col-span-2">
+                <label class="form-label">Tipo</label>
+                <select [(ngModel)]="editDocType" name="eDocType" class="form-input">
+                  @for (d of docTypeOptions; track d.value) {
+                    <option [value]="d.value">{{ d.label }}</option>
+                  }
+                </select>
+              </div>
+              <div>
+                <label class="form-label">Numero</label>
+                <input type="text" [(ngModel)]="editDocNumber" name="eDocNumber" class="form-input" />
+              </div>
+              <div>
+                <label class="form-label">Scadenza</label>
+                <input type="date" [(ngModel)]="editDocExpiry" name="eDocExpiry" class="form-input" />
+              </div>
+            </div>
+          </div>
+
+          <!-- Contatti -->
+          <div class="bg-surface-container-lowest rounded-2xl shadow-sm p-5">
+            <h3 class="font-romania font-bold text-on-surface text-base mb-4">Contatti</h3>
+            <div class="grid grid-cols-2 gap-3">
+              <div class="col-span-2">
+                <label class="form-label">Email</label>
+                <input type="email" [(ngModel)]="editEmail" name="eEmail" class="form-input" />
+              </div>
+              <div class="col-span-2">
+                <label class="form-label">Telefono</label>
+                <input type="tel" [(ngModel)]="editPhone" name="ePhone" class="form-input" />
+              </div>
+              <div class="col-span-2">
+                <label class="form-label">Via e civico</label>
+                <input type="text" [(ngModel)]="editAddressStreet" name="eStreet" class="form-input" />
+              </div>
+              <div>
+                <label class="form-label">CAP</label>
+                <input type="text" [(ngModel)]="editAddressZip" name="eZip" class="form-input" maxlength="5" />
+              </div>
+              <div>
+                <label class="form-label">Città</label>
+                <input type="text" [(ngModel)]="editAddressCity" name="eCity" class="form-input" />
+              </div>
+              <div class="col-span-2">
+                <label class="form-label">Provincia</label>
+                <input type="text" [(ngModel)]="editAddressProvince" name="eProvince" class="form-input uppercase" maxlength="2" />
+              </div>
+            </div>
+          </div>
+
+          <!-- Privacy -->
+          <div class="bg-surface-container-lowest rounded-2xl shadow-sm p-5">
+            <h3 class="font-romania font-bold text-on-surface text-base mb-4">Comunicazioni</h3>
+            <div class="flex flex-col gap-3">
+              <label class="flex items-start gap-3 cursor-pointer">
+                <input type="checkbox" [(ngModel)]="editNewsletter" name="eNews" class="accent-primary mt-0.5" />
+                <span class="font-inter text-sm text-on-surface">Acconsento a ricevere newsletter e comunicazioni dell'associazione</span>
+              </label>
+              <label class="flex items-start gap-3 cursor-pointer">
+                <input type="checkbox" [(ngModel)]="editThirdParties" name="eThird" class="accent-primary mt-0.5" />
+                <span class="font-inter text-sm text-on-surface">Acconsento alla cessione dei dati a partner dell'associazione</span>
+              </label>
+            </div>
+          </div>
+
+          <div class="flex gap-3">
+            <button (click)="cancelEdit()" class="flex-1 py-3 border border-outline-variant font-inter font-semibold text-sm text-on-surface-variant rounded-xl hover:bg-surface-container transition-colors">Annulla</button>
+            <button (click)="saveEdit()" [disabled]="saving()"
+                    class="flex-1 py-3 bg-primary text-on-primary font-inter font-bold text-sm rounded-xl hover:opacity-90 transition-all flex items-center justify-center gap-2 disabled:opacity-60">
+              @if (saving()) { <span class="material-symbols-outlined text-base spin">progress_activity</span> Salvataggio…
+              } @else { <span class="material-symbols-outlined text-base" style="font-variation-settings:'FILL' 1">save</span> Salva modifiche }
+            </button>
+          </div>
+        </div>
+
+      } @else {
+      <!-- read mode -->
+        <div class="bg-surface-container-lowest rounded-2xl shadow-sm p-5 mb-4">
+          <div class="flex items-center justify-between mb-3">
+            <h3 class="font-romania font-bold text-on-surface text-base">Dati anagrafici</h3>
+            <button (click)="startEdit()" class="font-inter text-xs text-primary font-semibold hover:underline">Modifica</button>
+          </div>
+          <dl class="divide-y divide-outline-variant/20">
+            <div class="flex justify-between py-2.5">
+              <dt class="form-dt">Nome e cognome</dt>
+              <dd class="form-dd">{{ member()!.firstName }} {{ member()!.lastName }}</dd>
+            </div>
+            <div class="flex justify-between py-2.5">
+              <dt class="form-dt">Email</dt>
+              <dd class="form-dd">{{ mask(member()!.email) }}</dd>
+            </div>
+            <div class="flex justify-between py-2.5">
+              <dt class="form-dt">Codice fiscale</dt>
+              <dd class="form-dd font-mono">{{ mask(member()!.fiscalCode) }}</dd>
+            </div>
+            <div class="flex justify-between py-2.5">
+              <dt class="form-dt">Data di nascita</dt>
+              <dd class="form-dd">{{ showPrivate() ? (member()!.birthDate | date:'dd/MM/yyyy') : '••/••/••••' }}</dd>
+            </div>
+            <div class="flex justify-between py-2.5">
+              <dt class="form-dt">Luogo di nascita</dt>
+              <dd class="form-dd">{{ mask(member()!.birthPlace) }}</dd>
+            </div>
+          </dl>
+        </div>
+
+        <div class="bg-surface-container-lowest rounded-2xl shadow-sm p-5 mb-4">
+          <div class="flex items-center justify-between mb-3">
+            <h3 class="font-romania font-bold text-on-surface text-base">Documento</h3>
+            <button (click)="startEdit()" class="font-inter text-xs text-primary font-semibold hover:underline">Modifica</button>
+          </div>
+          <dl class="divide-y divide-outline-variant/20">
+            <div class="flex justify-between py-2.5">
+              <dt class="form-dt">Numero</dt>
+              <dd class="form-dd font-mono">{{ mask(member()!.docNumber) }}</dd>
+            </div>
+            <div class="flex justify-between py-2.5">
+              <dt class="form-dt">Scadenza</dt>
+              <dd class="form-dd">{{ showPrivate() ? (member()!.docExpiry | date:'dd/MM/yyyy') : '••/••/••••' }}</dd>
+            </div>
+          </dl>
+        </div>
+
+        <div class="bg-surface-container-lowest rounded-2xl shadow-sm p-5 mb-4">
+          <div class="flex items-center justify-between mb-3">
+            <h3 class="font-romania font-bold text-on-surface text-base">Recapiti</h3>
+            <button (click)="startEdit()" class="font-inter text-xs text-primary font-semibold hover:underline">Modifica</button>
+          </div>
+          <dl class="divide-y divide-outline-variant/20">
+            <div class="flex justify-between py-2.5">
+              <dt class="form-dt">Telefono</dt>
+              <dd class="form-dd">{{ mask(member()!.phone) }}</dd>
+            </div>
+            <div class="flex justify-between py-2.5">
+              <dt class="form-dt">Indirizzo</dt>
+              <dd class="form-dd text-right">{{ showPrivate() ? member()!.addressStreet + ', ' + member()!.addressZip + ' ' + member()!.addressCity + ' (' + member()!.addressProvince + ')' : '••••••••' }}</dd>
+            </div>
+          </dl>
+        </div>
+
+        <div class="bg-surface-container-lowest rounded-2xl shadow-sm p-5 mb-4">
+          <div class="flex items-center justify-between mb-3">
+            <h3 class="font-romania font-bold text-on-surface text-base">Privacy e comunicazioni</h3>
+            <button (click)="startEdit()" class="font-inter text-xs text-primary font-semibold hover:underline">Modifica</button>
+          </div>
+          <dl class="divide-y divide-outline-variant/20">
+            <div class="flex justify-between py-2.5">
+              <dt class="form-dt">Newsletter</dt>
+              <dd class="font-inter text-sm" [class]="member()!.privacyNewsletter ? 'text-green-600' : 'text-on-surface-variant'">{{ member()!.privacyNewsletter ? 'Sì' : 'No' }}</dd>
+            </div>
+            <div class="flex justify-between py-2.5">
+              <dt class="form-dt">Terze parti</dt>
+              <dd class="font-inter text-sm" [class]="member()!.privacyThirdParties ? 'text-green-600' : 'text-on-surface-variant'">{{ member()!.privacyThirdParties ? 'Sì' : 'No' }}</dd>
+            </div>
+          </dl>
+        </div>
+
+        <div class="border border-red-100 rounded-2xl p-5">
+          <h3 class="font-romania font-bold text-red-600 text-base mb-2">Zona pericolosa</h3>
+          <p class="font-inter text-on-surface-variant text-sm mb-4">Richiedendo la cancellazione, il tuo record da socio verrà disattivato (art. 17 GDPR).</p>
+          <button (click)="askDelete()"
+                  class="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-red-200 text-red-600 font-inter font-semibold text-sm hover:bg-red-50 transition-colors">
+            <span class="material-symbols-outlined text-base">delete</span>
+            Richiedi cancellazione dati
+          </button>
+        </div>
+      }
+    }
+
+  </div>
+</main>
+
+<!-- ── Confirm delete ──────────────────────────────────────────────────────── -->
+@if (confirmDelete()) {
+  <div class="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-4" (click)="cancelDelete()">
+    <div class="bg-surface-container-lowest rounded-2xl shadow-xl p-6 w-full max-w-xs" (click)="$event.stopPropagation()">
+      <div class="flex items-center gap-3 mb-4">
+        <div class="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center flex-shrink-0">
+          <span class="material-symbols-outlined text-red-500 text-xl" style="font-variation-settings:'FILL' 1">delete</span>
+        </div>
+        <div>
+          <p class="font-inter font-bold text-on-surface text-sm">Conferma cancellazione</p>
+          <p class="font-inter text-on-surface-variant text-xs mt-0.5">I tuoi dati da socio verranno disattivati.</p>
+        </div>
+      </div>
+      <div class="flex gap-3">
+        <button (click)="cancelDelete()" class="flex-1 py-2.5 rounded-xl border border-outline-variant font-inter font-semibold text-sm text-on-surface-variant hover:bg-surface-container transition-colors">Annulla</button>
+        <button (click)="doDelete()" [disabled]="deleteLoading()"
+                class="flex-1 py-2.5 rounded-xl bg-red-500 text-white font-inter font-bold text-sm hover:bg-red-600 transition-colors disabled:opacity-60 flex items-center justify-center gap-2">
+          @if (deleteLoading()) { <span class="material-symbols-outlined text-base spin">progress_activity</span>
+          } @else { Conferma }
+        </button>
+      </div>
+    </div>
+  </div>
+}

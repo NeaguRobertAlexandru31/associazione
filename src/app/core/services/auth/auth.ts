@@ -4,6 +4,7 @@ import { Observable, tap } from 'rxjs';
 import { environment } from '../../../../environments/environment';
 import { InviteResponse } from '../../models/invite.model';
 import { LoginRequest, LoginResponse } from '../../models/login.model';
+import { SocioMemberDetail } from '../../models/member.model';
 import { RegisterRequest, RegisterResponse } from '../../models/register.model';
 
 export interface AuthUser {
@@ -11,6 +12,16 @@ export interface AuthUser {
   name: string;
   email: string;
   role: string;
+}
+
+export interface UpdateMyMemberRequest {
+  phone?: string;
+  addressStreet?: string;
+  addressZip?: string;
+  addressCity?: string;
+  addressProvince?: string;
+  privacyNewsletter?: boolean;
+  privacyThirdParties?: boolean;
 }
 
 const TOKEN_KEY = 'acr_token';
@@ -24,8 +35,8 @@ export class AuthService {
   private _token = signal<string | null>(localStorage.getItem(TOKEN_KEY));
   private _user  = signal<AuthUser | null>(this.restoreUser());
 
-  readonly isLoggedIn  = computed(() => !!this._token());
-  readonly user        = this._user.asReadonly();
+  readonly isLoggedIn   = computed(() => !!this._token());
+  readonly user         = this._user.asReadonly();
   readonly isSuperAdmin = computed(() => this._user()?.role === 'SUPERADMIN');
 
   private restoreUser(): AuthUser | null {
@@ -49,8 +60,8 @@ export class AuthService {
     );
   }
 
-  checkMember(email: string): Observable<{ isMember: boolean; name?: string }> {
-    return this.http.post<{ isMember: boolean; name?: string }>(`${API_URL}/auth/check-member`, { email });
+  checkMember(email: string): Observable<{ isMember: boolean }> {
+    return this.http.post<{ isMember: boolean }>(`${API_URL}/auth/check-member`, { email });
   }
 
   createInvite(): Observable<InviteResponse> {
@@ -69,6 +80,20 @@ export class AuthService {
 
   deleteProfile(currentPassword: string): Observable<void> {
     return this.http.delete<void>(`${API_URL}/auth/me`, { body: { currentPassword } });
+  }
+
+  // ── Area personale socio ───────────────────────────────────────────────
+
+  getMyMember(): Observable<SocioMemberDetail | null> {
+    return this.http.get<SocioMemberDetail | null>(`${API_URL}/auth/me/member`);
+  }
+
+  updateMyMember(dto: UpdateMyMemberRequest): Observable<SocioMemberDetail> {
+    return this.http.patch<SocioMemberDetail>(`${API_URL}/auth/me/member`, dto);
+  }
+
+  deleteMyMember(): Observable<void> {
+    return this.http.delete<void>(`${API_URL}/auth/me/member`);
   }
 
   logout(): void {

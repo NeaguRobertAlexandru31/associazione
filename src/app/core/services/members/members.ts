@@ -30,6 +30,10 @@ export class MembersService {
     return this.http.get<DirettivoMember>(`${API}/members/admin/${id}`);
   }
 
+  updateAdminBoardRoles(id: string, boardRoles: string[]): Observable<DirettivoMember> {
+    return this.http.patch<DirettivoMember>(`${API}/members/admin/${id}/board-role`, { boardRoles });
+  }
+
   deleteAdmin(id: string): Observable<void> {
     return this.http.delete<void>(`${API}/members/admin/${id}`);
   }
