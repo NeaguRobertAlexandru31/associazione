@@ -7,16 +7,30 @@
         {{ 'footer.tagline' | translate }}
       </p>
       <div class="grid grid-cols-3 gap-8 max-w-2xl mx-auto">
-        @for (stat of stats; track stat.labelKey) {
-          <div>
-            <div class="font-romania font-extrabold text-secondary text-4xl md:text-5xl">
-              {{ stat.value }}
-            </div>
-            <p class="font-inter font-semibold text-on-surface-variant text-xs uppercase tracking-widest mt-2">
-              {{ stat.labelKey | translate }}
-            </p>
+        <div>
+          <div class="font-romania font-extrabold text-secondary text-4xl md:text-5xl">
+            {{ stats() ? stats()!.soci : '—' }}
           </div>
-        }
+          <p class="font-inter font-semibold text-on-surface-variant text-xs uppercase tracking-widest mt-2">
+            {{ 'footer.stat_members' | translate }}
+          </p>
+        </div>
+        <div>
+          <div class="font-romania font-extrabold text-secondary text-4xl md:text-5xl">
+            {{ stats() ? stats()!.projects : '—' }}
+          </div>
+          <p class="font-inter font-semibold text-on-surface-variant text-xs uppercase tracking-widest mt-2">
+            {{ 'footer.stat_projects' | translate }}
+          </p>
+        </div>
+        <div>
+          <div class="font-romania font-extrabold text-secondary text-4xl md:text-5xl">
+            {{ stats() ? stats()!.events : '—' }}
+          </div>
+          <p class="font-inter font-semibold text-on-surface-variant text-xs uppercase tracking-widest mt-2">
+            {{ 'footer.stat_events' | translate }}
+          </p>
+        </div>
       </div>
     </div>
   </div>

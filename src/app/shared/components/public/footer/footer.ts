@@ -1,6 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { TranslatePipe } from '../../../../i18n/translate.pipe';
+import { PublicStats, StatsService } from '../../../../core/services/stats/stats';
 
 @Component({
   selector: 'app-footer',
@@ -8,12 +9,10 @@ import { TranslatePipe } from '../../../../i18n/translate.pipe';
   templateUrl: './footer.html',
   styleUrl: './footer.css',
 })
-export class Footer {
-  readonly stats = [
-    { value: '500+', labelKey: 'footer.stat_members'  },
-    { value: '15',   labelKey: 'footer.stat_projects' },
-    { value: '30+',  labelKey: 'footer.stat_events'   },
-  ];
+export class Footer implements OnInit {
+  private statsService = inject(StatsService);
+
+  stats = signal<PublicStats | null>(null);
 
   readonly navLinks = [
     { labelKey: 'nav.about-us',   route: '/about-us'  },
@@ -30,4 +29,11 @@ export class Footer {
     { labelKey: 'footer.press_kit', route: '/documents' },
     { labelKey: 'footer.contacts',  route: '/contacts'  },
   ];
+
+  ngOnInit(): void {
+    this.statsService.getPublic().subscribe({
+      next: s  => this.stats.set(s),
+      error: () => {},
+    });
+  }
 }
