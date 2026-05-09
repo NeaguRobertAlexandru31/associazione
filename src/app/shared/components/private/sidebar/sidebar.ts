@@ -11,6 +11,7 @@ export interface SidebarItem {
 export interface SidebarUser {
   name: string;
   email: string;
+  profileImage?: string | null;
 }
 
 @Component({

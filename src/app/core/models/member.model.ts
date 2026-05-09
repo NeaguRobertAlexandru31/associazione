@@ -27,6 +27,7 @@ export interface DirettivoMember {
   email: string;
   role: AdminRole;
   boardRoles?: BoardRole[];
+  profileImage?: string | null;
   createdAt: string;
 }
 
@@ -38,6 +39,7 @@ export interface SocioMember {
   category: MemberCategory;
   status: MemberStatus;
   membershipYear: number;
+  profileImage?: string | null;
   createdAt: string;
 }
 

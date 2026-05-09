@@ -122,6 +122,10 @@ export class AuthService {
     return this.http.get<SocioMemberDetail | null>(`${API_URL}/auth/me/member`);
   }
 
+  linkMember(memberEmail: string): Observable<{ ok: boolean }> {
+    return this.http.patch<{ ok: boolean }>(`${API_URL}/auth/me/link-member`, { memberEmail });
+  }
+
   updateMyMember(dto: UpdateMyMemberRequest): Observable<SocioMemberDetail> {
     return this.http.patch<SocioMemberDetail>(`${API_URL}/auth/me/member`, dto);
   }

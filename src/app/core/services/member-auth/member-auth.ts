@@ -65,6 +65,12 @@ export class MemberAuthService {
     return this.http.patch<SocioMemberDetail>(`${API}/member-auth/me`, dto, this.headers());
   }
 
+  uploadAvatar(file: File): Observable<{ url: string }> {
+    const form = new FormData();
+    form.append('file', file);
+    return this.http.post<{ url: string }>(`${API}/member-auth/avatar`, form, this.headers());
+  }
+
   deleteMe(): Observable<void> {
     return this.http.delete<void>(`${API}/member-auth/me`, this.headers());
   }

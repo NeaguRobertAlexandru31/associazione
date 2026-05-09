@@ -33,12 +33,13 @@ export class Personal implements OnInit {
   loginPassword = '';
 
   // dati
-  showPrivate   = signal(false);
-  editMode      = signal(false);
-  saving        = signal(false);
-  saveError     = signal<string | null>(null);
-  confirmDelete = signal(false);
-  deleteLoading = signal(false);
+  showPrivate     = signal(false);
+  editMode        = signal(false);
+  saving          = signal(false);
+  saveError       = signal<string | null>(null);
+  confirmDelete   = signal(false);
+  deleteLoading   = signal(false);
+  avatarUploading = signal(false);
 
   editFirstName       = '';
   editLastName        = '';
@@ -135,6 +136,19 @@ export class Personal implements OnInit {
   }
 
   // ── Phase: data — modifica ──────────────────────────────────────────────
+
+  onAvatarSelected(event: Event): void {
+    const file = (event.target as HTMLInputElement).files?.[0];
+    if (!file) return;
+    this.avatarUploading.set(true);
+    this.memberAuth.uploadAvatar(file).subscribe({
+      next: res => {
+        this.member.update(m => m ? { ...m, profileImage: res.url } : m);
+        this.avatarUploading.set(false);
+      },
+      error: () => this.avatarUploading.set(false),
+    });
+  }
 
   togglePrivate(): void { this.showPrivate.update(v => !v); }
 

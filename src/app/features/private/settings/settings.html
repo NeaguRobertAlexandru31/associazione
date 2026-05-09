@@ -9,7 +9,7 @@
   <div class="flex gap-1 mb-6 bg-surface-container rounded-xl p-1 w-fit">
     <button (click)="view.set('member')"
             class="px-4 py-2 rounded-lg font-inter font-semibold text-sm transition-all"
-            [class]="(view() === 'member' || view() === 'edit-member' || view() === 'change-password' || view() === 'delete')
+            [class]="(view() === 'member' || view() === 'edit-member' || view() === 'change-password' || view() === 'delete' || view() === 'link-member')
               ? 'bg-surface text-on-surface shadow-sm'
               : 'text-on-surface-variant hover:text-on-surface'">
       Profilo
@@ -31,7 +31,7 @@
   </div>
 
   <!-- ── TAB PROFILO ─────────────────────────────────────────────────────── -->
-  @if (view() === 'member' || view() === 'edit-member' || view() === 'change-password' || view() === 'delete') {
+  @if (view() === 'member' || view() === 'edit-member' || view() === 'change-password' || view() === 'delete' || view() === 'link-member') {
     <div class="max-w-lg">
 
       <!-- VISTA PROFILO -->
@@ -74,6 +74,23 @@
         @if (memberLoading()) {
           <div class="bg-surface-container-lowest rounded-2xl shadow-sm p-6 mb-4 flex justify-center">
             <lucide-icon name="loader-circle" [size]="22" class="text-primary spin" />
+          </div>
+        } @else if (!myMember()) {
+          <div class="bg-surface-container-lowest rounded-2xl shadow-sm p-6 mb-4">
+            <div class="flex items-start gap-3 mb-4">
+              <div class="w-10 h-10 rounded-xl bg-primary/8 flex items-center justify-center flex-shrink-0">
+                <lucide-icon name="link" class="text-primary" [size]="20" />
+              </div>
+              <div>
+                <h2 class="font-romania font-bold text-on-surface text-base">Nessun profilo socio collegato</h2>
+                <p class="font-inter text-on-surface-variant text-xs mt-0.5">Collega il tuo account al record socio per visualizzare e modificare i tuoi dati anagrafici.</p>
+              </div>
+            </div>
+            <button (click)="view.set('link-member')"
+                    class="w-full py-2.5 rounded-xl font-inter font-bold text-sm bg-primary/10 text-primary hover:bg-primary/20 transition-colors flex items-center justify-center gap-2">
+              <lucide-icon name="link" [size]="15" />
+              Collega profilo socio
+            </button>
           </div>
         } @else if (myMember()) {
           @let m = myMember()!;
@@ -345,6 +362,45 @@
               Salvataggio…
             } @else {
               Salva modifiche
+            }
+          </button>
+        </div>
+      }
+
+      <!-- COLLEGA PROFILO SOCIO -->
+      @if (view() === 'link-member') {
+        <div class="bg-surface-container-lowest rounded-2xl shadow-sm p-6">
+          <div class="flex items-center gap-3 mb-5">
+            <button (click)="view.set('member')" class="w-8 h-8 rounded-lg hover:bg-surface-container flex items-center justify-center transition-colors">
+              <lucide-icon name="arrow-left" [size]="18" class="text-on-surface-variant" />
+            </button>
+            <h2 class="font-romania font-bold text-on-surface text-base">Collega profilo socio</h2>
+          </div>
+
+          <p class="font-inter text-sm text-on-surface-variant mb-5">
+            Inserisci l'email con cui sei registrato come socio. Il tuo account verrà collegato a quel profilo.
+          </p>
+
+          @if (linkError()) {
+            <div class="mb-4 px-4 py-3 rounded-xl bg-red-50 border border-red-200 text-red-700 font-inter text-sm">{{ linkError() }}</div>
+          }
+
+          <div class="mb-4">
+            <label class="block font-inter text-xs text-on-surface-variant mb-1.5">Email del profilo socio</label>
+            <input type="email"
+                   [value]="linkEmail()" (input)="linkEmail.set($any($event.target).value)"
+                   placeholder="email@esempio.it"
+                   class="w-full px-4 py-2.5 rounded-xl border border-outline-variant bg-surface font-inter text-sm focus:outline-none focus:ring-2 focus:ring-primary/30" />
+          </div>
+
+          <button (click)="linkMember()" [disabled]="linkLoading() || !linkEmail().trim()"
+                  class="w-full py-3 bg-primary text-on-primary font-inter font-bold text-sm rounded-xl hover:opacity-90 transition-all flex items-center justify-center gap-2 disabled:opacity-60">
+            @if (linkLoading()) {
+              <lucide-icon name="loader-circle" [size]="16" class="spin" />
+              Collegamento…
+            } @else {
+              <lucide-icon name="link" [size]="16" />
+              Collega
             }
           </button>
         </div>

@@ -41,8 +41,12 @@
   <div class="px-3 py-4 border-t border-on-primary/10 flex-shrink-0">
     @if (user) {
       <div class="flex items-center gap-3 px-4 py-3 rounded-xl bg-on-primary/8 mb-2">
-        <div class="w-8 h-8 rounded-full bg-[#f8bd2a] flex items-center justify-center flex-shrink-0">
-          <span class="font-romania font-bold text-[#261a00] text-sm">{{ user.name[0] }}</span>
+        <div class="w-8 h-8 rounded-full bg-[#f8bd2a] flex items-center justify-center flex-shrink-0 overflow-hidden">
+          @if (user.profileImage) {
+            <img [src]="user.profileImage" alt="" class="w-full h-full object-cover" />
+          } @else {
+            <span class="font-romania font-bold text-[#261a00] text-sm">{{ user.name[0] }}</span>
+          }
         </div>
         <div class="flex-1 min-w-0">
           <p class="font-inter font-semibold text-on-primary text-xs truncate">{{ user.name }}</p>

@@ -6,7 +6,7 @@ import { LucideAngularModule } from 'lucide-angular';
 import { SiteSettingsService, SITE_IMAGE_KEYS, PLACEHOLDER_KEYS } from '../../../core/services/site-settings/site-settings';
 import { SocioMemberDetail } from '../../../core/models/member.model';
 
-type SettingsView = 'member' | 'edit-member' | 'change-password' | 'delete' | 'images' | 'placeholders';
+type SettingsView = 'member' | 'edit-member' | 'change-password' | 'delete' | 'images' | 'placeholders' | 'link-member';
 
 @Component({
   selector: 'app-settings',
@@ -72,6 +72,11 @@ export class Settings implements OnInit {
   deletePassword = signal('');
   deleteLoading  = signal(false);
   deleteError    = signal<string | null>(null);
+
+  // link member form
+  linkEmail   = signal('');
+  linkLoading = signal(false);
+  linkError   = signal<string | null>(null);
 
   ngOnInit(): void {
     this.siteSettings.load();
@@ -196,6 +201,27 @@ export class Settings implements OnInit {
       error: (err) => {
         this.deleteLoading.set(false);
         this.deleteError.set(err?.error?.message ?? 'Errore durante l\'eliminazione');
+      },
+    });
+  }
+
+  // ── Link member ────────────────────────────────────────────────────────────
+
+  linkMember(): void {
+    const email = this.linkEmail().trim();
+    if (!email) return;
+    this.linkLoading.set(true);
+    this.linkError.set(null);
+    this.auth.linkMember(email).subscribe({
+      next: () => {
+        this.linkLoading.set(false);
+        this.linkEmail.set('');
+        this.view.set('member');
+        this.loadMyMember();
+      },
+      error: err => {
+        this.linkLoading.set(false);
+        this.linkError.set(err?.error?.message ?? 'Errore durante il collegamento');
       },
     });
   }
