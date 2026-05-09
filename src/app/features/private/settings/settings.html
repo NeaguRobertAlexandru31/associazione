@@ -7,9 +7,9 @@
 
   <!-- TABS -->
   <div class="flex gap-1 mb-6 bg-surface-container rounded-xl p-1 w-fit">
-    <button (click)="view.set('profile')"
+    <button (click)="view.set('member')"
             class="px-4 py-2 rounded-lg font-inter font-semibold text-sm transition-all"
-            [class]="(view() === 'profile' || view() === 'edit' || view() === 'delete')
+            [class]="(view() === 'member' || view() === 'edit-member' || view() === 'change-password' || view() === 'delete')
               ? 'bg-surface text-on-surface shadow-sm'
               : 'text-on-surface-variant hover:text-on-surface'">
       Profilo
@@ -31,105 +31,316 @@
   </div>
 
   <!-- ── TAB PROFILO ─────────────────────────────────────────────────────── -->
-  @if (view() !== 'images' && view() !== 'placeholders') {
+  @if (view() === 'member' || view() === 'edit-member' || view() === 'change-password' || view() === 'delete') {
     <div class="max-w-lg">
 
-      <!-- PROFILE CARD -->
-      @if (view() === 'profile') {
-        <div class="bg-surface-container-lowest rounded-2xl shadow-sm p-6 mb-6">
-          <div class="flex items-center gap-3 mb-5">
-            <div class="w-10 h-10 rounded-xl bg-primary/8 flex items-center justify-center flex-shrink-0">
-              <lucide-icon name="user" class="text-primary" [size]="20" />
+      <!-- VISTA PROFILO -->
+      @if (view() === 'member') {
+
+        <!-- Avatar -->
+        <div class="bg-surface-container-lowest rounded-2xl shadow-sm p-6 mb-4">
+          <div class="flex items-center gap-5">
+            <div class="relative flex-shrink-0">
+              <div class="w-20 h-20 rounded-2xl overflow-hidden bg-primary/10 flex items-center justify-center">
+                @if (user()?.profileImage) {
+                  <img [src]="user()?.profileImage" alt="Avatar" class="w-full h-full object-cover" />
+                } @else {
+                  <lucide-icon name="user" class="text-primary" [size]="36" />
+                }
+                @if (avatarUploading()) {
+                  <div class="absolute inset-0 bg-black/40 flex items-center justify-center rounded-2xl">
+                    <lucide-icon name="loader-circle" [size]="22" class="text-white spin" />
+                  </div>
+                }
+              </div>
+              <input #avatarInput type="file" accept="image/*" class="hidden" (change)="onAvatarSelected($event)" />
+              <button (click)="avatarInput.click()" [disabled]="avatarUploading()"
+                      class="absolute -bottom-1.5 -right-1.5 w-7 h-7 rounded-lg bg-primary text-on-primary flex items-center justify-center shadow-md hover:opacity-90 transition-opacity disabled:opacity-50">
+                <lucide-icon name="pencil" [size]="13" />
+              </button>
             </div>
             <div>
-              <h2 class="font-romania font-bold text-on-surface text-base">Il mio profilo</h2>
-              <p class="font-inter text-on-surface-variant text-xs mt-0.5">Informazioni del tuo account.</p>
-            </div>
-          </div>
-
-          <dl class="space-y-3 mb-5">
-            <div class="flex items-center justify-between py-2 border-b border-outline-variant/20">
-              <dt class="font-inter text-xs text-on-surface-variant uppercase tracking-wide">Nome</dt>
-              <dd class="font-inter text-sm text-on-surface font-medium">{{ user()?.name }}</dd>
-            </div>
-            <div class="flex items-center justify-between py-2 border-b border-outline-variant/20">
-              <dt class="font-inter text-xs text-on-surface-variant uppercase tracking-wide">Email</dt>
-              <dd class="font-inter text-sm text-on-surface font-medium">{{ user()?.email }}</dd>
-            </div>
-            <div class="flex items-center justify-between py-2">
-              <dt class="font-inter text-xs text-on-surface-variant uppercase tracking-wide">Ruolo</dt>
-              <dd class="font-inter text-xs font-bold uppercase tracking-wide px-2.5 py-1 rounded-lg"
-                  [class]="user()?.role === 'SUPERADMIN' ? 'bg-primary/10 text-primary' : 'bg-surface-container text-on-surface-variant'">
+              <p class="font-romania font-bold text-on-surface text-lg">{{ user()?.name }}</p>
+              <p class="font-inter text-on-surface-variant text-sm">{{ user()?.email }}</p>
+              <span class="mt-1 inline-block font-inter text-xs font-bold uppercase tracking-wide px-2.5 py-0.5 rounded-lg"
+                    [class]="user()?.role === 'SUPERADMIN' ? 'bg-primary/10 text-primary' : 'bg-surface-container text-on-surface-variant'">
                 {{ user()?.role === 'SUPERADMIN' ? 'Presidente' : 'Admin' }}
-              </dd>
+              </span>
             </div>
-          </dl>
-
-          <div class="flex gap-2">
-            <button (click)="openEdit()"
-                    class="flex-1 py-2.5 rounded-xl font-inter font-bold text-sm bg-primary text-on-primary hover:opacity-90 transition-all flex items-center justify-center gap-2">
-              <lucide-icon name="pencil" [size]="15" />
-              Modifica profilo
-            </button>
-            <button (click)="view.set('delete')"
-                    class="py-2.5 px-4 rounded-xl font-inter font-bold text-sm bg-red-50 text-red-600 hover:bg-red-100 transition-all flex items-center justify-center gap-2">
-              <lucide-icon name="trash-2" [size]="15" />
-              Elimina
-            </button>
           </div>
+        </div>
+
+        <!-- Dati personali (se ha record socio) -->
+        @if (memberLoading()) {
+          <div class="bg-surface-container-lowest rounded-2xl shadow-sm p-6 mb-4 flex justify-center">
+            <lucide-icon name="loader-circle" [size]="22" class="text-primary spin" />
+          </div>
+        } @else if (myMember()) {
+          @let m = myMember()!;
+          <div class="bg-surface-container-lowest rounded-2xl shadow-sm p-6 mb-4">
+            <div class="flex items-center justify-between mb-4">
+              <h2 class="font-romania font-bold text-on-surface text-base">Dati personali</h2>
+              <button (click)="openEditMember()"
+                      class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-primary/10 text-primary font-inter font-semibold text-xs hover:bg-primary/20 transition-colors">
+                <lucide-icon name="pencil" [size]="13" />
+                Modifica
+              </button>
+            </div>
+
+            <dl class="space-y-2">
+              <div class="flex justify-between py-1.5 border-b border-outline-variant/20">
+                <dt class="font-inter text-xs text-on-surface-variant uppercase tracking-wide">Nome</dt>
+                <dd class="font-inter text-sm text-on-surface font-medium">{{ m.firstName }} {{ m.lastName }}</dd>
+              </div>
+              <div class="flex justify-between py-1.5 border-b border-outline-variant/20">
+                <dt class="font-inter text-xs text-on-surface-variant uppercase tracking-wide">Telefono</dt>
+                <dd class="font-inter text-sm text-on-surface font-medium">{{ m.phone || '—' }}</dd>
+              </div>
+              <div class="flex justify-between py-1.5 border-b border-outline-variant/20">
+                <dt class="font-inter text-xs text-on-surface-variant uppercase tracking-wide">Indirizzo</dt>
+                <dd class="font-inter text-sm text-on-surface font-medium text-right">{{ m.addressStreet }}, {{ m.addressZip }} {{ m.addressCity }} ({{ m.addressProvince }})</dd>
+              </div>
+              <div class="flex justify-between py-1.5 border-b border-outline-variant/20">
+                <dt class="font-inter text-xs text-on-surface-variant uppercase tracking-wide">Data di nascita</dt>
+                <dd class="font-inter text-sm text-on-surface font-medium">{{ m.birthDate | date:'dd/MM/yyyy' }}</dd>
+              </div>
+              <div class="flex justify-between py-1.5 border-b border-outline-variant/20">
+                <dt class="font-inter text-xs text-on-surface-variant uppercase tracking-wide">Luogo di nascita</dt>
+                <dd class="font-inter text-sm text-on-surface font-medium">{{ m.birthPlace }}</dd>
+              </div>
+              <div class="flex justify-between py-1.5 border-b border-outline-variant/20">
+                <dt class="font-inter text-xs text-on-surface-variant uppercase tracking-wide">Codice fiscale</dt>
+                <dd class="font-inter text-sm text-on-surface font-medium uppercase">{{ m.fiscalCode }}</dd>
+              </div>
+              <div class="flex justify-between py-1.5 border-b border-outline-variant/20">
+                <dt class="font-inter text-xs text-on-surface-variant uppercase tracking-wide">Documento</dt>
+                <dd class="font-inter text-sm text-on-surface font-medium uppercase">{{ m.docType }} – {{ m.docNumber }}</dd>
+              </div>
+              <div class="flex justify-between py-1.5 border-b border-outline-variant/20">
+                <dt class="font-inter text-xs text-on-surface-variant uppercase tracking-wide">Scadenza doc.</dt>
+                <dd class="font-inter text-sm text-on-surface font-medium">{{ m.docExpiry | date:'dd/MM/yyyy' }}</dd>
+              </div>
+              <div class="flex justify-between py-1.5 border-b border-outline-variant/20">
+                <dt class="font-inter text-xs text-on-surface-variant uppercase tracking-wide">Categoria</dt>
+                <dd class="font-inter text-sm text-on-surface font-medium capitalize">{{ m.category }}</dd>
+              </div>
+              <div class="flex justify-between py-1.5 border-b border-outline-variant/20">
+                <dt class="font-inter text-xs text-on-surface-variant uppercase tracking-wide">Anno</dt>
+                <dd class="font-inter text-sm text-on-surface font-medium">{{ m.membershipYear }}</dd>
+              </div>
+              <div class="flex justify-between py-1.5 border-b border-outline-variant/20">
+                <dt class="font-inter text-xs text-on-surface-variant uppercase tracking-wide">Newsletter</dt>
+                <dd class="font-inter text-sm font-medium" [class]="m.privacyNewsletter ? 'text-green-600' : 'text-on-surface-variant'">{{ m.privacyNewsletter ? 'Sì' : 'No' }}</dd>
+              </div>
+              <div class="flex justify-between py-1.5">
+                <dt class="font-inter text-xs text-on-surface-variant uppercase tracking-wide">Terze parti</dt>
+                <dd class="font-inter text-sm font-medium" [class]="m.privacyThirdParties ? 'text-green-600' : 'text-on-surface-variant'">{{ m.privacyThirdParties ? 'Sì' : 'No' }}</dd>
+              </div>
+            </dl>
+          </div>
+        }
+
+        <!-- Sicurezza -->
+        <div class="bg-surface-container-lowest rounded-2xl shadow-sm p-6 mb-4">
+          <div class="flex items-center justify-between mb-1">
+            <h2 class="font-romania font-bold text-on-surface text-base">Sicurezza</h2>
+          </div>
+          <p class="font-inter text-xs text-on-surface-variant mb-4">Cambia la password del tuo account.</p>
+          <button (click)="view.set('change-password')"
+                  class="w-full py-2.5 rounded-xl font-inter font-bold text-sm bg-surface-container text-on-surface hover:bg-surface-container-high transition-colors flex items-center justify-center gap-2">
+            <lucide-icon name="lock" [size]="15" />
+            Cambia password
+          </button>
+        </div>
+
+        <!-- Invita admin -->
+        @if (isSuperAdmin()) {
+          <div class="bg-surface-container-lowest rounded-2xl shadow-sm p-6 mb-4">
+            <div class="flex items-center gap-3 mb-4">
+              <div class="w-10 h-10 rounded-xl bg-primary/8 flex items-center justify-center flex-shrink-0">
+                <lucide-icon name="user-plus" class="text-primary" [size]="20" />
+              </div>
+              <div>
+                <h2 class="font-romania font-bold text-on-surface text-base">Invita un Admin</h2>
+                <p class="font-inter text-on-surface-variant text-xs mt-0.5">Genera un link monouso valido 7 giorni.</p>
+              </div>
+            </div>
+            <button (click)="generateInvite()" [disabled]="inviteLoading()"
+                    class="w-full py-3 bg-primary text-on-primary font-inter font-bold text-sm rounded-xl hover:opacity-90 transition-all uppercase tracking-wide flex items-center justify-center gap-2 disabled:opacity-60">
+              @if (inviteLoading()) {
+                <lucide-icon name="loader-circle" [size]="16" class="spin" />
+                Generazione…
+              } @else {
+                <lucide-icon name="link" [size]="16" />
+                Genera link di invito
+              }
+            </button>
+            @if (inviteLink()) {
+              <div class="mt-4 p-3 rounded-xl bg-surface-container border border-outline-variant/30 flex items-center gap-2">
+                <span class="font-inter text-xs text-on-surface-variant truncate flex-1 select-all">{{ inviteLink() }}</span>
+                <button (click)="copyLink()"
+                        class="flex-shrink-0 flex items-center gap-1 px-3 py-1.5 rounded-lg font-inter font-semibold text-xs transition-colors"
+                        [class]="copied() ? 'bg-green-100 text-green-700' : 'bg-primary/10 text-primary hover:bg-primary/20'">
+                  <lucide-icon [name]="copied() ? 'check' : 'copy'" [size]="14" />
+                  {{ copied() ? 'Copiato!' : 'Copia' }}
+                </button>
+              </div>
+            }
+          </div>
+        }
+
+        <!-- Elimina account -->
+        <div class="bg-surface-container-lowest rounded-2xl shadow-sm p-6 border border-red-100">
+          <h2 class="font-romania font-bold text-red-600 text-base mb-1">Zona pericolosa</h2>
+          <p class="font-inter text-xs text-on-surface-variant mb-4">L'eliminazione dell'account è irreversibile.</p>
+          <button (click)="view.set('delete')"
+                  class="w-full py-2.5 rounded-xl font-inter font-bold text-sm bg-red-50 text-red-600 hover:bg-red-100 transition-colors flex items-center justify-center gap-2">
+            <lucide-icon name="trash-2" [size]="15" />
+            Elimina account
+          </button>
         </div>
       }
 
-      <!-- EDIT PROFILE FORM -->
-      @if (view() === 'edit') {
-        <div class="bg-surface-container-lowest rounded-2xl shadow-sm p-6 mb-6">
+      <!-- MODIFICA DATI PERSONALI -->
+      @if (view() === 'edit-member') {
+        <div class="bg-surface-container-lowest rounded-2xl shadow-sm p-6">
           <div class="flex items-center gap-3 mb-5">
-            <button (click)="view.set('profile')" class="w-8 h-8 rounded-lg hover:bg-surface-container flex items-center justify-center transition-colors">
+            <button (click)="view.set('member')" class="w-8 h-8 rounded-lg hover:bg-surface-container flex items-center justify-center transition-colors">
               <lucide-icon name="arrow-left" [size]="18" class="text-on-surface-variant" />
             </button>
-            <h2 class="font-romania font-bold text-on-surface text-base">Modifica profilo</h2>
+            <h2 class="font-romania font-bold text-on-surface text-base">Modifica dati personali</h2>
           </div>
 
-          @if (editError()) {
-            <div class="mb-4 px-4 py-3 rounded-xl bg-red-50 border border-red-200 text-red-700 font-inter text-sm">
-              {{ editError() }}
-            </div>
+          @if (editMemberError()) {
+            <div class="mb-4 px-4 py-3 rounded-xl bg-red-50 border border-red-200 text-red-700 font-inter text-sm">{{ editMemberError() }}</div>
           }
-          @if (editSuccess()) {
+          @if (editMemberSuccess()) {
             <div class="mb-4 px-4 py-3 rounded-xl bg-green-50 border border-green-200 text-green-700 font-inter text-sm flex items-center gap-2">
-              <lucide-icon name="check" [size]="16" />
-              Profilo aggiornato!
+              <lucide-icon name="check" [size]="16" /> Dati aggiornati!
             </div>
           }
 
           <div class="space-y-4">
-            <div>
-              <label class="block font-inter text-xs text-on-surface-variant uppercase tracking-wide mb-1.5">Nome</label>
-              <input type="text" [value]="editName()" (input)="editName.set($any($event.target).value)"
-                     class="w-full px-4 py-2.5 rounded-xl border border-outline-variant bg-surface font-inter text-sm text-on-surface focus:outline-none focus:ring-2 focus:ring-primary/30" />
+            <p class="font-inter text-xs text-on-surface-variant uppercase tracking-wide font-semibold">Dati anagrafici</p>
+
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="block font-inter text-xs text-on-surface-variant mb-1.5">Nome</label>
+                <input type="text" [value]="editMemberFirstName()" (input)="editMemberFirstName.set($any($event.target).value)"
+                       class="w-full px-4 py-2.5 rounded-xl border border-outline-variant bg-surface font-inter text-sm focus:outline-none focus:ring-2 focus:ring-primary/30" />
+              </div>
+              <div>
+                <label class="block font-inter text-xs text-on-surface-variant mb-1.5">Cognome</label>
+                <input type="text" [value]="editMemberLastName()" (input)="editMemberLastName.set($any($event.target).value)"
+                       class="w-full px-4 py-2.5 rounded-xl border border-outline-variant bg-surface font-inter text-sm focus:outline-none focus:ring-2 focus:ring-primary/30" />
+              </div>
             </div>
+
             <div>
-              <label class="block font-inter text-xs text-on-surface-variant uppercase tracking-wide mb-1.5">Email</label>
-              <input type="email" [value]="editEmail()" (input)="editEmail.set($any($event.target).value)"
-                     class="w-full px-4 py-2.5 rounded-xl border border-outline-variant bg-surface font-inter text-sm text-on-surface focus:outline-none focus:ring-2 focus:ring-primary/30" />
+              <label class="block font-inter text-xs text-on-surface-variant mb-1.5">Codice fiscale</label>
+              <input type="text" [value]="editMemberFiscalCode()" (input)="editMemberFiscalCode.set($any($event.target).value.toUpperCase())"
+                     class="w-full px-4 py-2.5 rounded-xl border border-outline-variant bg-surface font-inter text-sm uppercase focus:outline-none focus:ring-2 focus:ring-primary/30" />
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="block font-inter text-xs text-on-surface-variant mb-1.5">Data di nascita</label>
+                <input type="date" [value]="editMemberBirthDate()" (input)="editMemberBirthDate.set($any($event.target).value)"
+                       class="w-full px-4 py-2.5 rounded-xl border border-outline-variant bg-surface font-inter text-sm focus:outline-none focus:ring-2 focus:ring-primary/30" />
+              </div>
+              <div>
+                <label class="block font-inter text-xs text-on-surface-variant mb-1.5">Luogo di nascita</label>
+                <input type="text" [value]="editMemberBirthPlace()" (input)="editMemberBirthPlace.set($any($event.target).value)"
+                       class="w-full px-4 py-2.5 rounded-xl border border-outline-variant bg-surface font-inter text-sm focus:outline-none focus:ring-2 focus:ring-primary/30" />
+              </div>
+            </div>
+
+            <div>
+              <label class="block font-inter text-xs text-on-surface-variant mb-1.5">Sesso</label>
+              <select [value]="editMemberGender()" (change)="editMemberGender.set($any($event.target).value)"
+                      class="w-full px-4 py-2.5 rounded-xl border border-outline-variant bg-surface font-inter text-sm focus:outline-none focus:ring-2 focus:ring-primary/30">
+                <option value="m">Maschio</option>
+                <option value="f">Femmina</option>
+                <option value="altro">Altro</option>
+              </select>
             </div>
 
             <div class="pt-2 border-t border-outline-variant/20">
-              <p class="font-inter text-xs text-on-surface-variant mb-3">Cambia password (lascia vuoto per non cambiarla)</p>
-              <div class="space-y-3">
-                <input type="password" [value]="editCurrent()" (input)="editCurrent.set($any($event.target).value)"
-                       placeholder="Password attuale"
-                       class="w-full px-4 py-2.5 rounded-xl border border-outline-variant bg-surface font-inter text-sm text-on-surface focus:outline-none focus:ring-2 focus:ring-primary/30" />
-                <input type="password" [value]="editPassword()" (input)="editPassword.set($any($event.target).value)"
-                       placeholder="Nuova password (min 6 caratteri)"
-                       class="w-full px-4 py-2.5 rounded-xl border border-outline-variant bg-surface font-inter text-sm text-on-surface focus:outline-none focus:ring-2 focus:ring-primary/30" />
+              <p class="font-inter text-xs text-on-surface-variant uppercase tracking-wide font-semibold mb-3">Documento di identità</p>
+              <div class="grid grid-cols-2 gap-3 mb-3">
+                <div>
+                  <label class="block font-inter text-xs text-on-surface-variant mb-1.5">Tipo</label>
+                  <select [value]="editMemberDocType()" (change)="editMemberDocType.set($any($event.target).value)"
+                          class="w-full px-4 py-2.5 rounded-xl border border-outline-variant bg-surface font-inter text-sm focus:outline-none focus:ring-2 focus:ring-primary/30">
+                    <option value="ci">Carta d'identità</option>
+                    <option value="passaporto">Passaporto</option>
+                    <option value="patente">Patente</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block font-inter text-xs text-on-surface-variant mb-1.5">Numero</label>
+                  <input type="text" [value]="editMemberDocNumber()" (input)="editMemberDocNumber.set($any($event.target).value)"
+                         class="w-full px-4 py-2.5 rounded-xl border border-outline-variant bg-surface font-inter text-sm focus:outline-none focus:ring-2 focus:ring-primary/30" />
+                </div>
               </div>
+              <div>
+                <label class="block font-inter text-xs text-on-surface-variant mb-1.5">Scadenza</label>
+                <input type="date" [value]="editMemberDocExpiry()" (input)="editMemberDocExpiry.set($any($event.target).value)"
+                       class="w-full px-4 py-2.5 rounded-xl border border-outline-variant bg-surface font-inter text-sm focus:outline-none focus:ring-2 focus:ring-primary/30" />
+              </div>
+            </div>
+
+            <div class="pt-2 border-t border-outline-variant/20">
+              <p class="font-inter text-xs text-on-surface-variant uppercase tracking-wide font-semibold mb-3">Contatti e indirizzo</p>
+              <div class="space-y-3">
+                <div>
+                  <label class="block font-inter text-xs text-on-surface-variant mb-1.5">Telefono</label>
+                  <input type="text" [value]="editMemberPhone()" (input)="editMemberPhone.set($any($event.target).value)"
+                         class="w-full px-4 py-2.5 rounded-xl border border-outline-variant bg-surface font-inter text-sm focus:outline-none focus:ring-2 focus:ring-primary/30" />
+                </div>
+                <div>
+                  <label class="block font-inter text-xs text-on-surface-variant mb-1.5">Via / Indirizzo</label>
+                  <input type="text" [value]="editMemberStreet()" (input)="editMemberStreet.set($any($event.target).value)"
+                         class="w-full px-4 py-2.5 rounded-xl border border-outline-variant bg-surface font-inter text-sm focus:outline-none focus:ring-2 focus:ring-primary/30" />
+                </div>
+                <div class="grid grid-cols-3 gap-3">
+                  <div>
+                    <label class="block font-inter text-xs text-on-surface-variant mb-1.5">CAP</label>
+                    <input type="text" maxlength="5" [value]="editMemberZip()" (input)="editMemberZip.set($any($event.target).value)"
+                           class="w-full px-4 py-2.5 rounded-xl border border-outline-variant bg-surface font-inter text-sm focus:outline-none focus:ring-2 focus:ring-primary/30" />
+                  </div>
+                  <div class="col-span-2">
+                    <label class="block font-inter text-xs text-on-surface-variant mb-1.5">Città</label>
+                    <input type="text" [value]="editMemberCity()" (input)="editMemberCity.set($any($event.target).value)"
+                           class="w-full px-4 py-2.5 rounded-xl border border-outline-variant bg-surface font-inter text-sm focus:outline-none focus:ring-2 focus:ring-primary/30" />
+                  </div>
+                </div>
+                <div>
+                  <label class="block font-inter text-xs text-on-surface-variant mb-1.5">Provincia (es. MI)</label>
+                  <input type="text" maxlength="2" [value]="editMemberProvince()" (input)="editMemberProvince.set($any($event.target).value.toUpperCase())"
+                         class="w-full px-4 py-2.5 rounded-xl border border-outline-variant bg-surface font-inter text-sm uppercase focus:outline-none focus:ring-2 focus:ring-primary/30" />
+                </div>
+              </div>
+            </div>
+
+            <div class="pt-2 border-t border-outline-variant/20 space-y-3">
+              <p class="font-inter text-xs text-on-surface-variant uppercase tracking-wide font-semibold">Privacy</p>
+              <label class="flex items-center gap-3 cursor-pointer">
+                <input type="checkbox" [checked]="editMemberNewsletter()" (change)="editMemberNewsletter.set($any($event.target).checked)"
+                       class="w-4 h-4 rounded accent-primary" />
+                <span class="font-inter text-sm text-on-surface">Acconsento alla newsletter</span>
+              </label>
+              <label class="flex items-center gap-3 cursor-pointer">
+                <input type="checkbox" [checked]="editMemberThirdParties()" (change)="editMemberThirdParties.set($any($event.target).checked)"
+                       class="w-4 h-4 rounded accent-primary" />
+                <span class="font-inter text-sm text-on-surface">Acconsento alla condivisione con terze parti</span>
+              </label>
             </div>
           </div>
 
-          <button (click)="saveProfile()" [disabled]="editLoading()"
+          <button (click)="saveMyMember()" [disabled]="editMemberLoading()"
                   class="w-full mt-5 py-3 bg-primary text-on-primary font-inter font-bold text-sm rounded-xl hover:opacity-90 transition-all flex items-center justify-center gap-2 disabled:opacity-60">
-            @if (editLoading()) {
+            @if (editMemberLoading()) {
               <lucide-icon name="loader-circle" [size]="16" class="spin" />
               Salvataggio…
             } @else {
@@ -139,11 +350,55 @@
         </div>
       }
 
-      <!-- DELETE ACCOUNT -->
-      @if (view() === 'delete') {
-        <div class="bg-surface-container-lowest rounded-2xl shadow-sm p-6 mb-6 border border-red-200">
+      <!-- CAMBIA PASSWORD -->
+      @if (view() === 'change-password') {
+        <div class="bg-surface-container-lowest rounded-2xl shadow-sm p-6">
           <div class="flex items-center gap-3 mb-5">
-            <button (click)="view.set('profile')" class="w-8 h-8 rounded-lg hover:bg-surface-container flex items-center justify-center transition-colors">
+            <button (click)="view.set('member')" class="w-8 h-8 rounded-lg hover:bg-surface-container flex items-center justify-center transition-colors">
+              <lucide-icon name="arrow-left" [size]="18" class="text-on-surface-variant" />
+            </button>
+            <h2 class="font-romania font-bold text-on-surface text-base">Cambia password</h2>
+          </div>
+
+          @if (pwdError()) {
+            <div class="mb-4 px-4 py-3 rounded-xl bg-red-50 border border-red-200 text-red-700 font-inter text-sm">{{ pwdError() }}</div>
+          }
+          @if (pwdSuccess()) {
+            <div class="mb-4 px-4 py-3 rounded-xl bg-green-50 border border-green-200 text-green-700 font-inter text-sm flex items-center gap-2">
+              <lucide-icon name="check" [size]="16" /> Password aggiornata!
+            </div>
+          }
+
+          <div class="space-y-3">
+            <div>
+              <label class="block font-inter text-xs text-on-surface-variant mb-1.5">Password attuale</label>
+              <input type="password" [value]="pwdCurrent()" (input)="pwdCurrent.set($any($event.target).value)"
+                     class="w-full px-4 py-2.5 rounded-xl border border-outline-variant bg-surface font-inter text-sm focus:outline-none focus:ring-2 focus:ring-primary/30" />
+            </div>
+            <div>
+              <label class="block font-inter text-xs text-on-surface-variant mb-1.5">Nuova password (min 6 caratteri)</label>
+              <input type="password" [value]="pwdNew()" (input)="pwdNew.set($any($event.target).value)"
+                     class="w-full px-4 py-2.5 rounded-xl border border-outline-variant bg-surface font-inter text-sm focus:outline-none focus:ring-2 focus:ring-primary/30" />
+            </div>
+          </div>
+
+          <button (click)="savePassword()" [disabled]="pwdLoading() || !pwdCurrent() || !pwdNew()"
+                  class="w-full mt-5 py-3 bg-primary text-on-primary font-inter font-bold text-sm rounded-xl hover:opacity-90 transition-all flex items-center justify-center gap-2 disabled:opacity-60">
+            @if (pwdLoading()) {
+              <lucide-icon name="loader-circle" [size]="16" class="spin" />
+              Salvataggio…
+            } @else {
+              Aggiorna password
+            }
+          </button>
+        </div>
+      }
+
+      <!-- ELIMINA ACCOUNT -->
+      @if (view() === 'delete') {
+        <div class="bg-surface-container-lowest rounded-2xl shadow-sm p-6 border border-red-200">
+          <div class="flex items-center gap-3 mb-5">
+            <button (click)="view.set('member')" class="w-8 h-8 rounded-lg hover:bg-surface-container flex items-center justify-center transition-colors">
               <lucide-icon name="arrow-left" [size]="18" class="text-on-surface-variant" />
             </button>
             <h2 class="font-romania font-bold text-red-600 text-base">Elimina account</h2>
@@ -151,18 +406,15 @@
 
           <p class="font-inter text-sm text-on-surface-variant mb-4">
             Questa azione è <strong>irreversibile</strong>. Il tuo account verrà eliminato definitivamente.
-            Inserisci la tua password per confermare.
           </p>
 
           @if (deleteError()) {
-            <div class="mb-4 px-4 py-3 rounded-xl bg-red-50 border border-red-200 text-red-700 font-inter text-sm">
-              {{ deleteError() }}
-            </div>
+            <div class="mb-4 px-4 py-3 rounded-xl bg-red-50 border border-red-200 text-red-700 font-inter text-sm">{{ deleteError() }}</div>
           }
 
           <input type="password" [value]="deletePassword()" (input)="deletePassword.set($any($event.target).value)"
                  placeholder="Password attuale"
-                 class="w-full px-4 py-2.5 rounded-xl border border-red-300 bg-surface font-inter text-sm text-on-surface focus:outline-none focus:ring-2 focus:ring-red-300 mb-4" />
+                 class="w-full px-4 py-2.5 rounded-xl border border-red-300 bg-surface font-inter text-sm focus:outline-none focus:ring-2 focus:ring-red-300 mb-4" />
 
           <button (click)="confirmDelete()" [disabled]="deleteLoading() || !deletePassword()"
                   class="w-full py-3 bg-red-600 text-white font-inter font-bold text-sm rounded-xl hover:bg-red-700 transition-all flex items-center justify-center gap-2 disabled:opacity-60">
@@ -177,44 +429,6 @@
         </div>
       }
 
-      <!-- INVITE -->
-      @if (isSuperAdmin()) {
-        <div class="bg-surface-container-lowest rounded-2xl shadow-sm p-6">
-          <div class="flex items-center gap-3 mb-4">
-            <div class="w-10 h-10 rounded-xl bg-primary/8 flex items-center justify-center flex-shrink-0">
-              <lucide-icon name="user-plus" class="text-primary" [size]="20" />
-            </div>
-            <div>
-              <h2 class="font-romania font-bold text-on-surface text-base">Invita un Admin</h2>
-              <p class="font-inter text-on-surface-variant text-xs mt-0.5">Genera un link monouso valido 7 giorni.</p>
-            </div>
-          </div>
-
-          <button (click)="generateInvite()" [disabled]="inviteLoading()"
-                  class="w-full py-3 bg-primary text-on-primary font-inter font-bold text-sm rounded-xl hover:opacity-90 transition-all uppercase tracking-wide flex items-center justify-center gap-2 disabled:opacity-60">
-            @if (inviteLoading()) {
-              <lucide-icon name="loader-circle" [size]="16" class="spin" />
-              Generazione in corso…
-            } @else {
-              <lucide-icon name="link" [size]="16" />
-              Genera link di invito
-            }
-          </button>
-
-          @if (inviteLink()) {
-            <div class="mt-4 p-3 rounded-xl bg-surface-container border border-outline-variant/30 flex items-center gap-2">
-              <span class="font-inter text-xs text-on-surface-variant truncate flex-1 select-all">{{ inviteLink() }}</span>
-              <button (click)="copyLink()"
-                      class="flex-shrink-0 flex items-center gap-1 px-3 py-1.5 rounded-lg font-inter font-semibold text-xs transition-colors"
-                      [class]="copied() ? 'bg-green-100 text-green-700' : 'bg-primary/10 text-primary hover:bg-primary/20'">
-                <lucide-icon [name]="copied() ? 'check' : 'copy'" [size]="14" />
-                {{ copied() ? 'Copiato!' : 'Copia' }}
-              </button>
-            </div>
-          }
-        </div>
-      }
-
     </div>
   }
 
@@ -223,12 +437,9 @@
     <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
       @for (item of imageKeys; track item.key) {
         <div class="bg-surface-container-lowest rounded-2xl shadow-sm overflow-hidden">
-
-          <!-- Preview -->
           <div class="aspect-video bg-surface-container relative">
             @if (siteSettings.settings()[item.key]) {
-              <img [src]="siteSettings.settings()[item.key]"
-                   alt="" class="w-full h-full object-cover" />
+              <img [src]="siteSettings.settings()[item.key]" alt="" class="w-full h-full object-cover" />
             } @else {
               <div class="w-full h-full flex items-center justify-center text-on-surface-variant/20">
                 <lucide-icon name="image" [size]="40" />
@@ -240,24 +451,18 @@
               </div>
             }
           </div>
-
-          <!-- Info + upload -->
           <div class="p-3 flex items-center gap-3">
             <div class="flex-1 min-w-0">
               <p class="font-inter font-semibold text-on-surface text-xs truncate">{{ item.label }}</p>
-              <p class="font-inter text-[10px] text-on-surface-variant truncate mt-0.5">
-                {{ siteSettings.settings()[item.key] ? 'Personalizzata' : 'Predefinita' }}
-              </p>
+              <p class="font-inter text-[10px] text-on-surface-variant truncate mt-0.5">{{ siteSettings.settings()[item.key] ? 'Personalizzata' : 'Predefinita' }}</p>
             </div>
-            <input #fileInput type="file" accept="image/*" class="hidden"
-                   (change)="onImageFileSelected(item.key, $event)" />
+            <input #fileInput type="file" accept="image/*" class="hidden" (change)="onImageFileSelected(item.key, $event)" />
             <button (click)="fileInput.click()" [disabled]="uploadingKey() === item.key"
                     class="flex-shrink-0 flex items-center gap-1 px-3 py-1.5 rounded-lg bg-primary/10 hover:bg-primary/20 font-inter text-xs font-semibold text-primary transition-colors disabled:opacity-50 disabled:pointer-events-none">
               <lucide-icon name="upload" [size]="13" />
               Cambia
             </button>
           </div>
-
         </div>
       }
     </div>
@@ -271,12 +476,9 @@
         e usate automaticamente in tutto il sito dove non è stata caricata un'immagine personalizzata.
       </p>
     </div>
-
     <div class="flex flex-col gap-4 max-w-2xl">
       @for (item of placeholderKeys; track item.key) {
         <div class="bg-surface-container-lowest rounded-2xl shadow-sm overflow-hidden flex flex-col sm:flex-row">
-
-          <!-- Preview -->
           <div class="w-full sm:w-48 flex-shrink-0 aspect-video sm:aspect-auto bg-surface-container relative">
             @if (siteSettings.settings()[item.key]) {
               <img [src]="siteSettings.settings()[item.key]" alt="" class="w-full h-full object-cover" />
@@ -291,8 +493,6 @@
               </div>
             }
           </div>
-
-          <!-- Info + upload -->
           <div class="p-4 flex flex-col justify-between gap-3 flex-1">
             <div>
               <p class="font-inter font-bold text-on-surface text-sm mb-1">{{ item.label }}</p>
@@ -304,8 +504,7 @@
               } @else {
                 <span class="font-inter text-[10px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-full bg-surface-container text-on-surface-variant">Non impostata</span>
               }
-              <input #placeholderInput type="file" accept="image/*" class="hidden"
-                     (change)="onPlaceholderFileSelected(item.key, $event)" />
+              <input #placeholderInput type="file" accept="image/*" class="hidden" (change)="onPlaceholderFileSelected(item.key, $event)" />
               <button (click)="placeholderInput.click()" [disabled]="uploadingPlaceholderKey() === item.key"
                       class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-primary/10 hover:bg-primary/20 font-inter text-xs font-semibold text-primary transition-colors disabled:opacity-50 disabled:pointer-events-none">
                 <lucide-icon name="upload" [size]="13" />
@@ -313,7 +512,6 @@
               </button>
             </div>
           </div>
-
         </div>
       }
     </div>

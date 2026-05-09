@@ -12,9 +12,19 @@ export interface AuthUser {
   name: string;
   email: string;
   role: string;
+  profileImage?: string | null;
 }
 
 export interface UpdateMyMemberRequest {
+  firstName?: string;
+  lastName?: string;
+  fiscalCode?: string;
+  birthDate?: string;
+  birthPlace?: string;
+  gender?: string;
+  docType?: string;
+  docNumber?: string;
+  docExpiry?: string;
   phone?: string;
   addressStreet?: string;
   addressZip?: string;
@@ -89,6 +99,21 @@ export class AuthService {
 
   deleteProfile(currentPassword: string): Observable<void> {
     return this.http.delete<void>(`${API_URL}/auth/me`, { body: { currentPassword } });
+  }
+
+  uploadAvatar(file: File): Observable<{ url: string }> {
+    const form = new FormData();
+    form.append('file', file);
+    return this.http.post<{ url: string }>(`${API_URL}/uploads/avatar`, form).pipe(
+      tap(res => {
+        const u = this._user();
+        if (u) {
+          const updated = { ...u, profileImage: res.url };
+          localStorage.setItem(USER_KEY, JSON.stringify(updated));
+          this._user.set(updated);
+        }
+      }),
+    );
   }
 
   // ── Area personale socio ───────────────────────────────────────────────
