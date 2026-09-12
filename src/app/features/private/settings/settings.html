@@ -336,13 +336,25 @@
           <div class="space-y-3">
             <div>
               <label class="block font-inter text-xs text-on-surface-variant mb-1.5">Password attuale</label>
-              <input type="password" [value]="pwdCurrent()" (input)="pwdCurrent.set($any($event.target).value)"
-                     class="w-full px-4 py-2.5 rounded-xl border border-outline-variant bg-surface font-inter text-sm focus:outline-none focus:ring-2 focus:ring-primary/30" />
+              <div class="relative">
+                <input [type]="showPwdCurrent() ? 'text' : 'password'" [value]="pwdCurrent()" (input)="pwdCurrent.set($any($event.target).value)"
+                       class="w-full px-4 py-2.5 pr-10 rounded-xl border border-outline-variant bg-surface font-inter text-sm focus:outline-none focus:ring-2 focus:ring-primary/30" />
+                <button type="button" (click)="showPwdCurrent.set(!showPwdCurrent())"
+                        class="absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-on-surface transition-colors">
+                  <lucide-icon [name]="showPwdCurrent() ? 'eye-off' : 'eye'" [size]="16" />
+                </button>
+              </div>
             </div>
             <div>
               <label class="block font-inter text-xs text-on-surface-variant mb-1.5">Nuova password (min 6 caratteri)</label>
-              <input type="password" [value]="pwdNew()" (input)="pwdNew.set($any($event.target).value)"
-                     class="w-full px-4 py-2.5 rounded-xl border border-outline-variant bg-surface font-inter text-sm focus:outline-none focus:ring-2 focus:ring-primary/30" />
+              <div class="relative">
+                <input [type]="showPwdNew() ? 'text' : 'password'" [value]="pwdNew()" (input)="pwdNew.set($any($event.target).value)"
+                       class="w-full px-4 py-2.5 pr-10 rounded-xl border border-outline-variant bg-surface font-inter text-sm focus:outline-none focus:ring-2 focus:ring-primary/30" />
+                <button type="button" (click)="showPwdNew.set(!showPwdNew())"
+                        class="absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-on-surface transition-colors">
+                  <lucide-icon [name]="showPwdNew() ? 'eye-off' : 'eye'" [size]="16" />
+                </button>
+              </div>
             </div>
           </div>
 
@@ -376,9 +388,15 @@
             <div class="mb-4 px-4 py-3 rounded-xl bg-red-50 border border-red-200 text-red-700 font-inter text-sm">{{ deleteError() }}</div>
           }
 
-          <input type="password" [value]="deletePassword()" (input)="deletePassword.set($any($event.target).value)"
-                 placeholder="Password attuale"
-                 class="w-full px-4 py-2.5 rounded-xl border border-red-300 bg-surface font-inter text-sm focus:outline-none focus:ring-2 focus:ring-red-300 mb-4" />
+          <div class="relative mb-4">
+            <input [type]="showDeletePassword() ? 'text' : 'password'" [value]="deletePassword()" (input)="deletePassword.set($any($event.target).value)"
+                   placeholder="Password attuale"
+                   class="w-full px-4 py-2.5 pr-10 rounded-xl border border-red-300 bg-surface font-inter text-sm focus:outline-none focus:ring-2 focus:ring-red-300" />
+            <button type="button" (click)="showDeletePassword.set(!showDeletePassword())"
+                    class="absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-on-surface transition-colors">
+              <lucide-icon [name]="showDeletePassword() ? 'eye-off' : 'eye'" [size]="16" />
+            </button>
+          </div>
 
           <button (click)="confirmDelete()" [disabled]="deleteLoading() || !deletePassword()"
                   class="w-full py-3 bg-red-600 text-white font-inter font-bold text-sm rounded-xl hover:bg-red-700 transition-all flex items-center justify-center gap-2 disabled:opacity-60">

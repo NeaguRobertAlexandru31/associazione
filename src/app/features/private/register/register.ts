@@ -70,9 +70,11 @@ export class Register implements OnInit {
   readonly relationOptions = [{ value: 'genitore', label: 'Genitore' }, { value: 'tutore_legale', label: 'Tutore legale' }];
 
   // ── Phase 3: account ─────────────────────────────────────────────────
-  accountName = '';
-  password    = '';
-  confirm     = '';
+  accountName  = '';
+  password     = '';
+  confirm      = '';
+  showPassword = signal(false);
+  showConfirm  = signal(false);
 
   ngOnInit(): void {
     const t = this.route.snapshot.queryParamMap.get('token');

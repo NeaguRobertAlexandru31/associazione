@@ -57,10 +57,13 @@ export class Settings implements OnInit {
   pwdLoading  = signal(false);
   pwdError    = signal<string | null>(null);
   pwdSuccess  = signal(false);
+  showPwdCurrent = signal(false);
+  showPwdNew     = signal(false);
 
-  deletePassword = signal('');
-  deleteLoading  = signal(false);
-  deleteError    = signal<string | null>(null);
+  deletePassword     = signal('');
+  deleteLoading      = signal(false);
+  deleteError        = signal<string | null>(null);
+  showDeletePassword = signal(false);
 
   ngOnInit(): void {
     this.siteSettings.load();

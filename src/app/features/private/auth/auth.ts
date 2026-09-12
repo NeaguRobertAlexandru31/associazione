@@ -25,6 +25,9 @@ export class Auth {
   error    = signal<string | null>(null);
   loading  = signal(false);
 
+  showPassword = signal(false);
+  showConfirm  = signal(false);
+
   submitEmail(): void {
     if (!this.email.trim()) return;
     this.error.set(null);
