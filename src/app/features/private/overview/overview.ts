@@ -34,11 +34,11 @@ export class Overview implements OnInit {
   });
 
   readonly sociAttiviCount = computed(() =>
-    this.soci().filter(s => s.status === 'attivo').length
+    [...this.direttivo(), ...this.soci()].filter(s => s.status === 'attivo').length
   );
 
   readonly sociInAttesaCount = computed(() =>
-    this.soci().filter(s => s.status === 'in_attesa_pagamento').length
+    this.soci().filter(s => s.status === 'in_attesa_pagamento' || s.status === 'pagamento_in_corso').length
   );
 
   readonly articlesThisMonth = computed(() => {
@@ -56,7 +56,7 @@ export class Overview implements OnInit {
       icon: 'group',
       label: 'Soci Attivi',
       value: this.loading() ? '—' : String(this.sociAttiviCount()),
-      delta: `di cui ${this.direttivo().length} nel direttivo · ${this.sociInAttesaCount()} in attesa`,
+      delta: `di cui ${this.direttivo().filter(d => d.status === 'attivo').length} nel direttivo · ${this.sociInAttesaCount()} in attesa`,
       positive: true,
       loading: this.loading(),
     },
