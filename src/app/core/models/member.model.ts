@@ -1,6 +1,20 @@
+export type UserRole       = 'SUPERADMIN' | 'ADMIN' | 'MEMBER';
+
+export type DashboardPage =
+  | 'overview'
+  | 'members'
+  | 'events'
+  | 'messages'
+  | 'activities'
+  | 'news'
+  | 'projects'
+  | 'donations'
+  | 'settings'
+  | 'permissions';
+
+export type PagePermissions = Partial<Record<DashboardPage, boolean>>;
 export type MemberCategory = 'ordinario' | 'under26' | 'sostenitore';
-export type MemberStatus  = 'in_attesa_pagamento' | 'pagamento_in_corso' | 'attivo' | 'rifiutato';
-export type AdminRole     = 'SUPERADMIN' | 'ADMIN';
+export type MemberStatus   = 'in_attesa_pagamento' | 'pagamento_in_corso' | 'attivo' | 'rifiutato';
 
 export type BoardRole =
   | 'presidente'
@@ -21,50 +35,49 @@ export const BOARD_ROLE_LABELS: Record<BoardRole, string> = {
   responsabile_eventi: 'Responsabile eventi',
 };
 
-export interface DirettivoMember {
+export interface AuthUser {
   id: string;
-  name: string;
   email: string;
-  role: AdminRole;
-  boardRoles?: BoardRole[];
+  firstName: string;
+  lastName: string;
+  role: UserRole;
   profileImage?: string | null;
-  createdAt: string;
+  boardRoles: string[];
+  pagePermissions?: PagePermissions | null;
 }
 
-export interface SocioMember {
+export interface MemberListItem {
   id: string;
   firstName: string;
   lastName: string;
   email: string;
+  role: UserRole;
   category: MemberCategory;
   status: MemberStatus;
-  membershipYear: number;
+  membershipYear: number | null;
   profileImage?: string | null;
+  boardRoles: string[];
+  pagePermissions?: PagePermissions | null;
   createdAt: string;
 }
 
 export interface MembersResponse {
-  direttivo: DirettivoMember[];
-  soci: SocioMember[];
+  direttivo: MemberListItem[];
+  soci: MemberListItem[];
 }
 
 export interface Guardian {
   firstName: string;
   lastName: string;
   fiscalCode: string;
-  phone: string;
+  relation: string;
+  docType: string;
+  docNumber: string;
+  docExpiry: string;
 }
 
-export interface UpdateSocioRequest {
-  firstName?: string; lastName?: string; fiscalCode?: string;
-  birthDate?: string; birthPlace?: string; gender?: string;
-  docType?: string; docNumber?: string; docExpiry?: string;
-  email?: string; phone?: string;
-  addressStreet?: string; addressZip?: string; addressCity?: string; addressProvince?: string;
-  category?: MemberCategory; status?: MemberStatus; paymentMethod?: string; isMinor?: boolean;
-}
-
-export interface SocioMemberDetail extends SocioMember {
+export interface MemberDetail extends MemberListItem {
+  isMinor: boolean;
   fiscalCode: string;
   birthDate: string;
   birthPlace: string;
@@ -78,10 +91,19 @@ export interface SocioMemberDetail extends SocioMember {
   addressCity: string;
   addressProvince: string;
   paymentMethod: string;
-  isMinor: boolean;
   privacyBase: boolean;
   privacyNewsletter: boolean;
   privacyThirdParties: boolean;
   guardian?: Guardian | null;
   updatedAt: string;
+}
+
+export interface UpdateMemberRequest {
+  firstName?: string; lastName?: string; fiscalCode?: string;
+  birthDate?: string; birthPlace?: string; gender?: string;
+  docType?: string; docNumber?: string; docExpiry?: string;
+  email?: string; phone?: string;
+  addressStreet?: string; addressZip?: string; addressCity?: string; addressProvince?: string;
+  category?: MemberCategory; status?: MemberStatus; paymentMethod?: string; isMinor?: boolean;
+  privacyNewsletter?: boolean; privacyThirdParties?: boolean;
 }

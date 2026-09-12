@@ -3,7 +3,7 @@
   <!-- Back -->
   <button (click)="back()" class="flex items-center gap-2 mb-6 font-inter text-sm text-on-surface-variant hover:text-on-surface transition-colors">
     <span class="material-symbols-outlined text-base">arrow_back</span>
-    Torna ai soci
+    Torna ai membri
   </button>
 
   @if (loading()) {
@@ -15,132 +15,44 @@
       <span class="material-symbols-outlined text-secondary text-4xl">error</span>
       <p class="font-inter text-on-surface-variant text-sm">Errore nel caricamento.</p>
     </div>
-
-  } @else if (type() === 'admin' && admin()) {
-    <!-- ── DIRETTIVO DETAIL ─────────────────────────────────────────────── -->
-    <div class="bg-surface-container-lowest rounded-2xl shadow-sm p-6">
-      <div class="flex items-center gap-4 mb-6">
-        <div class="w-14 h-14 rounded-full bg-primary flex items-center justify-center flex-shrink-0">
-          <span class="font-romania font-bold text-on-primary text-xl">{{ admin()!.name[0] }}</span>
-        </div>
-        <div class="flex-1 min-w-0">
-          <h1 class="font-romania font-bold text-on-surface text-2xl">{{ admin()!.name }}</h1>
-          <span class="font-inter text-[11px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full"
-                [class]="admin()!.role === 'SUPERADMIN' ? 'bg-primary/10 text-primary' : 'bg-surface-container text-on-surface-variant'">
-            {{ admin()!.role === 'SUPERADMIN' ? 'Presidente' : 'Admin' }}
-          </span>
-        </div>
-        <!-- Actions -->
-        <div class="flex items-center gap-2 flex-shrink-0">
-          <button (click)="togglePrivate()"
-                  class="flex items-center gap-1.5 px-3 py-2 rounded-xl font-inter text-xs font-semibold transition-colors"
-                  [class.bg-primary]="showPrivate()" [class.text-on-primary]="showPrivate()"
-                  [class.bg-surface-container]="!showPrivate()" [class.text-on-surface-variant]="!showPrivate()">
-            <span class="material-symbols-outlined text-base">{{ showPrivate() ? 'visibility' : 'visibility_off' }}</span>
-          </button>
-          @if (isSuperAdmin()) {
-            <button (click)="askDelete()"
-                    class="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-red-50 text-red-500 hover:bg-red-100 transition-colors">
-              <span class="material-symbols-outlined text-base">delete</span>
-            </button>
-          }
-        </div>
-      </div>
-
-      <dl class="divide-y divide-outline-variant/20 mb-5">
-        <div class="flex justify-between py-3">
-          <dt class="font-inter text-xs text-on-surface-variant uppercase tracking-wide">Email</dt>
-          <dd class="font-inter text-sm text-on-surface">{{ mask(admin()!.email) }}</dd>
-        </div>
-        <div class="flex justify-between py-3">
-          <dt class="font-inter text-xs text-on-surface-variant uppercase tracking-wide">Ruoli direttivo</dt>
-          <dd class="font-inter text-sm text-on-surface font-semibold">
-            @if (admin()!.boardRoles?.length) {
-              <span class="flex flex-wrap gap-1 justify-end">
-                @for (r of admin()!.boardRoles!; track r) {
-                  <span class="font-inter text-[10px] font-bold uppercase tracking-wider bg-primary/10 text-primary px-2 py-0.5 rounded-full">
-                    {{ boardRoleLabel(r) }}
-                  </span>
-                }
-              </span>
-            } @else {
-              <span class="text-on-surface-variant">—</span>
-            }
-          </dd>
-        </div>
-        <div class="flex justify-between py-3">
-          <dt class="font-inter text-xs text-on-surface-variant uppercase tracking-wide">Membro dal</dt>
-          <dd class="font-inter text-sm text-on-surface">{{ admin()!.createdAt | date:'dd/MM/yyyy' }}</dd>
-        </div>
-      </dl>
-
-      @if (isSuperAdmin()) {
-        <div class="border-t border-outline-variant/20 pt-4">
-          <p class="font-inter font-semibold text-[10px] text-on-surface-variant uppercase tracking-widest mb-3">Ruoli direttivo</p>
-          <div class="grid grid-cols-2 gap-2 mb-3">
-            @for (opt of boardRoleOptions; track opt.value) {
-              <label class="flex items-center gap-2 cursor-pointer select-none group">
-                <input type="checkbox"
-                       [checked]="boardRolesSelected().includes(opt.value)"
-                       (change)="toggleBoardRole(opt.value)"
-                       class="accent-primary w-4 h-4 cursor-pointer" />
-                <span class="font-inter text-sm text-on-surface group-hover:text-primary transition-colors">{{ opt.label }}</span>
-              </label>
-            }
-          </div>
-          <button (click)="saveBoardRole()" [disabled]="boardRoleSaving()"
-                  class="w-full py-2.5 rounded-xl font-inter font-bold text-sm transition-all flex items-center justify-center gap-2 disabled:opacity-60"
-                  [class.bg-green-100]="boardRoleSuccess()" [class.text-green-700]="boardRoleSuccess()"
-                  [class.bg-primary]="!boardRoleSuccess()" [class.text-on-primary]="!boardRoleSuccess()">
-            @if (boardRoleSaving()) {
-              <span class="material-symbols-outlined text-base spin">progress_activity</span>
-            } @else if (boardRoleSuccess()) {
-              <span class="material-symbols-outlined text-base" style="font-variation-settings:'FILL' 1">check_circle</span>
-              Salvato
-            } @else {
-              <span class="material-symbols-outlined text-base">save</span>
-              Salva ruoli
-            }
-          </button>
-        </div>
-      }
-    </div>
-
-  } @else if (type() === 'socio' && socio()) {
-    <!-- ── SOCIO DETAIL ─────────────────────────────────────────────────── -->
+  } @else if (member()) {
 
     <!-- Header -->
     <div class="flex items-start gap-4 mb-6">
-      <div class="w-14 h-14 rounded-full bg-surface-container flex items-center justify-center flex-shrink-0">
-        <span class="font-romania font-bold text-on-surface-variant text-xl">{{ socio()!.firstName[0] }}</span>
+      <div class="w-14 h-14 rounded-full bg-surface-container flex items-center justify-center flex-shrink-0 overflow-hidden">
+        @if (member()!.profileImage) {
+          <img [src]="member()!.profileImage" alt="" class="w-full h-full object-cover" />
+        } @else {
+          <span class="font-romania font-bold text-on-surface-variant text-xl">{{ member()!.firstName[0] }}</span>
+        }
       </div>
       <div class="flex-1 min-w-0">
-        <h1 class="font-romania font-bold text-on-surface text-2xl">{{ socio()!.firstName }} {{ socio()!.lastName }}</h1>
+        <h1 class="font-romania font-bold text-on-surface text-2xl">{{ member()!.firstName }} {{ member()!.lastName }}</h1>
         <div class="flex flex-wrap items-center gap-2 mt-1">
-          <span class="font-inter text-[11px] font-semibold px-2.5 py-1 rounded-full"
-                [class]="{
-                  'bg-primary/10 text-primary':                   socio()!.category === 'sostenitore',
-                  'bg-blue-100 text-blue-700':                    socio()!.category === 'under26',
-                  'bg-surface-container text-on-surface-variant': socio()!.category === 'ordinario'
-                }">
-            {{ categoryLabel(socio()!.category) }}
+          <!-- Ruolo -->
+          <span class="font-inter text-[11px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full"
+                [class]="member()!.role === 'SUPERADMIN' ? 'bg-primary/10 text-primary' : member()!.role === 'ADMIN' ? 'bg-blue-100 text-blue-700' : 'bg-surface-container text-on-surface-variant'">
+            {{ roleLabel(member()!.role) }}
           </span>
-          <span class="font-inter text-[11px] font-semibold px-2.5 py-1 rounded-full inline-flex items-center gap-1.5"
-                [class]="{
-                  'bg-green-100 text-green-700':   socio()!.status === 'attivo',
-                  'bg-yellow-100 text-yellow-700': socio()!.status === 'in_attesa_pagamento',
-                  'bg-blue-100 text-blue-700':     socio()!.status === 'pagamento_in_corso',
-                  'bg-red-100 text-red-700':       socio()!.status === 'rifiutato'
-                }">
-            <span class="w-1.5 h-1.5 rounded-full"
+          <!-- Stato iscrizione (solo MEMBER) -->
+          @if (member()!.role === 'MEMBER') {
+            <span class="font-inter text-[11px] font-semibold px-2.5 py-1 rounded-full inline-flex items-center gap-1.5"
                   [class]="{
-                    'bg-green-500':  socio()!.status === 'attivo',
-                    'bg-yellow-500': socio()!.status === 'in_attesa_pagamento',
-                    'bg-blue-500':   socio()!.status === 'pagamento_in_corso',
-                    'bg-red-500':    socio()!.status === 'rifiutato'
-                  }"></span>
-            {{ statusLabel(socio()!.status) }}
-          </span>
+                    'bg-green-100 text-green-700':   member()!.status === 'attivo',
+                    'bg-yellow-100 text-yellow-700': member()!.status === 'in_attesa_pagamento',
+                    'bg-blue-100 text-blue-700':     member()!.status === 'pagamento_in_corso',
+                    'bg-red-100 text-red-700':       member()!.status === 'rifiutato'
+                  }">
+              <span class="w-1.5 h-1.5 rounded-full"
+                    [class]="{
+                      'bg-green-500':  member()!.status === 'attivo',
+                      'bg-yellow-500': member()!.status === 'in_attesa_pagamento',
+                      'bg-blue-500':   member()!.status === 'pagamento_in_corso',
+                      'bg-red-500':    member()!.status === 'rifiutato'
+                    }"></span>
+              {{ statusLabel(member()!.status) }}
+            </span>
+          }
         </div>
       </div>
       <!-- Actions -->
@@ -164,6 +76,53 @@
       </div>
     </div>
 
+    <!-- ── Promozione ruolo (solo SUPERADMIN) ──────────────────────────── -->
+    @if (isSuperAdmin()) {
+      <div class="bg-surface-container-lowest rounded-2xl shadow-sm p-5 mb-4">
+        <h2 class="font-romania font-bold text-on-surface text-base mb-4">Ruolo e permessi</h2>
+
+        <div class="mb-3">
+          <label class="form-label">Ruolo</label>
+          <select [(ngModel)]="promoteRole" name="role" class="form-input">
+            <option value="MEMBER">Socio</option>
+            <option value="ADMIN">Direttivo (Admin)</option>
+            <option value="SUPERADMIN">Presidente (Superadmin)</option>
+          </select>
+        </div>
+
+        @if (promoteRole() !== 'MEMBER') {
+          <div class="mb-3">
+            <label class="form-label mb-2 block">Ruoli direttivo</label>
+            <div class="grid grid-cols-2 gap-2">
+              @for (opt of boardRoleOptions; track opt.value) {
+                <label class="flex items-center gap-2 cursor-pointer select-none group">
+                  <input type="checkbox"
+                         [checked]="boardRolesSelected().includes(opt.value)"
+                         (change)="toggleBoardRole(opt.value)"
+                         class="accent-primary w-4 h-4 cursor-pointer" />
+                  <span class="font-inter text-sm text-on-surface group-hover:text-primary transition-colors">{{ opt.label }}</span>
+                </label>
+              }
+            </div>
+          </div>
+        }
+
+        @if (promoteError()) {
+          <p class="font-inter text-xs text-red-500 mb-2">{{ promoteError() }}</p>
+        }
+
+        <button (click)="savePromoteRole()" [disabled]="promoteSaving()"
+                class="w-full py-2.5 rounded-xl bg-primary text-on-primary font-inter font-bold text-sm transition-all flex items-center justify-center gap-2 disabled:opacity-60">
+          @if (promoteSaving()) {
+            <span class="material-symbols-outlined text-base spin">progress_activity</span>
+          } @else {
+            <span class="material-symbols-outlined text-base">manage_accounts</span>
+            Salva ruolo
+          }
+        </button>
+      </div>
+    }
+
     <!-- ── EDIT MODE ─────────────────────────────────────────────────────── -->
     @if (editMode()) {
 
@@ -175,8 +134,6 @@
       }
 
       <div class="flex flex-col gap-4">
-
-        <!-- Anagrafica -->
         <div class="bg-surface-container-lowest rounded-2xl shadow-sm p-5">
           <h2 class="font-romania font-bold text-on-surface text-base mb-4">Dati anagrafici</h2>
           <div class="grid grid-cols-2 gap-3">
@@ -217,7 +174,6 @@
           </div>
         </div>
 
-        <!-- Documento -->
         <div class="bg-surface-container-lowest rounded-2xl shadow-sm p-5">
           <h2 class="font-romania font-bold text-on-surface text-base mb-4">Documento</h2>
           <div class="grid grid-cols-2 gap-3">
@@ -240,7 +196,6 @@
           </div>
         </div>
 
-        <!-- Contatti -->
         <div class="bg-surface-container-lowest rounded-2xl shadow-sm p-5">
           <h2 class="font-romania font-bold text-on-surface text-base mb-4">Contatti</h2>
           <div class="grid grid-cols-2 gap-3">
@@ -271,7 +226,6 @@
           </div>
         </div>
 
-        <!-- Iscrizione -->
         <div class="bg-surface-container-lowest rounded-2xl shadow-sm p-5">
           <h2 class="font-romania font-bold text-on-surface text-base mb-4">Iscrizione</h2>
           <div class="grid grid-cols-2 gap-3">
@@ -302,7 +256,6 @@
           </div>
         </div>
 
-        <!-- Buttons -->
         <div class="flex gap-3">
           <button (click)="cancelEdit()" class="flex-1 py-3 border border-outline-variant font-inter font-semibold text-sm text-on-surface-variant rounded-xl hover:bg-surface-container transition-colors">
             Annulla
@@ -321,37 +274,46 @@
       </div>
 
     } @else {
-    <!-- ── READ MODE ─────────────────────────────────────────────────────── -->
+      <!-- ── READ MODE ──────────────────────────────────────────────────── -->
 
-      <!-- Dati anagrafici -->
       <div class="bg-surface-container-lowest rounded-2xl shadow-sm p-5 mb-4">
         <h2 class="font-romania font-bold text-on-surface text-base mb-3">Dati anagrafici</h2>
         <dl class="divide-y divide-outline-variant/20">
           <div class="flex justify-between py-2.5">
             <dt class="form-dt">Email</dt>
-            <dd class="form-dd">{{ mask(socio()!.email) }}</dd>
+            <dd class="form-dd">{{ mask(member()!.email) }}</dd>
           </div>
-          <div class="flex justify-between py-2.5">
-            <dt class="form-dt">Telefono</dt>
-            <dd class="form-dd">{{ mask(socio()!.phone) }}</dd>
-          </div>
-          <div class="flex justify-between py-2.5">
-            <dt class="form-dt">Codice fiscale</dt>
-            <dd class="form-dd font-mono">{{ mask(socio()!.fiscalCode) }}</dd>
-          </div>
-          <div class="flex justify-between py-2.5">
-            <dt class="form-dt">Data di nascita</dt>
-            <dd class="form-dd">{{ showPrivate() ? (socio()!.birthDate | date:'dd/MM/yyyy') : '••/••/••••' }}</dd>
-          </div>
-          <div class="flex justify-between py-2.5">
-            <dt class="form-dt">Luogo di nascita</dt>
-            <dd class="form-dd">{{ mask(socio()!.birthPlace) }}</dd>
-          </div>
-          <div class="flex justify-between py-2.5">
-            <dt class="form-dt">Sesso</dt>
-            <dd class="form-dd uppercase">{{ mask(socio()!.gender) }}</dd>
-          </div>
-          @if (socio()!.isMinor) {
+          @if (member()!.phone) {
+            <div class="flex justify-between py-2.5">
+              <dt class="form-dt">Telefono</dt>
+              <dd class="form-dd">{{ mask(member()!.phone) }}</dd>
+            </div>
+          }
+          @if (member()!.fiscalCode) {
+            <div class="flex justify-between py-2.5">
+              <dt class="form-dt">Codice fiscale</dt>
+              <dd class="form-dd font-mono">{{ mask(member()!.fiscalCode) }}</dd>
+            </div>
+          }
+          @if (member()!.birthDate) {
+            <div class="flex justify-between py-2.5">
+              <dt class="form-dt">Data di nascita</dt>
+              <dd class="form-dd">{{ showPrivate() ? (member()!.birthDate | date:'dd/MM/yyyy') : '••/••/••••' }}</dd>
+            </div>
+          }
+          @if (member()!.birthPlace) {
+            <div class="flex justify-between py-2.5">
+              <dt class="form-dt">Luogo di nascita</dt>
+              <dd class="form-dd">{{ mask(member()!.birthPlace) }}</dd>
+            </div>
+          }
+          @if (member()!.gender) {
+            <div class="flex justify-between py-2.5">
+              <dt class="form-dt">Sesso</dt>
+              <dd class="form-dd uppercase">{{ mask(member()!.gender) }}</dd>
+            </div>
+          }
+          @if (member()!.isMinor) {
             <div class="flex justify-between py-2.5">
               <dt class="form-dt">Minore</dt>
               <dd class="font-inter text-sm text-orange-600 font-semibold">Sì — vedi tutore</dd>
@@ -360,111 +322,112 @@
         </dl>
       </div>
 
-      <!-- Documento -->
-      <div class="bg-surface-container-lowest rounded-2xl shadow-sm p-5 mb-4">
-        <h2 class="font-romania font-bold text-on-surface text-base mb-3">Documento d'identità</h2>
-        <dl class="divide-y divide-outline-variant/20">
-          <div class="flex justify-between py-2.5">
-            <dt class="form-dt">Tipo</dt>
-            <dd class="form-dd">{{ docTypeLabel(socio()!.docType) }}</dd>
-          </div>
-          <div class="flex justify-between py-2.5">
-            <dt class="form-dt">Numero</dt>
-            <dd class="form-dd font-mono">{{ mask(socio()!.docNumber) }}</dd>
-          </div>
-          <div class="flex justify-between py-2.5">
-            <dt class="form-dt">Scadenza</dt>
-            <dd class="form-dd">{{ showPrivate() ? (socio()!.docExpiry | date:'dd/MM/yyyy') : '••/••/••••' }}</dd>
-          </div>
-        </dl>
-      </div>
-
-      <!-- Indirizzo -->
-      <div class="bg-surface-container-lowest rounded-2xl shadow-sm p-5 mb-4">
-        <h2 class="font-romania font-bold text-on-surface text-base mb-3">Indirizzo</h2>
-        <dl class="divide-y divide-outline-variant/20">
-          <div class="flex justify-between py-2.5">
-            <dt class="form-dt">Via</dt>
-            <dd class="form-dd">{{ mask(socio()!.addressStreet) }}</dd>
-          </div>
-          <div class="flex justify-between py-2.5">
-            <dt class="form-dt">CAP</dt>
-            <dd class="form-dd">{{ mask(socio()!.addressZip) }}</dd>
-          </div>
-          <div class="flex justify-between py-2.5">
-            <dt class="form-dt">Città</dt>
-            <dd class="form-dd">{{ showPrivate() ? socio()!.addressCity + ' (' + socio()!.addressProvince + ')' : '••••••••' }}</dd>
-          </div>
-        </dl>
-      </div>
-
-      <!-- Iscrizione -->
-      <div class="bg-surface-container-lowest rounded-2xl shadow-sm p-5 mb-4">
-        <h2 class="font-romania font-bold text-on-surface text-base mb-3">Iscrizione</h2>
-        <dl class="divide-y divide-outline-variant/20">
-          <div class="flex justify-between py-2.5">
-            <dt class="form-dt">Anno</dt>
-            <dd class="form-dd">{{ socio()!.membershipYear }}</dd>
-          </div>
-          <div class="flex justify-between py-2.5">
-            <dt class="form-dt">Pagamento</dt>
-            <dd class="form-dd">{{ paymentLabel(socio()!.paymentMethod) }}</dd>
-          </div>
-          <div class="flex justify-between py-2.5">
-            <dt class="form-dt">Registrato il</dt>
-            <dd class="form-dd">{{ socio()!.createdAt | date:'dd/MM/yyyy HH:mm' }}</dd>
-          </div>
-        </dl>
-      </div>
-
-      <!-- Tutore (se minore) -->
-      @if (socio()!.isMinor && socio()!.guardian) {
+      @if (member()!.docType) {
         <div class="bg-surface-container-lowest rounded-2xl shadow-sm p-5 mb-4">
-          <h2 class="font-romania font-bold text-on-surface text-base mb-3">Tutore legale</h2>
+          <h2 class="font-romania font-bold text-on-surface text-base mb-3">Documento d'identità</h2>
           <dl class="divide-y divide-outline-variant/20">
             <div class="flex justify-between py-2.5">
-              <dt class="form-dt">Nome</dt>
-              <dd class="form-dd">{{ mask(socio()!.guardian!.firstName + ' ' + socio()!.guardian!.lastName) }}</dd>
+              <dt class="form-dt">Tipo</dt>
+              <dd class="form-dd">{{ docTypeLabel(member()!.docType!) }}</dd>
             </div>
             <div class="flex justify-between py-2.5">
-              <dt class="form-dt">Codice fiscale</dt>
-              <dd class="form-dd font-mono">{{ mask(socio()!.guardian!.fiscalCode) }}</dd>
+              <dt class="form-dt">Numero</dt>
+              <dd class="form-dd font-mono">{{ mask(member()!.docNumber) }}</dd>
+            </div>
+            <div class="flex justify-between py-2.5">
+              <dt class="form-dt">Scadenza</dt>
+              <dd class="form-dd">{{ showPrivate() ? (member()!.docExpiry | date:'dd/MM/yyyy') : '••/••/••••' }}</dd>
             </div>
           </dl>
         </div>
       }
 
-      <!-- Privacy -->
+      @if (member()!.addressStreet) {
+        <div class="bg-surface-container-lowest rounded-2xl shadow-sm p-5 mb-4">
+          <h2 class="font-romania font-bold text-on-surface text-base mb-3">Indirizzo</h2>
+          <dl class="divide-y divide-outline-variant/20">
+            <div class="flex justify-between py-2.5">
+              <dt class="form-dt">Via</dt>
+              <dd class="form-dd">{{ mask(member()!.addressStreet) }}</dd>
+            </div>
+            <div class="flex justify-between py-2.5">
+              <dt class="form-dt">CAP</dt>
+              <dd class="form-dd">{{ mask(member()!.addressZip) }}</dd>
+            </div>
+            <div class="flex justify-between py-2.5">
+              <dt class="form-dt">Città</dt>
+              <dd class="form-dd">{{ showPrivate() ? (member()!.addressCity + ' (' + member()!.addressProvince + ')') : '••••••••' }}</dd>
+            </div>
+          </dl>
+        </div>
+      }
+
+      @if (member()!.membershipYear) {
+        <div class="bg-surface-container-lowest rounded-2xl shadow-sm p-5 mb-4">
+          <h2 class="font-romania font-bold text-on-surface text-base mb-3">Iscrizione</h2>
+          <dl class="divide-y divide-outline-variant/20">
+            <div class="flex justify-between py-2.5">
+              <dt class="form-dt">Anno</dt>
+              <dd class="form-dd">{{ member()!.membershipYear }}</dd>
+            </div>
+            @if (member()!.paymentMethod) {
+              <div class="flex justify-between py-2.5">
+                <dt class="form-dt">Pagamento</dt>
+                <dd class="form-dd">{{ member()!.paymentMethod }}</dd>
+              </div>
+            }
+            <div class="flex justify-between py-2.5">
+              <dt class="form-dt">Registrato il</dt>
+              <dd class="form-dd">{{ member()!.createdAt | date:'dd/MM/yyyy HH:mm' }}</dd>
+            </div>
+          </dl>
+        </div>
+      }
+
+      @if (member()!.isMinor && member()!.guardian) {
+        <div class="bg-surface-container-lowest rounded-2xl shadow-sm p-5 mb-4">
+          <h2 class="font-romania font-bold text-on-surface text-base mb-3">Tutore legale</h2>
+          <dl class="divide-y divide-outline-variant/20">
+            <div class="flex justify-between py-2.5">
+              <dt class="form-dt">Nome</dt>
+              <dd class="form-dd">{{ mask(member()!.guardian!.firstName + ' ' + member()!.guardian!.lastName) }}</dd>
+            </div>
+            <div class="flex justify-between py-2.5">
+              <dt class="form-dt">Codice fiscale</dt>
+              <dd class="form-dd font-mono">{{ mask(member()!.guardian!.fiscalCode) }}</dd>
+            </div>
+          </dl>
+        </div>
+      }
+
       <div class="bg-surface-container-lowest rounded-2xl shadow-sm p-5">
         <h2 class="font-romania font-bold text-on-surface text-base mb-3">Privacy</h2>
         <dl class="divide-y divide-outline-variant/20">
           <div class="flex justify-between py-2.5">
             <dt class="form-dt">Base</dt>
-            <dd class="font-inter text-sm" [class]="socio()!.privacyBase ? 'text-green-600' : 'text-red-600'">
-              {{ socio()!.privacyBase ? 'Accettata' : 'Non accettata' }}
+            <dd class="font-inter text-sm" [class]="member()!.privacyBase ? 'text-green-600' : 'text-red-600'">
+              {{ member()!.privacyBase ? 'Accettata' : 'Non accettata' }}
             </dd>
           </div>
           <div class="flex justify-between py-2.5">
             <dt class="form-dt">Newsletter</dt>
-            <dd class="font-inter text-sm" [class]="socio()!.privacyNewsletter ? 'text-green-600' : 'text-on-surface-variant'">
-              {{ socio()!.privacyNewsletter ? 'Sì' : 'No' }}
+            <dd class="font-inter text-sm" [class]="member()!.privacyNewsletter ? 'text-green-600' : 'text-on-surface-variant'">
+              {{ member()!.privacyNewsletter ? 'Sì' : 'No' }}
             </dd>
           </div>
           <div class="flex justify-between py-2.5">
             <dt class="form-dt">Terze parti</dt>
-            <dd class="font-inter text-sm" [class]="socio()!.privacyThirdParties ? 'text-green-600' : 'text-on-surface-variant'">
-              {{ socio()!.privacyThirdParties ? 'Sì' : 'No' }}
+            <dd class="font-inter text-sm" [class]="member()!.privacyThirdParties ? 'text-green-600' : 'text-on-surface-variant'">
+              {{ member()!.privacyThirdParties ? 'Sì' : 'No' }}
             </dd>
           </div>
         </dl>
       </div>
-
     }
   }
 
 </div>
 
-<!-- ── Confirm delete dialog ─────────────────────────────────────────────── -->
 @if (confirmDelete()) {
   <div class="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-4" (click)="cancelDeleteConfirm()">
     <div class="bg-surface-container-lowest rounded-2xl shadow-xl p-6 w-full max-w-xs" (click)="$event.stopPropagation()">
@@ -474,9 +437,7 @@
         </div>
         <div>
           <p class="font-inter font-bold text-on-surface text-sm">Conferma eliminazione</p>
-          <p class="font-inter text-on-surface-variant text-xs mt-0.5">
-            {{ type() === 'socio' ? 'Il socio verrà eliminato definitivamente.' : 'Il membro del direttivo verrà rimosso.' }}
-          </p>
+          <p class="font-inter text-on-surface-variant text-xs mt-0.5">Il membro verrà eliminato definitivamente.</p>
         </div>
       </div>
       <div class="flex gap-3">

@@ -86,23 +86,8 @@ export class Register implements OnInit {
   // ── Phase 1 ───────────────────────────────────────────────────────────
   submitEmailCheck(): void {
     if (!this.checkEmail) return;
-    this.error.set(null);
-    this.loading.set(true);
-    this.auth.checkMember(this.checkEmail).subscribe({
-      next: (res) => {
-        this.loading.set(false);
-        this.memberEmail = this.checkEmail;
-        if (res.isMember) {
-          this.phase.set('account');
-        } else {
-          this.phase.set('membership');
-        }
-      },
-      error: () => {
-        this.loading.set(false);
-        this.error.set('Errore durante la verifica. Riprova.');
-      },
-    });
+    this.memberEmail = this.checkEmail;
+    this.phase.set('membership');
   }
 
   // ── Phase 2 ───────────────────────────────────────────────────────────
@@ -207,25 +192,6 @@ export class Register implements OnInit {
 
   // ── Phase 3 ───────────────────────────────────────────────────────────
   submitAccount(): void {
-    if (this.password !== this.confirm) { this.error.set('Le password non coincidono.'); return; }
-    if (this.password.length < 6)       { this.error.set('La password deve essere di almeno 6 caratteri.'); return; }
-    this.error.set(null);
-    this.loading.set(true);
-    this.auth.register({
-      token:    this.token()!,
-      name:     this.accountName,
-      email:    this.memberEmail,
-      password: this.password,
-    }).subscribe({
-      next: () => {
-        this.loading.set(false);
-        this.success.set(true);
-        setTimeout(() => this.router.navigate(['/dashboard']), 1500);
-      },
-      error: (err) => {
-        this.loading.set(false);
-        this.error.set(err?.error?.message ?? 'Errore durante la creazione dell\'account.');
-      },
-    });
+    this.router.navigate(['/login']);
   }
 }

@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from '../../../../environments/environment';
-import { DirettivoMember, MembersResponse, SocioMemberDetail, UpdateSocioRequest } from '../../models/member.model';
+import { MemberDetail, MembersResponse, UpdateMemberRequest } from '../../models/member.model';
 
 export interface DonationStats {
   count: number;
@@ -25,27 +25,15 @@ export class MembersService {
     return this.http.get<DonationStats>(`${API}/members/donation-stats`);
   }
 
-  getSocio(id: string): Observable<SocioMemberDetail> {
-    return this.http.get<SocioMemberDetail>(`${API}/members/soci/${id}`);
+  getMember(id: string): Observable<MemberDetail> {
+    return this.http.get<MemberDetail>(`${API}/members/${id}`);
   }
 
-  updateSocio(id: string, dto: UpdateSocioRequest): Observable<SocioMemberDetail> {
-    return this.http.patch<SocioMemberDetail>(`${API}/members/soci/${id}`, dto);
+  updateMember(id: string, dto: UpdateMemberRequest): Observable<MemberDetail> {
+    return this.http.patch<MemberDetail>(`${API}/members/${id}`, dto);
   }
 
-  deleteSocio(id: string): Observable<void> {
-    return this.http.delete<void>(`${API}/members/soci/${id}`);
-  }
-
-  getAdmin(id: string): Observable<DirettivoMember> {
-    return this.http.get<DirettivoMember>(`${API}/members/admin/${id}`);
-  }
-
-  updateAdminBoardRoles(id: string, boardRoles: string[]): Observable<DirettivoMember> {
-    return this.http.patch<DirettivoMember>(`${API}/members/admin/${id}/board-role`, { boardRoles });
-  }
-
-  deleteAdmin(id: string): Observable<void> {
-    return this.http.delete<void>(`${API}/members/admin/${id}`);
+  deleteMember(id: string): Observable<void> {
+    return this.http.delete<void>(`${API}/members/${id}`);
   }
 }

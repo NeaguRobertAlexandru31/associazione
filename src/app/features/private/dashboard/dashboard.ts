@@ -2,7 +2,8 @@ import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { Router, RouterOutlet } from '@angular/router';
 import { AuthService } from '../../../core/services/auth/auth';
 import { UnreadCountService } from '../../../core/services/contact/unread-count';
-import { Sidebar, SidebarItem } from '../../../shared/components/private/sidebar/sidebar';
+import { PermissionsService } from '../../../core/services/permissions/permissions';
+import { Sidebar, SidebarItem, SidebarUser } from '../../../shared/components/private/sidebar/sidebar';
 import { PrivateNavbar } from '../../../shared/components/private/navbar/navbar';
 
 @Component({
@@ -14,24 +15,21 @@ import { PrivateNavbar } from '../../../shared/components/private/navbar/navbar'
 
 export class Dashboard implements OnInit {
 
-  private auth            = inject(AuthService);
-  private router          = inject(Router);
-  private unreadCount     = inject(UnreadCountService);
+  private auth        = inject(AuthService);
+  private router      = inject(Router);
+  private unreadCount = inject(UnreadCountService);
+  private perms       = inject(PermissionsService);
 
-  readonly user = this.auth.user;
+  readonly sidebarUser = computed((): SidebarUser | null => {
+    const u = this.auth.user();
+    if (!u) return null;
+    return { name: `${u.firstName} ${u.lastName}`, email: u.email, profileImage: u.profileImage };
+  });
   sidebarOpen = signal(false);
 
-  readonly navItems = computed((): SidebarItem[] => [
-    { route: '/dashboard/overview',  icon: 'dashboard',          label: 'Panoramica'  },
-    { route: '/dashboard/members',   icon: 'group',              label: 'Soci'        },
-    { route: '/dashboard/events',    icon: 'calendar_month',     label: 'Calendario'  },
-    { route: '/dashboard/messages',   icon: 'mail',               label: 'Messaggi',   badge: this.unreadCount.count() },
-    { route: '/dashboard/activities', icon: 'history',            label: 'Attività'    },
-    { route: '/dashboard/news',       icon: 'article',            label: 'Contenuti'   },
-    { route: '/dashboard/projects',  icon: 'folder_open',        label: 'Progetti'    },
-    { route: '/dashboard/donations', icon: 'volunteer_activism', label: 'Donazioni'   },
-    { route: '/dashboard/settings',  icon: 'settings',           label: 'Impostazioni'},
-  ]);
+  readonly navItems = computed((): SidebarItem[] =>
+    this.perms.getNavItems({ messages: this.unreadCount.count() })
+  );
 
   ngOnInit(): void {
     this.unreadCount.load();

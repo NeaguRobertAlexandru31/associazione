@@ -1,7 +1,7 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from '../../../core/services/auth/auth';
-import { DirettivoMember, MembersResponse, SocioMember } from '../../../core/models/member.model';
+import { MemberListItem, MembersResponse } from '../../../core/models/member.model';
 import { MembersService } from '../../../core/services/members/members';
 
 @Component({
@@ -17,15 +17,13 @@ export class Members implements OnInit {
 
   readonly isSuperAdmin = this.auth.isSuperAdmin;
 
-  direttivo      = signal<DirettivoMember[]>([]);
-  soci           = signal<SocioMember[]>([]);
+  direttivo      = signal<MemberListItem[]>([]);
+  soci           = signal<MemberListItem[]>([]);
   membersLoading = signal(true);
   membersError   = signal(false);
-  showPrivate    = signal(false);
 
-  confirmDeleteId   = signal<string | null>(null);
-  confirmDeleteType = signal<'socio' | 'admin' | null>(null);
-  deleteLoading     = signal(false);
+  confirmDeleteId = signal<string | null>(null);
+  deleteLoading   = signal(false);
 
   ngOnInit(): void {
     this.load();
@@ -46,43 +44,27 @@ export class Members implements OnInit {
     });
   }
 
-  goToSocio(id: string): void { this.router.navigate(['/dashboard/members/socio', id]); }
-  goToAdmin(id: string): void { this.router.navigate(['/dashboard/members/admin', id]); }
+  goToMember(id: string): void { this.router.navigate(['/dashboard/members', id]); }
 
-  togglePrivate(): void { this.showPrivate.update(v => !v); }
-
-  mask(value: string): string {
-    return this.showPrivate() ? value : '••••••••';
-  }
-
-  askDelete(id: string, type: 'socio' | 'admin', event: MouseEvent): void {
+  askDelete(id: string, event: MouseEvent): void {
     event.stopPropagation();
     this.confirmDeleteId.set(id);
-    this.confirmDeleteType.set(type);
   }
 
-  cancelDelete(): void {
-    this.confirmDeleteId.set(null);
-    this.confirmDeleteType.set(null);
-  }
+  cancelDelete(): void { this.confirmDeleteId.set(null); }
 
   confirmDelete(): void {
-    const id   = this.confirmDeleteId();
-    const type = this.confirmDeleteType();
-    if (!id || !type) return;
+    const id = this.confirmDeleteId();
+    if (!id) return;
     this.deleteLoading.set(true);
 
-    const req = type === 'socio'
-      ? this.membersService.deleteSocio(id)
-      : this.membersService.deleteAdmin(id);
-
-    req.subscribe({
+    this.membersService.deleteMember(id).subscribe({
       next: () => {
         this.deleteLoading.set(false);
         this.cancelDelete();
         this.load();
       },
-      error: (err) => {
+      error: err => {
         this.deleteLoading.set(false);
         alert(err?.error?.message ?? 'Errore durante l\'eliminazione.');
         this.cancelDelete();

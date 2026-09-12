@@ -1,7 +1,7 @@
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { forkJoin } from 'rxjs';
-import { DirettivoMember, MembersResponse, SocioMember } from '../../../core/models/member.model';
+import { MemberListItem, MembersResponse } from '../../../core/models/member.model';
 import { CalendarEvent } from '../../../core/models/event.model';
 import { Article } from '../../../core/models/article.model';
 import { DonationStats, MembersService } from '../../../core/services/members/members';
@@ -21,8 +21,8 @@ export class Overview implements OnInit {
   private eventsService   = inject(EventsService);
   private articlesService = inject(ArticlesService);
 
-  direttivo     = signal<DirettivoMember[]>([]);
-  soci          = signal<SocioMember[]>([]);
+  direttivo     = signal<MemberListItem[]>([]);
+  soci          = signal<MemberListItem[]>([]);
   events        = signal<CalendarEvent[]>([]);
   articles      = signal<Article[]>([]);
   donationStats = signal<DonationStats>({ count: 0, total: 0, thisMonthCount: 0, thisMonthTotal: 0 });

@@ -3,7 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../../../core/services/auth/auth';
-import { BOARD_ROLE_LABELS, BoardRole, DirettivoMember, SocioMemberDetail, UpdateSocioRequest } from '../../../../core/models/member.model';
+import { BOARD_ROLE_LABELS, BoardRole, MemberDetail, UpdateMemberRequest } from '../../../../core/models/member.model';
 import { MembersService } from '../../../../core/services/members/members';
 
 @Component({
@@ -20,11 +20,9 @@ export class MembersDetail implements OnInit {
 
   readonly isSuperAdmin = this.auth.isSuperAdmin;
 
-  type    = signal<'socio' | 'admin'>('socio');
   loading = signal(true);
   error   = signal(false);
-  socio   = signal<SocioMemberDetail | null>(null);
-  admin   = signal<DirettivoMember | null>(null);
+  member  = signal<MemberDetail | null>(null);
 
   showPrivate   = signal(false);
   editMode      = signal(false);
@@ -33,7 +31,6 @@ export class MembersDetail implements OnInit {
   confirmDelete = signal(false);
   deleteLoading = signal(false);
 
-  // Campi del form di modifica — plain properties per [(ngModel)]
   editFirstName       = ''; editLastName        = '';
   editFiscalCode      = ''; editBirthDate       = ''; editBirthPlace  = '';
   editGender          = ''; editDocType         = ''; editDocNumber   = '';
@@ -57,6 +54,10 @@ export class MembersDetail implements OnInit {
   boardRoleSaving    = signal(false);
   boardRoleSuccess   = signal(false);
 
+  promoteRole   = signal<'MEMBER' | 'ADMIN' | 'SUPERADMIN' | ''>('');
+  promoteSaving = signal(false);
+  promoteError  = signal<string | null>(null);
+
   readonly categoryOptions  = [{ value: 'ordinario', label: 'Ordinario' }, { value: 'under26', label: 'Under 26' }, { value: 'sostenitore', label: 'Sostenitore' }];
   readonly statusOptions    = [{ value: 'in_attesa_pagamento', label: 'In attesa pagamento' }, { value: 'pagamento_in_corso', label: 'Pagamento in corso' }, { value: 'attivo', label: 'Attivo' }, { value: 'rifiutato', label: 'Rifiutato' }];
   readonly genderOptions    = [{ value: 'm', label: 'Maschio' }, { value: 'f', label: 'Femmina' }, { value: 'altro', label: 'Altro' }];
@@ -64,42 +65,50 @@ export class MembersDetail implements OnInit {
   readonly paymentOptions   = [{ value: 'contanti', label: 'Contanti' }, { value: 'online', label: 'Online' }];
 
   ngOnInit(): void {
-    const url     = this.router.url;
-    const isAdmin = url.includes('/members/admin/');
-    const id      = this.route.snapshot.paramMap.get('id')!;
-    this.type.set(isAdmin ? 'admin' : 'socio');
-
-    if (isAdmin) {
-      this.service.getAdmin(id).subscribe({
-        next: d  => {
-          this.admin.set(d);
-          this.boardRolesSelected.set(d.boardRoles ?? []);
-          this.loading.set(false);
-        },
-        error: () => { this.error.set(true); this.loading.set(false); },
-      });
-    } else {
-      this.service.getSocio(id).subscribe({
-        next: d  => { this.socio.set(d); this.loading.set(false); },
-        error: () => { this.error.set(true); this.loading.set(false); },
-      });
-    }
+    const id = this.route.snapshot.paramMap.get('id')!;
+    this.service.getMember(id).subscribe({
+      next: d => {
+        this.member.set(d);
+        this.boardRolesSelected.set(d.boardRoles ?? []);
+        this.promoteRole.set(d.role as any);
+        this.loading.set(false);
+      },
+      error: () => { this.error.set(true); this.loading.set(false); },
+    });
   }
 
   back(): void { this.router.navigate(['/dashboard/members']); }
 
-  saveBoardRole(): void {
-    const id = this.admin()?.id;
-    if (!id) return;
+  saveBoardRoles(): void {
+    const m = this.member();
+    if (!m) return;
     this.boardRoleSaving.set(true);
-    this.service.updateAdminBoardRoles(id, this.boardRolesSelected()).subscribe({
+    this.auth.promoteRole(m.id, m.role, this.boardRolesSelected()).subscribe({
       next: updated => {
-        this.admin.set(updated);
+        this.member.update(cur => cur ? { ...cur, boardRoles: updated.boardRoles } : cur);
         this.boardRoleSaving.set(false);
         this.boardRoleSuccess.set(true);
         setTimeout(() => this.boardRoleSuccess.set(false), 2000);
       },
       error: () => this.boardRoleSaving.set(false),
+    });
+  }
+
+  savePromoteRole(): void {
+    const m    = this.member();
+    const role = this.promoteRole();
+    if (!m || !role) return;
+    this.promoteSaving.set(true);
+    this.promoteError.set(null);
+    this.auth.promoteRole(m.id, role as any, role === 'MEMBER' ? [] : this.boardRolesSelected()).subscribe({
+      next: updated => {
+        this.member.update(cur => cur ? { ...cur, role: updated.role, boardRoles: updated.boardRoles } : cur);
+        this.promoteSaving.set(false);
+      },
+      error: err => {
+        this.promoteSaving.set(false);
+        this.promoteError.set(err?.error?.message ?? 'Errore durante la modifica del ruolo.');
+      },
     });
   }
 
@@ -116,29 +125,28 @@ export class MembersDetail implements OnInit {
     return this.showPrivate() ? value : '••••••••';
   }
 
-  // ── Edit ─────────────────────────────────────────────────────────────
   startEdit(): void {
-    const s = this.socio();
+    const s = this.member();
     if (!s) return;
     this.editFirstName       = s.firstName;
     this.editLastName        = s.lastName;
-    this.editFiscalCode      = s.fiscalCode;
+    this.editFiscalCode      = s.fiscalCode ?? '';
     this.editBirthDate       = s.birthDate ? s.birthDate.substring(0, 10) : '';
-    this.editBirthPlace      = s.birthPlace;
-    this.editGender          = s.gender;
-    this.editDocType         = s.docType;
-    this.editDocNumber       = s.docNumber;
+    this.editBirthPlace      = s.birthPlace ?? '';
+    this.editGender          = s.gender ?? '';
+    this.editDocType         = s.docType ?? '';
+    this.editDocNumber       = s.docNumber ?? '';
     this.editDocExpiry       = s.docExpiry ? s.docExpiry.substring(0, 10) : '';
     this.editEmail           = s.email;
-    this.editPhone           = s.phone;
-    this.editAddressStreet   = s.addressStreet;
-    this.editAddressZip      = s.addressZip;
-    this.editAddressCity     = s.addressCity;
-    this.editAddressProvince = s.addressProvince;
+    this.editPhone           = s.phone ?? '';
+    this.editAddressStreet   = s.addressStreet ?? '';
+    this.editAddressZip      = s.addressZip ?? '';
+    this.editAddressCity     = s.addressCity ?? '';
+    this.editAddressProvince = s.addressProvince ?? '';
     this.editCategory        = s.category;
     this.editStatus          = s.status;
-    this.editPaymentMethod   = s.paymentMethod;
-    this.editIsMinor         = s.isMinor;
+    this.editPaymentMethod   = s.paymentMethod ?? '';
+    this.editIsMinor         = s.isMinor ?? false;
     this.saveError.set(null);
     this.editMode.set(true);
   }
@@ -146,12 +154,12 @@ export class MembersDetail implements OnInit {
   cancelEdit(): void { this.editMode.set(false); this.saveError.set(null); }
 
   saveEdit(): void {
-    const s = this.socio();
+    const s = this.member();
     if (!s) return;
     this.saving.set(true);
     this.saveError.set(null);
 
-    const dto: UpdateSocioRequest = {
+    const dto: UpdateMemberRequest = {
       firstName: this.editFirstName, lastName: this.editLastName,
       fiscalCode: this.editFiscalCode, birthDate: this.editBirthDate,
       birthPlace: this.editBirthPlace, gender: this.editGender,
@@ -164,9 +172,9 @@ export class MembersDetail implements OnInit {
       paymentMethod: this.editPaymentMethod, isMinor: this.editIsMinor,
     };
 
-    this.service.updateSocio(s.id, dto).subscribe({
+    this.service.updateMember(s.id, dto).subscribe({
       next: updated => {
-        this.socio.set(updated);
+        this.member.set(updated);
         this.saving.set(false);
         this.editMode.set(false);
       },
@@ -177,20 +185,15 @@ export class MembersDetail implements OnInit {
     });
   }
 
-  // ── Delete ────────────────────────────────────────────────────────────
   askDelete(): void { this.confirmDelete.set(true); }
   cancelDeleteConfirm(): void { this.confirmDelete.set(false); }
 
   doDelete(): void {
-    const id   = this.type() === 'socio' ? this.socio()?.id : this.admin()?.id;
+    const id = this.member()?.id;
     if (!id) return;
     this.deleteLoading.set(true);
 
-    const req = this.type() === 'socio'
-      ? this.service.deleteSocio(id)
-      : this.service.deleteAdmin(id);
-
-    req.subscribe({
+    this.service.deleteMember(id).subscribe({
       next: () => { this.router.navigate(['/dashboard/members']); },
       error: err => {
         this.deleteLoading.set(false);
@@ -200,15 +203,18 @@ export class MembersDetail implements OnInit {
     });
   }
 
-  // ── Labels ────────────────────────────────────────────────────────────
   boardRoleLabel(r: string | null | undefined): string {
     if (!r) return '—';
     return BOARD_ROLE_LABELS[r as BoardRole] ?? r;
   }
 
-  boardRolesLabel(roles: BoardRole[] | undefined): string {
+  boardRolesLabel(roles: string[] | undefined): string {
     if (!roles?.length) return '—';
-    return roles.map(r => BOARD_ROLE_LABELS[r] ?? r).join(', ');
+    return roles.map(r => BOARD_ROLE_LABELS[r as BoardRole] ?? r).join(', ');
+  }
+
+  roleLabel(r: string): string {
+    return r === 'SUPERADMIN' ? 'Presidente' : r === 'ADMIN' ? 'Direttivo' : 'Socio';
   }
 
   categoryLabel(c: string): string {
@@ -220,10 +226,6 @@ export class MembersDetail implements OnInit {
          : s === 'pagamento_in_corso'  ? 'Pagamento in corso'
          : s === 'attivo'              ? 'Attivo'
          : 'Rifiutato';
-  }
-
-  paymentLabel(p: string): string {
-    return p === 'bonifico' ? 'Bonifico' : p === 'contanti' ? 'Contanti' : p;
   }
 
   docTypeLabel(d: string): string {

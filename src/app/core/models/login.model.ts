@@ -1,3 +1,5 @@
+import { AuthUser } from './member.model';
+
 export interface LoginRequest {
   email: string;
   password: string;
@@ -5,9 +7,5 @@ export interface LoginRequest {
 
 export interface LoginResponse {
   access_token: string;
-  admin: {
-    id: string;
-    name: string;
-    email: string;
-  };
+  user: AuthUser;
 }

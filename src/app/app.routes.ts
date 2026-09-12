@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 import { authGuard } from './core/guards/auth.guard';
+import { roleGuard } from './core/guards/role.guard';
 
 export const routes: Routes = [
 	{ path: '', redirectTo: 'home', pathMatch: 'full' },
@@ -20,7 +21,7 @@ export const routes: Routes = [
 	{ path: 'unisciti', 		loadComponent: () => import('./features/public/register/register').then(m => m.Register) },
 	// ── Auth ──────────────────────────────────────────────────────────────
 	{ path: 'login', 			loadComponent: () => import('./features/private/auth/auth').then(m => m.Auth) },
-	{ path: 'register', 		loadComponent: () => import('./features/private/register/register').then(m => m.Register) },
+	{ path: 'register', 		redirectTo: 'login' },
 	{ path: 'area-socio',       loadComponent: () => import('./features/private/personal/personal').then(m => m.Personal) },
 	// ── Dashboard (shell + children) ──────────────────────────────────────
 	{
@@ -29,17 +30,17 @@ export const routes: Routes = [
 		loadComponent: () => import('./features/private/dashboard/dashboard').then(m => m.Dashboard),
 		children: [
 			{ path: '', redirectTo: 'overview', pathMatch: 'full' },
-			{ path: 'overview',  		 loadComponent: () => import('./features/private/overview/overview').then(m => m.Overview) },
-			{ path: 'members',           loadComponent: () => import('./features/private/members/members').then(m => m.Members) },
-			{ path: 'members/socio/:id', loadComponent: () => import('./features/private/members/members-detail/members-detail').then(m => m.MembersDetail) },
-			{ path: 'members/admin/:id', loadComponent: () => import('./features/private/members/members-detail/members-detail').then(m => m.MembersDetail) },
-			{ path: 'events',    		 loadComponent: () => import('./features/private/events/events').then(m => m.Events) },
-			{ path: 'messages',  		 loadComponent: () => import('./features/private/messagges/messagges').then(m => m.Messagges) },
-			{ path: 'news',     		 loadComponent: () => import('./features/private/news/news').then(m => m.News) },
-			{ path: 'projects', 		 loadComponent: () => import('./features/private/projects/projects').then(m => m.Projects) },
-			{ path: 'donations', 		 loadComponent: () => import('./features/private/donations/donations').then(m => m.Donations) },
-			{ path: 'settings',   		 loadComponent: () => import('./features/private/settings/settings').then(m => m.Settings) },
-			{ path: 'activities', 		 loadComponent: () => import('./features/private/activities/activities').then(m => m.Activities) },
+			{ path: 'overview',      canActivate: [roleGuard('overview')],     loadComponent: () => import('./features/private/overview/overview').then(m => m.Overview) },
+			{ path: 'members',       canActivate: [roleGuard('members')],      loadComponent: () => import('./features/private/members/members').then(m => m.Members) },
+			{ path: 'members/:id',   canActivate: [roleGuard('members')],      loadComponent: () => import('./features/private/members/members-detail/members-detail').then(m => m.MembersDetail) },
+			{ path: 'events',        canActivate: [roleGuard('events')],       loadComponent: () => import('./features/private/events/events').then(m => m.Events) },
+			{ path: 'messages',      canActivate: [roleGuard('messages')],     loadComponent: () => import('./features/private/messagges/messagges').then(m => m.Messagges) },
+			{ path: 'news',          canActivate: [roleGuard('news')],         loadComponent: () => import('./features/private/news/news').then(m => m.News) },
+			{ path: 'projects',      canActivate: [roleGuard('projects')],     loadComponent: () => import('./features/private/projects/projects').then(m => m.Projects) },
+			{ path: 'donations',     canActivate: [roleGuard('donations')],    loadComponent: () => import('./features/private/donations/donations').then(m => m.Donations) },
+			{ path: 'settings',      canActivate: [roleGuard('settings')],     loadComponent: () => import('./features/private/settings/settings').then(m => m.Settings) },
+			{ path: 'activities',    canActivate: [roleGuard('activities')],   loadComponent: () => import('./features/private/activities/activities').then(m => m.Activities) },
+			{ path: 'permissions',   canActivate: [roleGuard('permissions')],  loadComponent: () => import('./features/private/permissions/permissions').then(m => m.Permissions) },
 		],
 	},
 	{ path: '**', redirectTo: 'home' },

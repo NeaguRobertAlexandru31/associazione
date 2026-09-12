@@ -1,0 +1,80 @@
+<div class="dash-content">
+
+  <div class="mb-6">
+    <h1 class="font-romania font-extrabold text-primary text-3xl mb-1">Gestione Permessi</h1>
+    <p class="font-inter text-on-surface-variant text-sm">Configura quali sezioni del pannello sono visibili per ogni amministratore.</p>
+  </div>
+
+  @if (loading()) {
+    <div class="flex items-center justify-center py-20">
+      <span class="material-symbols-outlined text-4xl text-primary animate-spin">progress_activity</span>
+    </div>
+  } @else if (rows().length === 0) {
+    <div class="bg-surface-container rounded-2xl p-10 text-center">
+      <span class="material-symbols-outlined text-4xl text-on-surface-variant mb-3 block">group_off</span>
+      <p class="font-inter text-on-surface-variant text-sm">Nessun amministratore presente.</p>
+    </div>
+  } @else {
+    <div class="flex flex-col gap-6">
+      @for (row of rows(); track row.member.id) {
+        <div class="bg-surface rounded-2xl border border-outline-variant overflow-hidden">
+
+          <!-- Header admin -->
+          <div class="flex items-center gap-3 px-6 py-4 border-b border-outline-variant bg-surface-container">
+            <div class="w-9 h-9 rounded-full bg-primary flex items-center justify-center flex-shrink-0 overflow-hidden">
+              @if (row.member.profileImage) {
+                <img [src]="row.member.profileImage" alt="" class="w-full h-full object-cover" />
+              } @else {
+                <span class="font-romania font-bold text-on-primary text-sm">{{ row.member.firstName[0] }}</span>
+              }
+            </div>
+            <div class="flex-1 min-w-0">
+              <p class="font-inter font-semibold text-on-surface text-sm truncate">{{ row.member.firstName }} {{ row.member.lastName }}</p>
+              <p class="font-inter text-on-surface-variant text-xs truncate">{{ row.member.email }}</p>
+            </div>
+            <div class="flex items-center gap-3">
+              @if (row.saved) {
+                <span class="font-inter text-xs text-green-600 font-semibold flex items-center gap-1">
+                  <span class="material-symbols-outlined text-base">check_circle</span>
+                  Salvato
+                </span>
+              }
+              @if (row.error) {
+                <span class="font-inter text-xs text-red-600">{{ row.error }}</span>
+              }
+              <button (click)="save(row)"
+                      [disabled]="row.saving"
+                      class="px-4 py-2 rounded-xl bg-primary text-on-primary font-inter font-semibold text-sm transition-opacity disabled:opacity-50 hover:opacity-90">
+                @if (row.saving) {
+                  <span class="material-symbols-outlined text-base animate-spin">progress_activity</span>
+                } @else {
+                  Salva
+                }
+              </button>
+            </div>
+          </div>
+
+          <!-- Griglia permessi -->
+          <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-px bg-outline-variant">
+            @for (p of pages; track p.page) {
+              <button (click)="toggle(row, p.page)"
+                      class="flex items-center gap-3 px-4 py-3.5 bg-surface transition-colors hover:bg-surface-container">
+                <span class="w-5 h-5 rounded flex items-center justify-center flex-shrink-0 border-2 transition-colors"
+                      [class]="row.permissions[p.page]
+                        ? 'bg-primary border-primary'
+                        : 'bg-transparent border-outline'">
+                  @if (row.permissions[p.page]) {
+                    <span class="material-symbols-outlined text-on-primary text-sm" style="font-size:14px">check</span>
+                  }
+                </span>
+                <span class="font-inter text-sm text-on-surface">{{ p.label }}</span>
+              </button>
+            }
+          </div>
+
+        </div>
+      }
+    </div>
+  }
+
+</div>

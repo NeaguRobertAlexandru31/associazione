@@ -2,7 +2,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable, inject, signal } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from '../../../../environments/environment';
-import { SocioMemberDetail } from '../../models/member.model';
+import { MemberDetail } from '../../models/member.model';
 
 export interface UpdateMemberMeRequest {
   firstName?: string;
@@ -57,12 +57,12 @@ export class MemberAuthService {
     this._token.set(token);
   }
 
-  getMe(): Observable<SocioMemberDetail> {
-    return this.http.get<SocioMemberDetail>(`${API}/member-auth/me`, this.headers());
+  getMe(): Observable<MemberDetail> {
+    return this.http.get<MemberDetail>(`${API}/member-auth/me`, this.headers());
   }
 
-  updateMe(dto: UpdateMemberMeRequest): Observable<SocioMemberDetail> {
-    return this.http.patch<SocioMemberDetail>(`${API}/member-auth/me`, dto, this.headers());
+  updateMe(dto: UpdateMemberMeRequest): Observable<MemberDetail> {
+    return this.http.patch<MemberDetail>(`${API}/member-auth/me`, dto, this.headers());
   }
 
   uploadAvatar(file: File): Observable<{ url: string }> {

@@ -4,7 +4,7 @@
   <div class="hidden md:block sticky top-0 h-screen flex-shrink-0">
     <app-sidebar
       [items]="navItems()"
-      [user]="user()"
+      [user]="sidebarUser()"
       (logoutClick)="logout()" />
   </div>
 
@@ -21,7 +21,7 @@
         <div class="sidebar-animate h-full">
           <app-sidebar
             [items]="navItems()"
-            [user]="user()"
+            [user]="sidebarUser()"
             (logoutClick)="logout()"
             (itemClick)="sidebarOpen.set(false)" />
         </div>
