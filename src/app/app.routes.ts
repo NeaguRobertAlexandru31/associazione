@@ -22,7 +22,6 @@ export const routes: Routes = [
 	// ── Auth ──────────────────────────────────────────────────────────────
 	{ path: 'login', 			loadComponent: () => import('./features/private/auth/auth').then(m => m.Auth) },
 	{ path: 'register', 		redirectTo: 'login' },
-	{ path: 'area-socio',       loadComponent: () => import('./features/private/personal/personal').then(m => m.Personal) },
 	// ── Dashboard (shell + children) ──────────────────────────────────────
 	{
 		path: 'dashboard',
@@ -31,6 +30,7 @@ export const routes: Routes = [
 		children: [
 			{ path: '', redirectTo: 'overview', pathMatch: 'full' },
 			{ path: 'overview',      canActivate: [roleGuard('overview')],     loadComponent: () => import('./features/private/overview/overview').then(m => m.Overview) },
+			{ path: 'tessera',       canActivate: [roleGuard('tessera')],      loadComponent: () => import('./features/private/tessera/tessera').then(m => m.Tessera) },
 			{ path: 'members',       canActivate: [roleGuard('members')],      loadComponent: () => import('./features/private/members/members').then(m => m.Members) },
 			{ path: 'members/:id',   canActivate: [roleGuard('members')],      loadComponent: () => import('./features/private/members/members-detail/members-detail').then(m => m.MembersDetail) },
 			{ path: 'events',        canActivate: [roleGuard('events')],       loadComponent: () => import('./features/private/events/events').then(m => m.Events) },

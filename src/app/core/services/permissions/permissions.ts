@@ -15,6 +15,7 @@ export interface NavPage {
 
 const ALL_PAGES: Omit<NavPage, 'badge'>[] = [
   { page: 'overview',     route: '/dashboard/overview',     icon: 'dashboard',          label: 'Panoramica'    },
+  { page: 'tessera',      route: '/dashboard/tessera',      icon: 'badge',              label: 'Tessera'       },
   { page: 'members',      route: '/dashboard/members',      icon: 'group',              label: 'Soci'          },
   { page: 'events',       route: '/dashboard/events',       icon: 'calendar_month',     label: 'Calendario'    },
   { page: 'messages',     route: '/dashboard/messages',     icon: 'mail',               label: 'Messaggi'      },
@@ -42,12 +43,12 @@ export class PermissionsService {
     if (user.role === 'ADMIN') {
       const perms: PagePermissions = user.pagePermissions ?? {};
       return ALL_PAGES
-        .filter(p => p.page !== 'permissions' && (p.page === 'settings' || perms[p.page] === true))
+        .filter(p => p.page !== 'permissions' && (p.page === 'settings' || p.page === 'tessera' || perms[p.page] === true))
         .map(p => p.page);
     }
 
     if (user.role === 'MEMBER') {
-      return ['settings'];
+      return ['tessera', 'settings'];
     }
 
     return [];

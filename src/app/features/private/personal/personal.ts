@@ -3,8 +3,7 @@ import { DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../../../core/services/auth/auth';
-import { UpdateMemberRequest } from '../../../core/models/member.model';
-import { MemberDetail } from '../../../core/models/member.model';
+import { MemberDetail, UpdateMemberRequest } from '../../../core/models/member.model';
 
 @Component({
   selector: 'app-personal',
@@ -13,8 +12,8 @@ import { MemberDetail } from '../../../core/models/member.model';
   styleUrl: './personal.css',
 })
 export class Personal implements OnInit {
-  private auth    = inject(AuthService);
-  private router  = inject(Router);
+  private auth   = inject(AuthService);
+  private router = inject(Router);
 
   loading = signal(false);
   error   = signal<string | null>(null);
@@ -51,7 +50,7 @@ export class Personal implements OnInit {
 
   ngOnInit(): void {
     if (!this.auth.isLoggedIn()) {
-      this.router.navigate(['/login'], { queryParams: { returnUrl: '/area-socio' } });
+      this.router.navigate(['/login']);
       return;
     }
     this.loadData();
@@ -115,23 +114,15 @@ export class Personal implements OnInit {
     this.saving.set(true);
     this.saveError.set(null);
     const dto: UpdateMemberRequest = {
-      firstName:           this.editFirstName,
-      lastName:            this.editLastName,
-      fiscalCode:          this.editFiscalCode,
-      birthDate:           this.editBirthDate,
-      birthPlace:          this.editBirthPlace,
-      gender:              this.editGender,
-      docType:             this.editDocType,
-      docNumber:           this.editDocNumber,
-      docExpiry:           this.editDocExpiry,
-      email:               this.editEmail,
-      phone:               this.editPhone,
-      addressStreet:       this.editAddressStreet,
-      addressZip:          this.editAddressZip,
-      addressCity:         this.editAddressCity,
-      addressProvince:     this.editAddressProvince,
-      privacyNewsletter:   this.editNewsletter,
-      privacyThirdParties: this.editThirdParties,
+      firstName: this.editFirstName, lastName: this.editLastName,
+      fiscalCode: this.editFiscalCode, birthDate: this.editBirthDate,
+      birthPlace: this.editBirthPlace, gender: this.editGender,
+      docType: this.editDocType, docNumber: this.editDocNumber,
+      docExpiry: this.editDocExpiry, email: this.editEmail,
+      phone: this.editPhone, addressStreet: this.editAddressStreet,
+      addressZip: this.editAddressZip, addressCity: this.editAddressCity,
+      addressProvince: this.editAddressProvince,
+      privacyNewsletter: this.editNewsletter, privacyThirdParties: this.editThirdParties,
     };
     this.auth.updateMyMember(dto).subscribe({
       next: updated => { this.member.set(updated); this.saving.set(false); this.editMode.set(false); },
@@ -145,10 +136,7 @@ export class Personal implements OnInit {
   doDelete(): void {
     this.deleteLoading.set(true);
     this.auth.deleteProfile('').subscribe({
-      next: () => {
-        this.auth.logout();
-        this.router.navigate(['/home']);
-      },
+      next: () => { this.auth.logout(); this.router.navigate(['/home']); },
       error: err => {
         this.deleteLoading.set(false);
         this.confirmDelete.set(false);
@@ -160,10 +148,7 @@ export class Personal implements OnInit {
   goToSite():       void { this.router.navigate(['/home']); }
   goToMembership(): void { this.router.navigate(['/unisciti']); }
 
-  logout(): void {
-    this.auth.logout();
-    this.router.navigate(['/login']);
-  }
+  logout(): void { this.auth.logout(); this.router.navigate(['/login']); }
 
   categoryLabel(c: string): string {
     return c === 'under26' ? 'Under 26' : c === 'sostenitore' ? 'Sostenitore' : 'Ordinario';

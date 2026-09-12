@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable, computed, inject, signal } from '@angular/core';
 import { Observable, tap } from 'rxjs';
 import { environment } from '../../../../environments/environment';
-import { AuthUser, MemberDetail, UpdateMemberRequest, UserRole } from '../../models/member.model';
+import { AuthUser, MemberDetail, TesseraInfo, UpdateMemberRequest, UserRole } from '../../models/member.model';
 import { LoginRequest, LoginResponse } from '../../models/login.model';
 
 const TOKEN_KEY = 'acr_token';
@@ -112,6 +112,10 @@ export class AuthService {
 
   updateMyMember(dto: UpdateMemberRequest): Observable<MemberDetail> {
     return this.http.patch<MemberDetail>(`${API}/auth/me/member`, dto);
+  }
+
+  getMyTessera(): Observable<TesseraInfo> {
+    return this.http.get<TesseraInfo>(`${API}/auth/me/tessera`);
   }
 
   // ── Promozione ruolo (solo SUPERADMIN) ────────────────────────────────────

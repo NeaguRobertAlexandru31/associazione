@@ -10,7 +10,8 @@ export type DashboardPage =
   | 'projects'
   | 'donations'
   | 'settings'
-  | 'permissions';
+  | 'permissions'
+  | 'tessera';
 
 export type PagePermissions = Partial<Record<DashboardPage, boolean>>;
 export type MemberCategory = 'ordinario' | 'under26' | 'sostenitore';
@@ -96,6 +97,21 @@ export interface MemberDetail extends MemberListItem {
   privacyThirdParties: boolean;
   guardian?: Guardian | null;
   updatedAt: string;
+}
+
+export interface TesseraInfo {
+  id: string;
+  firstName: string;
+  lastName: string;
+  category: string;
+  status: string;
+  membershipYear: number;
+  expiryDate: string;
+  expired: boolean;
+  daysLeft: number;
+  paymentMethod: string | null;
+  profileImage: string | null;
+  cardCode: string;
 }
 
 export interface UpdateMemberRequest {
