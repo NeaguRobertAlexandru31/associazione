@@ -42,7 +42,7 @@
           </div>
 
           <div class="flex-1 min-w-0">
-            <div class="flex items-center gap-2">
+            <div class="flex items-center gap-2 flex-wrap">
               <span class="font-inter font-semibold text-sm"
                     [class]="isPast(evt.date) ? 'text-on-surface-variant' : 'text-on-surface'">
                 {{ evt.name }}
@@ -55,6 +55,26 @@
               {{ evt.time }} · {{ evt.location }}
             </p>
           </div>
+
+          <!-- RSVP chips -->
+          @if (statsFor(evt.id); as s) {
+            @if (s.total > 0) {
+              <div class="flex items-center gap-1.5 flex-shrink-0">
+                @if (s.attending > 0) {
+                  <span class="flex items-center gap-1 text-[11px] font-inter font-medium text-primary bg-primary/8 px-2 py-0.5 rounded-full">
+                    <span class="material-symbols-outlined text-xs" style="font-variation-settings:'FILL' 1">check_circle</span>
+                    {{ s.attending }}
+                  </span>
+                }
+                @if (s.interested > 0) {
+                  <span class="flex items-center gap-1 text-[11px] font-inter font-medium text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full">
+                    <span class="material-symbols-outlined text-xs" style="font-variation-settings:'FILL' 1">star</span>
+                    {{ s.interested }}
+                  </span>
+                }
+              </div>
+            }
+          }
 
           <span class="material-symbols-outlined text-on-surface-variant/40 text-lg flex-shrink-0">chevron_right</span>
         </button>
@@ -96,47 +116,135 @@
         </button>
       </div>
 
+      <!-- Tabs -->
+      <div class="flex border-b border-outline-variant/20 px-6">
+        <button (click)="switchTab('info')"
+                [class]="detailTab() === 'info'
+                  ? 'font-inter font-semibold text-sm text-primary border-b-2 border-primary pb-3 pt-3 mr-6'
+                  : 'font-inter text-sm text-on-surface-variant pb-3 pt-3 mr-6 hover:text-on-surface transition-colors'">
+          Dettagli
+        </button>
+        <button (click)="switchTab('rsvp')"
+                [class]="detailTab() === 'rsvp'
+                  ? 'font-inter font-semibold text-sm text-primary border-b-2 border-primary pb-3 pt-3 flex items-center gap-1.5'
+                  : 'font-inter text-sm text-on-surface-variant pb-3 pt-3 flex items-center gap-1.5 hover:text-on-surface transition-colors'">
+          Partecipanti
+          @if (statsFor(evt.id); as s) {
+            @if (s.total > 0) {
+              <span class="text-[10px] font-inter font-bold bg-primary text-white rounded-full px-1.5 py-0.5 leading-none">{{ s.total }}</span>
+            }
+          }
+        </button>
+      </div>
+
       <!-- Body -->
       <div class="flex-1 overflow-y-auto p-6 flex flex-col gap-4">
 
-        <div class="flex flex-col gap-2">
-          <div class="flex items-center gap-2 font-inter text-sm text-on-surface">
-            <span class="material-symbols-outlined text-base text-on-surface-variant" style="font-variation-settings:'FILL' 1">schedule</span>
-            {{ evt.time }}
-          </div>
-          <div class="flex items-center gap-2 font-inter text-sm text-on-surface">
-            <span class="material-symbols-outlined text-base text-on-surface-variant" style="font-variation-settings:'FILL' 1">location_on</span>
-            {{ evt.location }}
-          </div>
-        </div>
+        @if (detailTab() === 'info') {
 
-        @if (evt.description) {
-          <div class="bg-surface-container rounded-xl p-4">
-            <p class="font-inter text-sm text-on-surface leading-relaxed">{{ evt.description }}</p>
+          <div class="flex flex-col gap-2">
+            <div class="flex items-center gap-2 font-inter text-sm text-on-surface">
+              <span class="material-symbols-outlined text-base text-on-surface-variant" style="font-variation-settings:'FILL' 1">schedule</span>
+              {{ evt.time }}
+            </div>
+            <div class="flex items-center gap-2 font-inter text-sm text-on-surface">
+              <span class="material-symbols-outlined text-base text-on-surface-variant" style="font-variation-settings:'FILL' 1">location_on</span>
+              {{ evt.location }}
+            </div>
           </div>
-        }
 
-        @if (evt.images && evt.images.length > 0) {
-          <div class="grid grid-cols-3 gap-2">
-            @for (img of evt.images; track img) {
-              <div class="aspect-square rounded-xl overflow-hidden bg-surface-container">
-                <img [src]="img" alt="" class="w-full h-full object-cover" />
-              </div>
-            }
-          </div>
-        }
-
-        <!-- Delete -->
-        <button (click)="deleteEvent(evt.id)"
-                [disabled]="deleting() === evt.id"
-                class="mt-auto flex items-center justify-center gap-2 w-full py-2.5 rounded-xl border border-error/30 text-error font-inter font-bold text-sm hover:bg-error/8 transition-all disabled:opacity-50">
-          @if (deleting() === evt.id) {
-            <span class="material-symbols-outlined text-base spin">progress_activity</span>
-          } @else {
-            <span class="material-symbols-outlined text-base" style="font-variation-settings:'FILL' 1">delete</span>
+          @if (evt.description) {
+            <div class="bg-surface-container rounded-xl p-4">
+              <p class="font-inter text-sm text-on-surface leading-relaxed">{{ evt.description }}</p>
+            </div>
           }
-          Elimina evento
-        </button>
+
+          <!-- RSVP summary in info tab -->
+          @if (statsFor(evt.id); as s) {
+            <div class="grid grid-cols-3 gap-3">
+              <div class="bg-primary/5 rounded-xl p-3 text-center">
+                <p class="font-romania font-bold text-primary text-xl">{{ s.attending }}</p>
+                <p class="font-inter text-xs text-on-surface-variant mt-0.5">Partecipano</p>
+              </div>
+              <div class="bg-amber-50 rounded-xl p-3 text-center">
+                <p class="font-romania font-bold text-amber-600 text-xl">{{ s.interested }}</p>
+                <p class="font-inter text-xs text-on-surface-variant mt-0.5">Interessati</p>
+              </div>
+              <div class="bg-surface-container rounded-xl p-3 text-center">
+                <p class="font-romania font-bold text-on-surface text-xl">{{ s.total }}</p>
+                <p class="font-inter text-xs text-on-surface-variant mt-0.5">Totale</p>
+              </div>
+            </div>
+          }
+
+          @if (evt.images && evt.images.length > 0) {
+            <div class="grid grid-cols-3 gap-2">
+              @for (img of evt.images; track img) {
+                <div class="aspect-square rounded-xl overflow-hidden bg-surface-container">
+                  <img [src]="img" alt="" class="w-full h-full object-cover" />
+                </div>
+              }
+            </div>
+          }
+
+          <!-- Delete -->
+          <button (click)="deleteEvent(evt.id)"
+                  [disabled]="deleting() === evt.id"
+                  class="mt-auto flex items-center justify-center gap-2 w-full py-2.5 rounded-xl border border-error/30 text-error font-inter font-bold text-sm hover:bg-error/8 transition-all disabled:opacity-50">
+            @if (deleting() === evt.id) {
+              <span class="material-symbols-outlined text-base spin">progress_activity</span>
+            } @else {
+              <span class="material-symbols-outlined text-base" style="font-variation-settings:'FILL' 1">delete</span>
+            }
+            Elimina evento
+          </button>
+
+        }
+
+        @if (detailTab() === 'rsvp') {
+
+          @if (rsvpLoading()) {
+            <div class="flex items-center justify-center py-12">
+              <span class="material-symbols-outlined text-primary text-3xl spin">progress_activity</span>
+            </div>
+          } @else if (detailRsvps().length === 0) {
+            <div class="flex flex-col items-center gap-3 py-12 text-center">
+              <span class="material-symbols-outlined text-on-surface-variant/30 text-4xl">group</span>
+              <p class="font-inter text-sm text-on-surface-variant">Nessuna risposta ancora.</p>
+            </div>
+          } @else {
+            <div class="divide-y divide-outline-variant/10">
+              @for (r of detailRsvps(); track r.id) {
+                <div class="flex items-center gap-3 py-3">
+                  <div class="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0"
+                       [class]="r.status === 'attending' ? 'bg-primary/8' : 'bg-amber-50'">
+                    <span class="material-symbols-outlined text-sm"
+                          [class]="r.status === 'attending' ? 'text-primary' : 'text-amber-500'"
+                          style="font-variation-settings:'FILL' 1">
+                      {{ r.status === 'attending' ? 'check_circle' : 'star' }}
+                    </span>
+                  </div>
+                  <div class="flex-1 min-w-0">
+                    <p class="font-inter font-semibold text-sm text-on-surface truncate">{{ r.name }}</p>
+                    @if (r.email) {
+                      <p class="font-inter text-xs text-on-surface-variant truncate">{{ r.email }}</p>
+                    }
+                  </div>
+                  <div class="flex flex-col items-end gap-0.5 flex-shrink-0">
+                    <span class="text-[10px] font-inter font-medium px-2 py-0.5 rounded-full"
+                          [class]="r.status === 'attending' ? 'text-primary bg-primary/8' : 'text-amber-600 bg-amber-50'">
+                      {{ r.status === 'attending' ? 'Partecipa' : 'Interessato' }}
+                    </span>
+                    <span class="font-inter text-[10px] text-on-surface-variant/60">
+                      {{ r.createdAt | date:'dd MMM' : '' : 'it-IT' }}
+                    </span>
+                  </div>
+                </div>
+              }
+            </div>
+          }
+
+        }
 
       </div>
     </div>

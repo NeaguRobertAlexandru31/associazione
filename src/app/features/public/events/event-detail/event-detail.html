@@ -47,11 +47,87 @@
   <div class="container mx-auto px-8 py-12">
     <div class="grid md:grid-cols-[1fr_300px] gap-10 items-start">
 
-      <!-- Left: description + gallery -->
+      <!-- Left: description + gallery + RSVP -->
       <div>
         @if (ev.description) {
           <p class="font-inter text-on-surface text-base leading-relaxed mb-10 max-w-2xl">{{ ev.description }}</p>
         }
+
+        <!-- RSVP section -->
+        <div class="mb-10 bg-surface-container-lowest rounded-2xl p-6 shadow-sm">
+          <h2 class="font-romania font-bold text-primary text-xl mb-1">Parteciperai?</h2>
+          <p class="font-inter text-sm text-on-surface-variant mb-5">Facci sapere se verrai, così potremo organizzarci meglio.</p>
+
+          @if (rsvpStats(); as s) {
+            <div class="flex items-center gap-4 mb-5">
+              <span class="flex items-center gap-1.5 text-xs font-inter text-on-surface-variant">
+                <span class="material-symbols-outlined text-primary text-base" style="font-variation-settings:'FILL' 1">check_circle</span>
+                <strong class="text-on-surface">{{ s.attending }}</strong> partecipano
+              </span>
+              <span class="flex items-center gap-1.5 text-xs font-inter text-on-surface-variant">
+                <span class="material-symbols-outlined text-amber-500 text-base" style="font-variation-settings:'FILL' 1">star</span>
+                <strong class="text-on-surface">{{ s.interested }}</strong> interessati
+              </span>
+            </div>
+          }
+
+          @if (rsvpStep() === 'idle') {
+            <div class="flex flex-wrap gap-3">
+              <button (click)="openRsvpForm('attending')"
+                      class="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-primary text-white font-inter font-semibold text-sm hover:bg-primary/90 transition-colors">
+                <span class="material-symbols-outlined text-base">check_circle</span>
+                Parteciperò
+              </button>
+              <button (click)="openRsvpForm('interested')"
+                      class="flex items-center gap-2 px-5 py-2.5 rounded-xl border border-primary text-primary font-inter font-semibold text-sm hover:bg-primary/5 transition-colors">
+                <span class="material-symbols-outlined text-base">star</span>
+                Sono interessato
+              </button>
+            </div>
+          }
+
+          @if (rsvpStep() === 'form') {
+            <div class="space-y-3 max-w-sm">
+              <p class="font-inter text-sm font-semibold text-on-surface">
+                {{ rsvpStatus() === 'attending' ? 'Conferma partecipazione' : 'Registra interesse' }}
+              </p>
+              <input [(ngModel)]="rsvpName" [ngModelOptions]="{standalone:true}"
+                     placeholder="Il tuo nome *"
+                     class="w-full px-4 py-2.5 rounded-xl border border-outline-variant font-inter text-sm text-on-surface bg-surface focus:outline-none focus:ring-2 focus:ring-primary/30" />
+              <input [(ngModel)]="rsvpEmail" [ngModelOptions]="{standalone:true}"
+                     placeholder="Email (opzionale)"
+                     type="email"
+                     class="w-full px-4 py-2.5 rounded-xl border border-outline-variant font-inter text-sm text-on-surface bg-surface focus:outline-none focus:ring-2 focus:ring-primary/30" />
+              <div class="flex gap-2 pt-1">
+                <button (click)="submitRsvp()" [disabled]="rsvpSending() || !rsvpName().trim()"
+                        class="flex-1 py-2.5 rounded-xl bg-primary text-white font-inter font-semibold text-sm hover:bg-primary/90 disabled:opacity-50 transition-colors">
+                  {{ rsvpSending() ? 'Invio...' : 'Conferma' }}
+                </button>
+                <button (click)="cancelRsvp()"
+                        class="px-4 py-2.5 rounded-xl border border-outline-variant font-inter text-sm text-on-surface-variant hover:bg-surface-container transition-colors">
+                  Annulla
+                </button>
+              </div>
+            </div>
+          }
+
+          @if (rsvpStep() === 'success') {
+            <div class="flex items-center gap-3 text-sm font-inter text-green-700 bg-green-50 rounded-xl px-4 py-3">
+              <span class="material-symbols-outlined text-base" style="font-variation-settings:'FILL' 1">check_circle</span>
+              Grazie! La tua risposta è stata registrata.
+            </div>
+          }
+
+          @if (rsvpStep() === 'error') {
+            <div class="space-y-3">
+              <div class="flex items-center gap-3 text-sm font-inter text-red-700 bg-red-50 rounded-xl px-4 py-3">
+                <span class="material-symbols-outlined text-base">error</span>
+                Ops, qualcosa è andato storto. Riprova.
+              </div>
+              <button (click)="cancelRsvp()" class="text-sm font-inter text-primary underline">Riprova</button>
+            </div>
+          }
+        </div>
 
         @if (ev.images.length > 0) {
           <h2 class="font-romania font-bold text-primary text-xl mb-4">Galleria</h2>
@@ -99,7 +175,26 @@
           </div>
         </div>
 
-        <div class="border-t border-outline-variant/20 pt-4 mt-2">
+        <!-- Calendar buttons -->
+        <div class="border-t border-outline-variant/20 pt-4 mt-2 flex flex-col gap-2">
+          <p class="font-inter text-xs text-on-surface-variant uppercase tracking-wider font-semibold mb-1">Aggiungi al calendario</p>
+
+          <a [href]="googleCalendarUrl(ev)" target="_blank" rel="noopener"
+             class="flex items-center gap-2.5 w-full py-2.5 px-4 rounded-xl bg-[#4285F4] text-white font-inter font-semibold text-sm hover:bg-[#3367d6] transition-colors">
+            <svg class="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/>
+            </svg>
+            Google Calendar
+          </a>
+
+          <button (click)="downloadIcs(ev)"
+                  class="flex items-center gap-2.5 w-full py-2.5 px-4 rounded-xl border border-outline-variant font-inter font-semibold text-sm text-on-surface hover:bg-surface-container transition-colors">
+            <span class="material-symbols-outlined text-base">calendar_add_on</span>
+            Apple / Outlook (.ics)
+          </button>
+        </div>
+
+        <div class="pt-1">
           <a routerLink="/events"
              class="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl border border-outline-variant font-inter font-semibold text-sm text-primary hover:bg-surface-container transition-colors">
             <span class="material-symbols-outlined text-base">arrow_back</span>

@@ -10,6 +10,20 @@ export interface CalendarEvent {
   cover?: string;
 }
 
+export interface EventRsvp {
+  id: string;
+  name: string;
+  email?: string;
+  status: 'attending' | 'interested';
+  createdAt: string;
+}
+
+export interface RsvpStats {
+  attending: number;
+  interested: number;
+  total: number;
+}
+
 export interface CreateEventDto {
   name: string;
   date: string;

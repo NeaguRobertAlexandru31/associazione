@@ -163,9 +163,13 @@ export class Register implements OnInit {
 
     this.svc.create(dto).subscribe({
       next: (res) => {
-        this.result.set({ ...res, firstName: this.firstName, lastName: this.lastName, category: this.category });
         this.loading.set(false);
-        this.router.navigate(['/tessera-preview']);
+        if (res.payment_url) {
+          window.location.href = res.payment_url;
+        } else {
+          this.result.set({ ...res, firstName: this.firstName, lastName: this.lastName, category: this.category });
+          this.router.navigate(['/tessera-preview']);
+        }
       },
       error: (err) => {
         this.loading.set(false);

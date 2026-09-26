@@ -1,0 +1,26 @@
+<div class="p-6 md:p-8 max-w-5xl mx-auto">
+  <div class="mb-8">
+    <h1 class="text-2xl font-semibold text-gray-900">Servizi</h1>
+    <p class="mt-1 text-sm text-gray-500">Accesso rapido alle dashboard dei servizi terzi collegati.</p>
+  </div>
+
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+    @for (service of services; track service.name) {
+      <div class="flex flex-col rounded-xl border p-5 gap-4 transition-shadow hover:shadow-md" [class]="service.color">
+        <div class="flex items-center gap-3">
+          <img [src]="service.logo" [alt]="service.name" class="h-8 w-8 object-contain" />
+          <span class="font-semibold text-gray-900">{{ service.name }}</span>
+        </div>
+        <p class="text-sm text-gray-600 flex-1">{{ service.description }}</p>
+        <button
+          type="button"
+          (click)="open(service.url)"
+          class="mt-auto flex items-center justify-center gap-2 rounded-lg bg-white border border-gray-200 px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-50 hover:border-gray-300 cursor-pointer"
+        >
+          <span class="material-symbols-outlined text-[18px]">open_in_new</span>
+          Apri dashboard
+        </button>
+      </div>
+    }
+  </div>
+</div>

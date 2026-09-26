@@ -2,7 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../../environments/environment';
-import { CalendarEvent, CreateEventDto } from '../../models/event.model';
+import { CalendarEvent, CreateEventDto, EventRsvp, RsvpStats } from '../../models/event.model';
 
 @Injectable({ providedIn: 'root' })
 export class EventsService {
@@ -28,5 +28,17 @@ export class EventsService {
 
   delete(id: string): Observable<void> {
     return this.http.delete<void>(`${environment.apiUrl}/events/${id}`);
+  }
+
+  rsvp(eventId: string, body: { name: string; email?: string; status: 'attending' | 'interested' }): Observable<unknown> {
+    return this.http.post(`${environment.apiUrl}/events/${eventId}/rsvp`, body);
+  }
+
+  getRsvpStats(eventId: string): Observable<RsvpStats> {
+    return this.http.get<RsvpStats>(`${environment.apiUrl}/events/${eventId}/rsvp/stats`);
+  }
+
+  getRsvpList(eventId: string): Observable<EventRsvp[]> {
+    return this.http.get<EventRsvp[]>(`${environment.apiUrl}/events/${eventId}/rsvp`);
   }
 }

@@ -1,1 +1,103 @@
-<p>donations works!</p>
+<div class="p-6 space-y-6">
+
+  <!-- Header -->
+  <div>
+    <h1 class="text-2xl font-bold text-[#002068]">Finanza</h1>
+    <p class="text-sm text-[#444653] mt-1">Tutte le entrate dell'associazione</p>
+  </div>
+
+  <!-- Metric cards -->
+  <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+    @for (s of stats(); track s.label) {
+      <div class="bg-white rounded-2xl p-5 shadow-sm">
+        <div class="flex items-center justify-between mb-3">
+          <span class="text-xs font-medium text-[#444653] uppercase tracking-wide">{{ s.label }}</span>
+          <span class="material-symbols-outlined text-[#002068] text-xl">{{ s.icon }}</span>
+        </div>
+        @if (loading()) {
+          <div class="h-7 w-24 bg-gray-100 rounded animate-pulse mb-1"></div>
+          <div class="h-4 w-32 bg-gray-100 rounded animate-pulse"></div>
+        } @else {
+          <p class="text-2xl font-bold text-[#002068]">{{ s.value }}</p>
+          <p class="text-xs text-[#444653] mt-1">{{ s.sub }}</p>
+        }
+      </div>
+    }
+  </div>
+
+  <!-- Tabella transazioni -->
+  <div class="bg-white rounded-2xl shadow-sm overflow-hidden">
+
+    <!-- Filtri -->
+    <div class="flex items-center gap-2 px-5 py-4 border-b border-gray-100">
+      <span class="text-sm font-medium text-[#002068] mr-2">Filtra:</span>
+      @for (f of filters; track f.value) {
+        <button
+          (click)="setFilter(f.value)"
+          [class]="filter() === f.value
+            ? 'px-3 py-1 rounded-full text-xs font-semibold bg-[#002068] text-white'
+            : 'px-3 py-1 rounded-full text-xs font-semibold bg-gray-100 text-[#444653] hover:bg-gray-200'">
+          {{ f.label }}
+        </button>
+      }
+    </div>
+
+    <!-- Lista -->
+    @if (loading()) {
+      <div class="divide-y divide-gray-50">
+        @for (_ of [1,2,3,4,5]; track $index) {
+          <div class="flex items-center gap-4 px-5 py-4">
+            <div class="w-9 h-9 rounded-full bg-gray-100 animate-pulse"></div>
+            <div class="flex-1 space-y-2">
+              <div class="h-4 w-40 bg-gray-100 rounded animate-pulse"></div>
+              <div class="h-3 w-24 bg-gray-100 rounded animate-pulse"></div>
+            </div>
+            <div class="h-5 w-16 bg-gray-100 rounded animate-pulse"></div>
+          </div>
+        }
+      </div>
+    } @else if (filtered().length === 0) {
+      <div class="py-16 text-center text-[#444653] text-sm">Nessuna transazione trovata</div>
+    } @else {
+      <div class="divide-y divide-gray-50">
+        @for (t of filtered(); track t.id) {
+          <div class="flex items-center gap-3 px-5 py-4 hover:bg-gray-50 transition-colors">
+
+            <!-- Icona -->
+            <div class="w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0"
+              [class]="t.type === 'quota' ? 'bg-blue-50' : 'bg-purple-50'">
+              <span class="material-symbols-outlined text-sm"
+                [class]="t.type === 'quota' ? 'text-[#002068]' : 'text-purple-600'">
+                {{ t.type === 'quota' ? 'badge' : 'volunteer_activism' }}
+              </span>
+            </div>
+
+            <!-- Nome + dettaglio -->
+            <div class="flex-1 min-w-0">
+              <p class="text-sm font-medium text-[#002068] truncate">{{ t.name }}</p>
+              <p class="text-xs text-[#444653] mt-0.5">
+                {{ t.type === 'quota'
+                  ? 'Quota ' + categoryLabel(t.category) + ' ' + t.year + ' · ' + methodLabel(t.method)
+                  : 'Donazione · ' + methodLabel(t.method) }}
+              </p>
+            </div>
+
+            <!-- Badge -->
+            <span class="text-xs font-medium px-2 py-0.5 rounded-full flex-shrink-0"
+              [class]="t.type === 'quota' ? 'bg-blue-50 text-[#002068]' : 'bg-purple-50 text-purple-700'">
+              {{ t.type === 'quota' ? 'Quota' : 'Donazione' }}
+            </span>
+
+            <!-- Importo + data -->
+            <div class="flex-shrink-0 text-right">
+              <p class="text-sm font-bold text-[#002068]">{{ fmt(t.amount) }}</p>
+              <p class="text-xs text-[#444653] mt-0.5">{{ t.createdAt | date:'dd MMM yy' : '' : 'it-IT' }}</p>
+            </div>
+
+          </div>
+        }
+      </div>
+    }
+  </div>
+
+</div>

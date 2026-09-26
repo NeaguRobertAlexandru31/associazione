@@ -25,6 +25,7 @@ const ALL_PAGES: Omit<NavPage, 'badge'>[] = [
   { page: 'donations',    route: '/dashboard/donations',    icon: 'volunteer_activism', label: 'Donazioni'     },
   { page: 'settings',     route: '/dashboard/settings',     icon: 'settings',           label: 'Impostazioni'  },
   { page: 'permissions',  route: '/dashboard/permissions',  icon: 'admin_panel_settings', label: 'Permessi'    },
+  { page: 'services',    route: '/dashboard/services',    icon: 'grid_view',            label: 'Servizi'     },
 ];
 
 @Injectable({ providedIn: 'root' })
@@ -43,7 +44,7 @@ export class PermissionsService {
     if (user.role === 'ADMIN') {
       const perms: PagePermissions = user.pagePermissions ?? {};
       return ALL_PAGES
-        .filter(p => p.page !== 'permissions' && (p.page === 'settings' || p.page === 'tessera' || perms[p.page] === true))
+        .filter(p => p.page !== 'permissions' && p.page !== 'services' && (p.page === 'settings' || p.page === 'tessera' || perms[p.page] === true))
         .map(p => p.page);
     }
 

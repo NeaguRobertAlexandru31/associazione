@@ -1,7 +1,9 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { HttpClient } from '@angular/common/http';
 import { TranslatePipe } from '../../../i18n/translate.pipe';
 import { SiteSettingsService } from '../../../core/services/site-settings/site-settings';
+import { environment } from '../../../../environments/environment';
 
 @Component({
   selector: 'app-donations',
@@ -11,6 +13,8 @@ import { SiteSettingsService } from '../../../core/services/site-settings/site-s
 })
 export class Donations implements OnInit {
   readonly siteSettings = inject(SiteSettingsService);
+  private http = inject(HttpClient);
+  loadingCheckout = signal(false);
   readonly amounts = [10, 25, 50, 100, 250];
   readonly impacts = [
     { iconKey: 'donations.impact_1_icon', titleKey: 'donations.impact_1_title', descKey: 'donations.impact_1_desc' },
@@ -48,5 +52,19 @@ export class Donations implements OnInit {
     navigator.clipboard.writeText('97123456789');
     this.cfCopied.set(true);
     setTimeout(() => this.cfCopied.set(false), 2000);
+  }
+
+  donate(): void {
+    const amount = this.customAmount() ? Number(this.customAmount()) : this.selectedAmount();
+    if (!amount || amount <= 0) return;
+
+    this.loadingCheckout.set(true);
+    this.http.post<{ url: string }>(`${environment.apiUrl}/stripe/donation-checkout`, {
+      amount,
+      frequency: this.frequency(),
+    }).subscribe({
+      next:  ({ url }) => { window.location.href = url; },
+      error: () => this.loadingCheckout.set(false),
+    });
   }
 }

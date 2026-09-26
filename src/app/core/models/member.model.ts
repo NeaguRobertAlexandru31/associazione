@@ -11,7 +11,8 @@ export type DashboardPage =
   | 'donations'
   | 'settings'
   | 'permissions'
-  | 'tessera';
+  | 'tessera'
+  | 'services';
 
 export type PagePermissions = Partial<Record<DashboardPage, boolean>>;
 export type MemberCategory = 'ordinario' | 'under26' | 'sostenitore';

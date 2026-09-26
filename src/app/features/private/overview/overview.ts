@@ -4,9 +4,10 @@ import { forkJoin } from 'rxjs';
 import { MemberListItem, MembersResponse } from '../../../core/models/member.model';
 import { CalendarEvent } from '../../../core/models/event.model';
 import { Article } from '../../../core/models/article.model';
-import { DonationStats, MembersService } from '../../../core/services/members/members';
+import { MembersService } from '../../../core/services/members/members';
 import { EventsService } from '../../../core/services/events/events';
 import { ArticlesService } from '../../../core/services/articles/articles';
+import { FinanceService, FinanceSummary } from '../../../core/services/finance/finance';
 import { MetricCard } from '../../../shared/components/private/metric-card/metric-card';
 import { Recents } from '../../../shared/components/private/recents/recents';
 
@@ -20,13 +21,14 @@ export class Overview implements OnInit {
   private membersService  = inject(MembersService);
   private eventsService   = inject(EventsService);
   private articlesService = inject(ArticlesService);
+  private financeService  = inject(FinanceService);
 
-  direttivo     = signal<MemberListItem[]>([]);
-  soci          = signal<MemberListItem[]>([]);
-  events        = signal<CalendarEvent[]>([]);
-  articles      = signal<Article[]>([]);
-  donationStats = signal<DonationStats>({ count: 0, total: 0, thisMonthCount: 0, thisMonthTotal: 0 });
-  loading       = signal(true);
+  direttivo      = signal<MemberListItem[]>([]);
+  soci           = signal<MemberListItem[]>([]);
+  events         = signal<CalendarEvent[]>([]);
+  articles       = signal<Article[]>([]);
+  financeSummary = signal<FinanceSummary | null>(null);
+  loading        = signal(true);
 
   readonly upcomingCount = computed(() => {
     const now = new Date();
@@ -77,10 +79,10 @@ export class Overview implements OnInit {
       loading: this.loading(),
     },
     {
-      icon: 'volunteer_activism',
-      label: 'Donazioni Ricevute',
-      value: this.loading() ? '—' : this.fmt(this.donationStats().total),
-      delta: `${this.donationStats().count} totali · ${this.fmt(this.donationStats().thisMonthTotal)} questo mese`,
+      icon: 'account_balance_wallet',
+      label: 'Entrate Totali',
+      value: this.loading() ? '—' : this.fmt(this.financeSummary()?.totale ?? 0),
+      delta: `${this.fmt(this.financeSummary()?.questoMese ?? 0)} questo mese`,
       positive: true,
       loading: this.loading(),
     },
@@ -97,17 +99,17 @@ export class Overview implements OnInit {
 
   ngOnInit(): void {
     forkJoin({
-      members:       this.membersService.getAll(),
-      events:        this.eventsService.getAll(),
-      articles:      this.articlesService.getAll(),
-      donationStats: this.membersService.getDonationStats(),
+      members:  this.membersService.getAll(),
+      events:   this.eventsService.getAll(),
+      articles: this.articlesService.getAll(),
+      finance:  this.financeService.getSummary(),
     }).subscribe({
-      next: ({ members, events, articles, donationStats }) => {
+      next: ({ members, events, articles, finance }) => {
         this.direttivo.set((members as MembersResponse).direttivo);
         this.soci.set((members as MembersResponse).soci);
         this.events.set(events);
         this.articles.set(articles);
-        this.donationStats.set(donationStats);
+        this.financeSummary.set(finance);
         this.loading.set(false);
       },
       error: () => this.loading.set(false),

@@ -1,6 +1,7 @@
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
+import { DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { CalendarEvent, CreateEventDto } from '../../../../core/models/event.model';
+import { CalendarEvent, CreateEventDto, EventRsvp, RsvpStats } from '../../../../core/models/event.model';
 import { EventsService } from '../../../../core/services/events/events';
 
 export interface ImagePreview {
@@ -11,9 +12,11 @@ export interface ImagePreview {
   error:     boolean;
 }
 
+type DetailTab = 'info' | 'rsvp';
+
 @Component({
   selector: 'app-event-calendar',
-  imports: [FormsModule],
+  imports: [FormsModule, DatePipe],
   templateUrl: './event-calendar.html',
   styleUrl: './event-calendar.css',
 })
@@ -27,6 +30,11 @@ export class EventCalendar implements OnInit {
 
   showCreateModal = signal(false);
   detailEvent     = signal<CalendarEvent | null>(null);
+  detailTab       = signal<DetailTab>('info');
+
+  rsvpStatsMap  = signal<Record<string, RsvpStats>>({});
+  detailRsvps   = signal<EventRsvp[]>([]);
+  rsvpLoading   = signal(false);
 
   imagePreviews = signal<ImagePreview[]>([]);
   coverPreview  = signal<ImagePreview | null>(null);
@@ -42,9 +50,26 @@ export class EventCalendar implements OnInit {
   load(): void {
     this.loading.set(true);
     this.eventsService.getAll().subscribe({
-      next: evts => { this.events.set(evts); this.loading.set(false); },
-      error: ()   => this.loading.set(false),
+      next: evts => {
+        this.events.set(evts);
+        this.loading.set(false);
+        this.loadAllStats(evts);
+      },
+      error: () => this.loading.set(false),
     });
+  }
+
+  private loadAllStats(evts: CalendarEvent[]): void {
+    evts.forEach(ev => {
+      this.eventsService.getRsvpStats(ev.id).subscribe({
+        next: stats => this.rsvpStatsMap.update(m => ({ ...m, [ev.id]: stats })),
+        error: () => {},
+      });
+    });
+  }
+
+  statsFor(eventId: string): RsvpStats | null {
+    return this.rsvpStatsMap()[eventId] ?? null;
   }
 
   openCreate(): void {
@@ -58,8 +83,26 @@ export class EventCalendar implements OnInit {
     this.clearPreviews();
   }
 
-  openDetail(evt: CalendarEvent): void { this.detailEvent.set(evt); }
+  openDetail(evt: CalendarEvent): void {
+    this.detailEvent.set(evt);
+    this.detailTab.set('info');
+    this.detailRsvps.set([]);
+  }
+
   closeDetail(): void { this.detailEvent.set(null); }
+
+  switchTab(tab: DetailTab): void {
+    this.detailTab.set(tab);
+    if (tab === 'rsvp') {
+      const ev = this.detailEvent();
+      if (!ev) return;
+      this.rsvpLoading.set(true);
+      this.eventsService.getRsvpList(ev.id).subscribe({
+        next: list => { this.detailRsvps.set(list); this.rsvpLoading.set(false); },
+        error: ()   => this.rsvpLoading.set(false),
+      });
+    }
+  }
 
   // ── Cover upload ──────────────────────────────────────────────────────
 
