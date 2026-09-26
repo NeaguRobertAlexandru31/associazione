@@ -22,6 +22,7 @@ const ALL_PAGES: Omit<NavPage, 'badge'>[] = [
   { page: 'activities',   route: '/dashboard/activities',   icon: 'history',            label: 'Attività'      },
   { page: 'news',         route: '/dashboard/news',         icon: 'article',            label: 'Contenuti'     },
   { page: 'projects',     route: '/dashboard/projects',     icon: 'folder_open',        label: 'Progetti'      },
+  { page: 'documents',    route: '/dashboard/documents',    icon: 'folder_copy',        label: 'Documenti'     },
   { page: 'donations',    route: '/dashboard/donations',    icon: 'volunteer_activism', label: 'Donazioni'     },
   { page: 'settings',     route: '/dashboard/settings',     icon: 'settings',           label: 'Impostazioni'  },
   { page: 'permissions',  route: '/dashboard/permissions',  icon: 'admin_panel_settings', label: 'Permessi'    },
@@ -61,6 +62,7 @@ export class PermissionsService {
 
   getNavItems(badgeMap: Partial<Record<DashboardPage, number>> = {}): NavPage[] {
     return this.visiblePages()
+      .filter(page => page !== 'settings')
       .map(page => {
         const def = ALL_PAGES.find(p => p.page === page)!;
         return { ...def, badge: badgeMap[page] };

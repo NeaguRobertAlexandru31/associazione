@@ -1,0 +1,66 @@
+<!-- Overlay scuro -->
+@if (visible()) {
+  <div class="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm fab-overlay"
+       [class.fab-overlay--open]="open()"
+       (click)="close()"></div>
+}
+
+<!-- Wrapper relativo: bottone + pannello ancorato sotto -->
+<div class="relative z-50">
+
+  <!-- FAB button -->
+  <button (click)="toggle()"
+          class="fab-btn w-12 h-12 rounded-2xl bg-surface/90 backdrop-blur-md shadow-lg border border-outline-variant/15 flex items-center justify-center text-on-surface"
+          [class.open]="open()">
+    <span class="material-symbols-outlined text-[22px] fab-icon" style="font-variation-settings:'FILL' 1">
+      {{ open() ? 'close' : 'menu' }}
+    </span>
+  </button>
+
+  <!-- Pannello voci: ancorato in alto a destra rispetto al wrapper -->
+  @if (visible()) {
+    <div class="fab-panel absolute top-14 right-0"
+         [class.fab-panel--open]="open()">
+      <div class="flex flex-col gap-0.5 bg-surface/96 backdrop-blur-xl rounded-2xl shadow-2xl border border-outline-variant/15 p-2 w-72 max-h-[calc(100vh-100px)] overflow-y-auto">
+
+        <!-- Nav items -->
+        @for (item of items; track item.route; let i = $index) {
+          <a [routerLink]="item.route"
+             routerLinkActive="!bg-primary/15 !text-primary"
+             [routerLinkActiveOptions]="{ exact: false }"
+             (click)="onItemClick()"
+             class="fab-item flex items-center gap-3 px-3 py-2.5 rounded-xl text-on-surface hover:bg-on-surface/8 transition-colors duration-150"
+             [style]="'--i:' + (i + 1)">
+            <span class="material-symbols-outlined text-[20px]" style="font-variation-settings:'FILL' 1">{{ item.icon }}</span>
+            <span class="font-inter font-semibold text-sm flex-1">{{ item.label }}</span>
+            @if (item.badge && item.badge > 0) {
+              <span class="bg-primary text-on-primary font-inter font-bold text-[10px] px-1.5 py-0.5 rounded-full min-w-[18px] text-center">
+                {{ item.badge }}
+              </span>
+            }
+          </a>
+        }
+
+        <div class="h-px bg-outline-variant/20 mx-2 my-1"></div>
+
+        <!-- Sito pubblico -->
+        <a href="/" target="_blank" rel="noopener" (click)="close()"
+           class="fab-item flex items-center gap-3 px-3 py-2.5 rounded-xl text-on-surface-variant hover:bg-on-surface/8 hover:text-on-surface transition-colors duration-150"
+           [style]="'--i:' + (items.length + 1)">
+          <span class="material-symbols-outlined text-[20px]">open_in_new</span>
+          <span class="font-inter font-semibold text-sm">Vai al sito</span>
+        </a>
+
+        <!-- Logout -->
+        <button (click)="logoutClick.emit(); close()"
+                class="fab-item flex items-center gap-3 px-3 py-2.5 rounded-xl text-error hover:bg-error/10 transition-colors duration-150 w-full"
+                [style]="'--i:' + (items.length + 2)">
+          <span class="material-symbols-outlined text-[20px]">logout</span>
+          <span class="font-inter font-semibold text-sm">Esci</span>
+        </button>
+
+      </div>
+    </div>
+  }
+
+</div>

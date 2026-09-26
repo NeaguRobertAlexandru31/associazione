@@ -8,6 +8,7 @@ export type DashboardPage =
   | 'activities'
   | 'news'
   | 'projects'
+  | 'documents'
   | 'donations'
   | 'settings'
   | 'permissions'

@@ -1,0 +1,265 @@
+<div class="dash-content">
+
+  <div class="flex items-center justify-between mb-8">
+    <div>
+      <h1 class="text-2xl font-bold text-[#002068]">Documenti</h1>
+      <p class="text-sm text-[#444653] mt-1">Gestisci verbali, statuti e documenti ufficiali.</p>
+    </div>
+    <div class="flex items-center gap-2">
+      <button (click)="openTemplate()"
+              class="flex items-center gap-2 px-4 py-2.5 bg-surface-container text-on-surface font-inter font-bold text-sm rounded-xl hover:bg-surface-container-high transition-all">
+        <span class="material-symbols-outlined text-base">description</span>
+        Template verbale
+      </button>
+      <button (click)="openCreate()"
+              class="flex items-center gap-2 px-4 py-2.5 bg-primary text-on-primary font-inter font-bold text-sm rounded-xl hover:opacity-90 transition-all">
+        <span class="material-symbols-outlined text-base" style="font-variation-settings:'FILL' 1">upload_file</span>
+        Carica documento
+      </button>
+    </div>
+  </div>
+
+  @if (loading()) {
+    <div class="flex items-center justify-center min-h-[40vh]">
+      <span class="material-symbols-outlined text-primary text-4xl spin">progress_activity</span>
+    </div>
+  } @else if (documents().length === 0) {
+    <div class="flex flex-col items-center gap-3 py-20 text-center">
+      <span class="material-symbols-outlined text-on-surface-variant/40 text-5xl">folder_open</span>
+      <p class="font-inter text-on-surface-variant text-sm">Nessun documento caricato.</p>
+    </div>
+  } @else {
+    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+      @for (d of documents(); track d.id) {
+        <div class="group relative bg-white rounded-2xl shadow-sm border border-outline-variant/10 overflow-hidden cursor-pointer hover:shadow-md hover:-translate-y-0.5 transition-all duration-200"
+             (click)="openDetail(d)">
+
+          <!-- Checkbox -->
+          <div class="absolute top-2.5 left-2.5 z-10" (click)="toggleCheck(d.id, $event)">
+            <input type="checkbox" [checked]="isChecked(d.id)"
+                   (click)="$event.stopPropagation()" (change)="toggleCheck(d.id, $event)"
+                   class="w-4 h-4 rounded accent-primary cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity"
+                   [class.opacity-100]="isChecked(d.id)" />
+          </div>
+
+          <!-- Anteprima documento -->
+          <div class="relative h-40 overflow-hidden bg-surface-container">
+            <!-- iframe anteprima reale -->
+            <iframe [src]="previewUrl(d.fileUrl, d.fileName)"
+                    class="absolute inset-0 w-full h-full border-0 pointer-events-none scale-[1] origin-top-left"
+                    style="width:200%; height:200%; transform:scale(0.5); transform-origin:top left;"
+                    loading="lazy"
+                    sandbox="allow-same-origin allow-scripts">
+            </iframe>
+            <!-- Overlay sfumato in basso per raccordare con le info -->
+            <div class="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-white to-transparent pointer-events-none"></div>
+            <!-- Badge categoria -->
+            <span class="absolute top-2.5 left-2.5 font-inter text-[10px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-full shadow-sm"
+                  [class]="categoryColor(d.category)">
+              {{ categoryLabel(d.category) }}
+            </span>
+            <!-- Data -->
+            <span class="absolute top-2.5 right-2.5 font-inter text-[10px] text-white bg-black/40 backdrop-blur-sm px-2 py-0.5 rounded-full">
+              {{ formatDate(d.createdAt) }}
+            </span>
+          </div>
+
+          <!-- Info -->
+          <div class="p-3">
+            <p class="font-inter font-semibold text-on-surface text-sm leading-tight line-clamp-2 mb-1">{{ d.title }}</p>
+            <p class="font-inter text-[11px] text-on-surface-variant truncate">{{ formatSize(d.fileSize) }}</p>
+          </div>
+
+        </div>
+      }
+    </div>
+  }
+
+</div>
+
+<!-- Detail modal -->
+@if (detailDoc(); as d) {
+  <div class="fixed inset-0 z-40 flex items-center justify-center p-4">
+    <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" (click)="closeDetail()"></div>
+    <div class="relative z-10 w-full max-w-lg bg-surface rounded-2xl shadow-2xl flex flex-col max-h-[90vh]">
+
+      <div class="flex items-start justify-between p-6 border-b border-outline-variant/20">
+        <div class="flex-1 min-w-0 pr-4">
+          <p class="font-romania font-bold text-primary text-xl leading-tight">{{ d.title }}</p>
+          <p class="font-inter text-xs text-on-surface-variant mt-1">{{ formatDate(d.createdAt) }}</p>
+        </div>
+        <button (click)="closeDetail()" class="w-7 h-7 rounded-lg flex items-center justify-center hover:bg-surface-container transition-colors flex-shrink-0">
+          <span class="material-symbols-outlined text-on-surface-variant text-lg">close</span>
+        </button>
+      </div>
+
+      <div class="flex-1 overflow-y-auto p-6 flex flex-col gap-4">
+
+        <div class="flex items-center gap-4 p-4 bg-surface-container rounded-xl">
+          <span class="material-symbols-outlined text-primary text-3xl">{{ fileIcon(d.fileName) }}</span>
+          <div class="flex-1 min-w-0">
+            <p class="font-inter font-semibold text-on-surface text-sm truncate">{{ d.fileName }}</p>
+            <p class="font-inter text-xs text-on-surface-variant mt-0.5">{{ formatSize(d.fileSize) }}</p>
+          </div>
+          <a [href]="d.fileUrl" target="_blank" rel="noopener"
+             class="flex items-center gap-1.5 px-3 py-1.5 bg-primary/10 text-primary font-inter font-semibold text-xs rounded-lg hover:bg-primary/20 transition-colors">
+            <span class="material-symbols-outlined text-sm">download</span>
+            Scarica
+          </a>
+        </div>
+
+        <div class="flex gap-2 flex-wrap">
+          <span class="font-inter text-xs font-semibold uppercase tracking-wide px-3 py-1 rounded-full"
+                [class]="categoryColor(d.category)">
+            {{ categoryLabel(d.category) }}
+          </span>
+        </div>
+
+        @if (d.description) {
+          <div class="bg-surface-container rounded-xl p-4">
+            <p class="font-inter text-sm text-on-surface leading-relaxed whitespace-pre-wrap">{{ d.description }}</p>
+          </div>
+        }
+
+        <button (click)="onDelete(d.id)"
+                class="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl border border-error/30 text-error font-inter font-bold text-sm hover:bg-error/8 transition-all">
+          <span class="material-symbols-outlined text-base" style="font-variation-settings:'FILL' 1">delete</span>
+          Elimina documento
+        </button>
+
+      </div>
+    </div>
+  </div>
+}
+
+<!-- Create modal -->
+@if (showModal()) {
+  <div class="fixed inset-0 z-40 flex items-center justify-center p-4">
+    <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" (click)="closeCreate()"></div>
+    <div class="relative z-10 w-full max-w-lg bg-surface rounded-2xl shadow-2xl flex flex-col max-h-[90vh]">
+
+      <div class="flex items-center justify-between p-6 border-b border-outline-variant/20">
+        <p class="font-romania font-bold text-primary text-lg">Carica documento</p>
+        <button (click)="closeCreate()" class="w-7 h-7 rounded-lg flex items-center justify-center hover:bg-surface-container transition-colors">
+          <span class="material-symbols-outlined text-on-surface-variant text-lg">close</span>
+        </button>
+      </div>
+
+      <div class="flex-1 overflow-y-auto p-6 flex flex-col gap-4">
+
+        <div class="flex flex-col gap-2">
+          <label class="font-inter font-semibold text-xs text-on-surface-variant uppercase tracking-wider">File *</label>
+          @if (filePreview(); as fp) {
+            <div class="flex items-center gap-3 p-4 rounded-xl border border-outline-variant/30 bg-surface-container">
+              @if (fp.uploading) {
+                <span class="material-symbols-outlined text-primary text-2xl spin">progress_activity</span>
+              } @else if (fp.error) {
+                <span class="material-symbols-outlined text-error text-2xl">error</span>
+              } @else {
+                <span class="material-symbols-outlined text-primary text-2xl">{{ fileIcon(fp.fileName) }}</span>
+              }
+              <div class="flex-1 min-w-0">
+                <p class="font-inter text-sm font-semibold text-on-surface truncate">{{ fp.fileName }}</p>
+                <p class="font-inter text-xs text-on-surface-variant mt-0.5">
+                  @if (fp.uploading) { Caricamento… }
+                  @else if (fp.error) { Errore nel caricamento }
+                  @else { {{ formatSize(fp.fileSize) }} · Caricato }
+                </p>
+              </div>
+              <button type="button" (click)="removeFile()"
+                      class="w-6 h-6 rounded-full hover:bg-error/10 flex items-center justify-center transition-colors">
+                <span class="material-symbols-outlined text-on-surface-variant text-sm">close</span>
+              </button>
+            </div>
+          } @else {
+            <label (dragover)="onDragOver($event)" (drop)="onFileDrop($event)"
+                   class="flex flex-col items-center gap-2 px-4 py-6 rounded-xl border-2 border-dashed border-outline-variant/40 bg-surface-container hover:border-primary/40 hover:bg-primary/4 transition-all cursor-pointer">
+              <span class="material-symbols-outlined text-on-surface-variant text-3xl">upload_file</span>
+              <span class="font-inter text-xs text-on-surface-variant text-center">
+                Trascina il file o <span class="text-primary font-semibold">clicca per selezionare</span>
+              </span>
+              <span class="font-inter text-[10px] text-on-surface-variant/60">PDF, DOC, DOCX, XLS, XLSX · max 50 MB</span>
+              <input type="file" accept=".pdf,.doc,.docx,.xls,.xlsx,.odt,.ods" class="hidden" (change)="onFileSelected($event)" />
+            </label>
+          }
+        </div>
+
+        <div class="flex flex-col gap-1">
+          <label class="font-inter font-semibold text-xs text-on-surface-variant uppercase tracking-wider">Titolo *</label>
+          <input [value]="formTitle()" (input)="formTitle.set($any($event.target).value)" type="text" placeholder="Es. Verbale assemblea 2026"
+                 class="w-full px-3 py-2.5 rounded-xl bg-surface-container border border-outline-variant/30 font-inter text-sm text-on-surface placeholder:text-on-surface-variant/50 outline-none focus:ring-2 focus:ring-primary/30 transition-all" />
+        </div>
+
+        <div class="flex flex-col gap-1">
+          <label class="font-inter font-semibold text-xs text-on-surface-variant uppercase tracking-wider">Categoria *</label>
+          <select [(ngModel)]="form.category"
+                  class="w-full px-3 py-2.5 rounded-xl bg-surface-container border border-outline-variant/30 font-inter text-sm text-on-surface outline-none focus:ring-2 focus:ring-primary/30 transition-all">
+            @for (cat of categories; track cat.value) {
+              <option [value]="cat.value">{{ cat.label }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="flex flex-col gap-1">
+          <label class="font-inter font-semibold text-xs text-on-surface-variant uppercase tracking-wider">Descrizione</label>
+          <textarea [(ngModel)]="form.description" rows="3" placeholder="Note o descrizione del documento (opzionale)…"
+                    class="w-full px-3 py-2.5 rounded-xl bg-surface-container border border-outline-variant/30 font-inter text-sm text-on-surface placeholder:text-on-surface-variant/50 outline-none focus:ring-2 focus:ring-primary/30 transition-all resize-none"></textarea>
+        </div>
+
+        <button (click)="submit()" [disabled]="saving() || !canSubmit()"
+                class="w-full py-3 bg-primary text-on-primary font-inter font-bold text-sm rounded-xl hover:opacity-90 transition-all flex items-center justify-center gap-2 disabled:opacity-50">
+          @if (saving()) {
+            <span class="material-symbols-outlined text-base spin">progress_activity</span>
+            Salvataggio…
+          } @else {
+            <span class="material-symbols-outlined text-base" style="font-variation-settings:'FILL' 1">check</span>
+            Salva documento
+          }
+        </button>
+
+      </div>
+    </div>
+  </div>
+}
+
+<!-- Template verbale modal -->
+@if (showTemplate()) {
+  <div class="fixed inset-0 z-40 flex items-center justify-center p-4">
+    <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" (click)="closeTemplate()"></div>
+    <div class="relative z-10 w-full max-w-2xl bg-surface rounded-2xl shadow-2xl flex flex-col max-h-[90vh]">
+
+      <div class="flex items-center justify-between p-6 border-b border-outline-variant/20">
+        <div>
+          <p class="font-romania font-bold text-primary text-lg">Template verbale assemblea</p>
+          <p class="font-inter text-xs text-on-surface-variant mt-0.5">Copia o scarica il modello da compilare</p>
+        </div>
+        <button (click)="closeTemplate()" class="w-7 h-7 rounded-lg flex items-center justify-center hover:bg-surface-container transition-colors">
+          <span class="material-symbols-outlined text-on-surface-variant text-lg">close</span>
+        </button>
+      </div>
+
+      <div class="flex-1 overflow-y-auto p-6">
+        <pre class="font-mono text-xs text-on-surface leading-relaxed whitespace-pre-wrap bg-surface-container rounded-xl p-4 border border-outline-variant/20">{{ verbaleTemplate }}</pre>
+      </div>
+
+      <div class="flex gap-3 p-6 border-t border-outline-variant/20">
+        <button (click)="copyTemplate()"
+                class="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl border border-outline-variant/30 font-inter font-bold text-sm transition-all"
+                [class]="templateCopied() ? 'bg-green-50 text-green-700 border-green-200' : 'hover:bg-surface-container text-on-surface'">
+          <span class="material-symbols-outlined text-base" style="font-variation-settings:'FILL' 1">
+            {{ templateCopied() ? 'check_circle' : 'content_copy' }}
+          </span>
+          {{ templateCopied() ? 'Copiato!' : 'Copia testo' }}
+        </button>
+        <button (click)="downloadTemplate()"
+                class="flex-1 flex items-center justify-center gap-2 py-2.5 bg-primary text-on-primary font-inter font-bold text-sm rounded-xl hover:opacity-90 transition-all">
+          <span class="material-symbols-outlined text-base" style="font-variation-settings:'FILL' 1">download</span>
+          Scarica .txt
+        </button>
+      </div>
+
+    </div>
+  </div>
+}
+
+<app-toolbar [active]="checkedCount() > 0" [count]="checkedCount()" (delete)="onDelete()" />

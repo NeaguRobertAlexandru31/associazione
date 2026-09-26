@@ -2,8 +2,8 @@
 
   <div class="flex items-center justify-between mb-8">
     <div>
-      <h1 class="font-romania font-extrabold text-primary text-3xl mb-1">Progetti</h1>
-      <p class="font-inter text-on-surface-variant text-sm">Gestisci i progetti pubblicati sul sito.</p>
+      <h1 class="text-2xl font-bold text-[#002068]">Progetti</h1>
+      <p class="text-sm text-[#444653] mt-1">Gestisci i progetti pubblicati sul sito.</p>
     </div>
     <button (click)="openCreate()"
             class="flex items-center gap-2 px-4 py-2.5 bg-primary text-on-primary font-inter font-bold text-sm rounded-xl hover:opacity-90 transition-all">
@@ -22,45 +22,50 @@
       <p class="font-inter text-on-surface-variant text-sm">Nessun progetto pubblicato.</p>
     </div>
   } @else {
-    <div class="bg-surface-container-lowest rounded-2xl shadow-sm overflow-hidden">
+    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
       @for (p of projects(); track p.id) {
-        <button (click)="openDetail(p)"
-                class="w-full text-left px-5 py-4 border-b border-outline-variant/10 last:border-0 transition-colors flex items-center gap-4 hover:bg-surface-container/60">
+        <div class="group relative bg-white rounded-2xl shadow-sm border border-outline-variant/10 overflow-hidden cursor-pointer hover:shadow-md hover:-translate-y-0.5 transition-all duration-200"
+             (click)="openDetail(p)">
 
-          <div (click)="toggleCheck(p.id, $event)" class="flex-shrink-0 w-5 h-5 flex items-center justify-center">
+          <!-- Checkbox -->
+          <div class="absolute top-2.5 left-2.5 z-10" (click)="toggleCheck(p.id, $event)">
             <input type="checkbox" [checked]="isChecked(p.id)"
                    (click)="$event.stopPropagation()" (change)="toggleCheck(p.id, $event)"
-                   class="w-4 h-4 rounded accent-primary cursor-pointer" />
+                   class="w-4 h-4 rounded accent-primary cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity"
+                   [class.opacity-100]="isChecked(p.id)" />
           </div>
 
-          <div class="w-14 h-14 rounded-xl overflow-hidden bg-surface-container flex-shrink-0">
-            @if (p.images.length > 0) {
-              <img [src]="resolveImg(p.images[0])" alt="" class="w-full h-full object-cover" />
+          <!-- Anteprima immagine -->
+          <div class="relative h-40 overflow-hidden bg-surface-container">
+            @if (p.cover || p.images.length > 0) {
+              <img [src]="resolveImg(p.cover ?? p.images[0])" alt=""
+                   class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
             } @else {
-              <div class="w-full h-full flex items-center justify-center">
-                <span class="material-symbols-outlined text-on-surface-variant/40 text-2xl">folder_open</span>
+              <div class="w-full h-full flex items-center justify-center bg-surface-container-high">
+                <span class="material-symbols-outlined text-on-surface-variant/30 text-5xl">folder_open</span>
               </div>
             }
+            <!-- Sfumatura bassa -->
+            <div class="absolute bottom-0 left-0 right-0 h-12 bg-gradient-to-t from-black/40 to-transparent pointer-events-none"></div>
+            <!-- Badge categoria -->
+            <span class="absolute top-2.5 left-2.5 font-inter text-[10px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-full shadow-sm"
+                  [class]="categoryColor(p.category)">
+              {{ categoryLabel(p.category) }}
+            </span>
+            <!-- Badge stato -->
+            <span class="absolute top-2.5 right-2.5 font-inter text-[10px] font-bold px-2 py-0.5 rounded-full shadow-sm"
+                  [class]="p.status === 'ongoing' ? 'bg-green-100 text-green-700' : 'bg-surface-container text-on-surface-variant'">
+              {{ p.status === 'ongoing' ? 'In corso' : 'Completato' }}
+            </span>
           </div>
 
-          <div class="flex-1 min-w-0">
-            <p class="font-inter font-semibold text-on-surface text-sm truncate">{{ p.title }}</p>
-            <p class="font-inter text-xs text-on-surface-variant truncate mt-0.5">{{ p.description }}</p>
-            <div class="flex items-center gap-2 mt-1.5">
-              <span class="font-inter text-[10px] font-semibold uppercase tracking-wide px-2 py-0.5 rounded-full"
-                    [class]="categoryColor(p.category)">
-                {{ categoryLabel(p.category) }}
-              </span>
-              <span class="font-inter text-[10px] font-semibold px-2 py-0.5 rounded-full"
-                    [class]="p.status === 'ongoing' ? 'bg-[#d4edda] text-[#155724]' : 'bg-surface-container text-on-surface-variant'">
-                {{ p.status === 'ongoing' ? 'In corso' : 'Completato' }}
-              </span>
-              <span class="font-inter text-[10px] text-on-surface-variant ml-auto">{{ formatDate(p.createdAt) }}</span>
-            </div>
+          <!-- Info -->
+          <div class="p-3">
+            <p class="font-inter font-semibold text-on-surface text-sm leading-tight line-clamp-1 mb-1">{{ p.title }}</p>
+            <p class="font-inter text-[11px] text-on-surface-variant line-clamp-2 leading-snug">{{ p.description }}</p>
           </div>
 
-          <span class="material-symbols-outlined text-on-surface-variant/40 text-lg flex-shrink-0">chevron_right</span>
-        </button>
+        </div>
       }
     </div>
   }

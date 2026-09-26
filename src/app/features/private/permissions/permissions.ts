@@ -19,6 +19,7 @@ const MANAGED_PAGES: { page: DashboardPage; label: string }[] = [
   { page: 'activities', label: 'Attività'      },
   { page: 'news',       label: 'Contenuti'     },
   { page: 'projects',   label: 'Progetti'      },
+  { page: 'documents',  label: 'Documenti'     },
   { page: 'donations',  label: 'Donazioni'     },
 ];
 

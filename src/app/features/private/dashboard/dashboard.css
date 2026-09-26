@@ -1,15 +1,75 @@
 .dash-content {
-  animation: dashIn 0.3s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation: dashIn 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 @keyframes dashIn {
-  from { opacity: 0; transform: translateY(10px); }
+  from { opacity: 0; transform: translateY(12px); }
   to   { opacity: 1; transform: translateY(0);    }
 }
 
-.sidebar-animate {
-  animation: slideIn 0.3s cubic-bezier(0.22, 1, 0.36, 1) both;
+/* ── Overlay ────────────────────────────────────────────── */
+.fab-overlay {
+  opacity: 0;
+  transition: opacity 0.4s ease;
 }
-@keyframes slideIn {
-  from { transform: translateX(-100%); }
-  to   { transform: translateX(0);     }
+.fab-overlay--open {
+  opacity: 1;
+}
+
+/* ── Pannello ───────────────────────────────────────────── */
+.fab-panel {
+  opacity: 0;
+  transform-origin: top right;
+  transform: scale(0.7) translateY(-10px);
+  transition:
+    opacity  0.45s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.5s  cubic-bezier(0.34, 1.45, 0.64, 1);
+}
+.fab-panel--open {
+  opacity: 1;
+  transform: scale(1) translateY(0);
+}
+
+/* ── Voci staggered ─────────────────────────────────────── */
+.fab-item {
+  opacity: 0;
+  transform: translateX(16px);
+  transition:
+    opacity   0.35s ease,
+    transform 0.4s  cubic-bezier(0.34, 1.3, 0.64, 1),
+    background-color 0.15s ease;
+}
+.fab-panel--open .fab-item {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+/* stagger tramite nth-child */
+.fab-panel--open .fab-item:nth-child(1)  { transition-delay: 60ms;  }
+.fab-panel--open .fab-item:nth-child(2)  { transition-delay: 100ms; }
+.fab-panel--open .fab-item:nth-child(3)  { transition-delay: 140ms; }
+.fab-panel--open .fab-item:nth-child(4)  { transition-delay: 180ms; }
+.fab-panel--open .fab-item:nth-child(5)  { transition-delay: 220ms; }
+.fab-panel--open .fab-item:nth-child(6)  { transition-delay: 260ms; }
+.fab-panel--open .fab-item:nth-child(7)  { transition-delay: 300ms; }
+.fab-panel--open .fab-item:nth-child(8)  { transition-delay: 340ms; }
+.fab-panel--open .fab-item:nth-child(9)  { transition-delay: 380ms; }
+.fab-panel--open .fab-item:nth-child(10) { transition-delay: 420ms; }
+.fab-panel--open .fab-item:nth-child(11) { transition-delay: 460ms; }
+.fab-panel--open .fab-item:nth-child(12) { transition-delay: 500ms; }
+
+/* ── FAB button ─────────────────────────────────────────── */
+.fab-btn {
+  transition:
+    transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1),
+    box-shadow 0.2s ease;
+}
+.fab-btn:hover  { transform: scale(1.03); }
+.fab-btn:active { transform: scale(0.97); }
+
+.fab-btn .fab-icon {
+  display: block;
+  transition: transform 0.45s cubic-bezier(0.34, 1.4, 0.64, 1);
+}
+.fab-btn.open .fab-icon {
+  transform: rotate(135deg);
 }

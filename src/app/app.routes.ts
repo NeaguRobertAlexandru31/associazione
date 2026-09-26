@@ -40,6 +40,7 @@ export const routes: Routes = [
 			{ path: 'messages',      canActivate: [roleGuard('messages')],     loadComponent: () => import('./features/private/messagges/messagges').then(m => m.Messagges) },
 			{ path: 'news',          canActivate: [roleGuard('news')],         loadComponent: () => import('./features/private/news/news').then(m => m.News) },
 			{ path: 'projects',      canActivate: [roleGuard('projects')],     loadComponent: () => import('./features/private/projects/projects').then(m => m.Projects) },
+			{ path: 'documents',     canActivate: [roleGuard('documents')],    loadComponent: () => import('./features/private/documents/documents').then(m => m.Documents) },
 			{ path: 'donations',     canActivate: [roleGuard('donations')],    loadComponent: () => import('./features/private/donations/donations').then(m => m.Donations) },
 			{ path: 'settings',      canActivate: [roleGuard('settings')],     loadComponent: () => import('./features/private/settings/settings').then(m => m.Settings) },
 			{ path: 'activities',    canActivate: [roleGuard('activities')],   loadComponent: () => import('./features/private/activities/activities').then(m => m.Activities) },

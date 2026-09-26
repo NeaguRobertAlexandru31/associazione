@@ -3,8 +3,8 @@
   <!-- Header -->
   <div class="flex items-center justify-between mb-8">
     <div>
-      <h1 class="font-romania font-extrabold text-primary text-3xl mb-1">Calendario</h1>
-      <p class="font-inter text-on-surface-variant text-sm">Gestisci e visualizza gli eventi.</p>
+      <h1 class="text-2xl font-bold text-[#002068]">Calendario</h1>
+      <p class="text-sm text-[#444653] mt-1">Gestisci e visualizza gli eventi.</p>
     </div>
     <button (click)="openCreate()"
             class="flex items-center gap-2 px-4 py-2.5 bg-primary text-on-primary font-inter font-bold text-sm rounded-xl hover:opacity-90 transition-all">
@@ -23,61 +23,74 @@
       <p class="font-inter text-on-surface-variant text-sm">Nessun evento in programma.</p>
     </div>
   } @else {
-    <div class="bg-surface-container-lowest rounded-2xl shadow-sm overflow-hidden">
+    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
       @for (evt of events(); track evt.id) {
-        <button (click)="openDetail(evt)"
-                class="w-full text-left px-5 py-4 border-b border-outline-variant/10 last:border-0 transition-colors flex items-center gap-4 hover:bg-surface-container/60">
+        <div class="group relative bg-white rounded-2xl shadow-sm border border-outline-variant/10 overflow-hidden cursor-pointer hover:shadow-md hover:-translate-y-0.5 transition-all duration-200"
+             (click)="openDetail(evt)">
 
-          <!-- Date badge -->
-          <div class="w-11 h-11 rounded-xl flex flex-col items-center justify-center flex-shrink-0"
-               [class]="isPast(evt.date) ? 'bg-surface-container' : 'bg-primary/8'">
-            <span class="font-romania font-bold leading-none text-base"
-                  [class]="isPast(evt.date) ? 'text-on-surface-variant' : 'text-primary'">
-              {{ toDate(evt.date).getDate() }}
-            </span>
-            <span class="font-inter text-[9px] uppercase tracking-wide"
-                  [class]="isPast(evt.date) ? 'text-on-surface-variant/60' : 'text-primary'">
-              {{ shortMonth(evt.date) }}
-            </span>
-          </div>
-
-          <div class="flex-1 min-w-0">
-            <div class="flex items-center gap-2 flex-wrap">
-              <span class="font-inter font-semibold text-sm"
-                    [class]="isPast(evt.date) ? 'text-on-surface-variant' : 'text-on-surface'">
-                {{ evt.name }}
-              </span>
-              @if (isPast(evt.date)) {
-                <span class="font-inter text-[10px] text-on-surface-variant bg-surface-container px-2 py-0.5 rounded-full">passato</span>
-              }
-            </div>
-            <p class="font-inter text-xs text-on-surface-variant mt-0.5">
-              {{ evt.time }} · {{ evt.location }}
-            </p>
-          </div>
-
-          <!-- RSVP chips -->
-          @if (statsFor(evt.id); as s) {
-            @if (s.total > 0) {
-              <div class="flex items-center gap-1.5 flex-shrink-0">
-                @if (s.attending > 0) {
-                  <span class="flex items-center gap-1 text-[11px] font-inter font-medium text-primary bg-primary/8 px-2 py-0.5 rounded-full">
-                    <span class="material-symbols-outlined text-xs" style="font-variation-settings:'FILL' 1">check_circle</span>
-                    {{ s.attending }}
-                  </span>
-                }
-                @if (s.interested > 0) {
-                  <span class="flex items-center gap-1 text-[11px] font-inter font-medium text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full">
-                    <span class="material-symbols-outlined text-xs" style="font-variation-settings:'FILL' 1">star</span>
-                    {{ s.interested }}
-                  </span>
-                }
+          <!-- Anteprima -->
+          <div class="relative h-40 overflow-hidden"
+               [class]="isPast(evt.date) ? 'bg-surface-container-high' : 'bg-primary/8'">
+            @if (evt.cover || evt.images.length > 0) {
+              <img [src]="evt.cover ?? evt.images[0]" alt=""
+                   class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                   [class.opacity-60]="isPast(evt.date)" />
+            } @else {
+              <!-- Anteprima stilizzata con data grande -->
+              <div class="w-full h-full flex flex-col items-center justify-center gap-1">
+                <span class="font-romania font-extrabold leading-none text-5xl"
+                      [class]="isPast(evt.date) ? 'text-on-surface-variant/30' : 'text-primary/40'">
+                  {{ toDate(evt.date).getDate() }}
+                </span>
+                <span class="font-inter font-bold text-sm uppercase tracking-widest"
+                      [class]="isPast(evt.date) ? 'text-on-surface-variant/40' : 'text-primary/50'">
+                  {{ shortMonth(evt.date) }}
+                </span>
               </div>
             }
-          }
+            <!-- Sfumatura bassa -->
+            <div class="absolute bottom-0 left-0 right-0 h-10 bg-gradient-to-t from-black/30 to-transparent pointer-events-none"></div>
+            <!-- Badge data (sempre visibile) -->
+            <span class="absolute top-2.5 left-2.5 flex items-center gap-1 font-inter text-[10px] font-bold px-2 py-0.5 rounded-full shadow-sm"
+                  [class]="isPast(evt.date) ? 'bg-surface-container text-on-surface-variant' : 'bg-primary text-on-primary'">
+              <span class="material-symbols-outlined text-[11px]" style="font-variation-settings:'FILL' 1">calendar_today</span>
+              {{ toDate(evt.date).getDate() }} {{ shortMonth(evt.date) }}
+            </span>
+            <!-- Badge passato -->
+            @if (isPast(evt.date)) {
+              <span class="absolute top-2.5 right-2.5 font-inter text-[10px] font-bold px-2 py-0.5 rounded-full bg-surface-container text-on-surface-variant shadow-sm">
+                passato
+              </span>
+            }
+            <!-- RSVP in basso a destra -->
+            @if (statsFor(evt.id); as s) {
+              @if (s.total > 0) {
+                <div class="absolute bottom-2 right-2 flex items-center gap-1">
+                  @if (s.attending > 0) {
+                    <span class="flex items-center gap-0.5 text-[10px] font-inter font-bold text-white bg-black/30 backdrop-blur-sm px-1.5 py-0.5 rounded-full">
+                      <span class="material-symbols-outlined text-[10px]" style="font-variation-settings:'FILL' 1">check_circle</span>
+                      {{ s.attending }}
+                    </span>
+                  }
+                  @if (s.interested > 0) {
+                    <span class="flex items-center gap-0.5 text-[10px] font-inter font-bold text-white bg-black/30 backdrop-blur-sm px-1.5 py-0.5 rounded-full">
+                      <span class="material-symbols-outlined text-[10px]" style="font-variation-settings:'FILL' 1">star</span>
+                      {{ s.interested }}
+                    </span>
+                  }
+                </div>
+              }
+            }
+          </div>
 
-          <span class="material-symbols-outlined text-on-surface-variant/40 text-lg flex-shrink-0">chevron_right</span>
-        </button>
+          <!-- Info -->
+          <div class="p-3">
+            <p class="font-inter font-semibold text-on-surface text-sm leading-tight line-clamp-1 mb-1"
+               [class.text-on-surface-variant]="isPast(evt.date)">{{ evt.name }}</p>
+            <p class="font-inter text-[11px] text-on-surface-variant truncate">{{ evt.time }} · {{ evt.location }}</p>
+          </div>
+
+        </div>
       }
     </div>
   }

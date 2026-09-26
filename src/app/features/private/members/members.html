@@ -1,7 +1,7 @@
 <div class="dash-content">
   <div class="mb-8">
-    <h1 class="font-romania font-extrabold text-primary text-3xl mb-1">Soci</h1>
-    <p class="font-inter text-on-surface-variant text-sm">Direttivo e soci dell'associazione.</p>
+    <h1 class="text-2xl font-bold text-[#002068]">Soci</h1>
+    <p class="text-sm text-[#444653] mt-1">Direttivo e soci dell'associazione.</p>
   </div>
 
   @if (membersLoading()) {
@@ -43,9 +43,9 @@
                     [class]="m.role === 'SUPERADMIN' ? 'bg-primary/10 text-primary' : 'bg-surface-container text-on-surface-variant'">
                 {{ m.role === 'SUPERADMIN' ? 'Presidente' : 'Admin' }}
               </span>
-              @if (m.boardRoles?.length) {
+              @if (m.boardRoles.length) {
                 <span class="flex flex-wrap gap-1 justify-end max-w-[140px]">
-                  @for (r of m.boardRoles!; track r) {
+                  @for (r of m.boardRoles; track r) {
                     <span class="font-inter text-[9px] font-semibold text-on-surface-variant/70 bg-surface-container px-1.5 py-0.5 rounded-full truncate">
                       {{ r === 'vicepresidente' ? 'Vicepres.' :
                          r === 'segretario' ? 'Segretario' :
