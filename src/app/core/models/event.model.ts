@@ -8,6 +8,8 @@ export interface CalendarEvent {
   description?: string;
   images: string[];
   cover?: string;
+  uploadToken?: string | null;
+  uploadUrl?: string | null;
 }
 
 export interface EventRsvp {
@@ -32,4 +34,13 @@ export interface CreateEventDto {
   description?: string;
   images?: string[];
   cover?: string;
+}
+
+export interface EventPhoto {
+  id: string;
+  url: string;
+  approved: boolean;
+  isMember: boolean;
+  uploaderName?: string;
+  createdAt: string;
 }

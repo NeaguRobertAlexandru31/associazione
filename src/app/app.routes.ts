@@ -11,6 +11,7 @@ export const routes: Routes = [
 	{ path: 'news', 			loadComponent: () => import('./features/public/news/news').then(m => m.News) },
 	{ path: 'news/:id', 		loadComponent: () => import('./features/public/news/news-detail/news-detail').then(m => m.NewsDetail) },
 	{ path: 'events', 			loadComponent: () => import('./features/public/events/events').then(m => m.Events) },
+	{ path: 'events/:slug/upload', loadComponent: () => import('./features/public/events/event-photo-upload/event-photo-upload').then(m => m.EventPhotoUpload) },
 	{ path: 'events/:slug', 	loadComponent: () => import('./features/public/events/event-detail/event-detail').then(m => m.EventDetail) },
 	{ path: 'donations', 		loadComponent: () => import('./features/public/donations/donations').then(m => m.Donations) },
 	{ path: 'contacts', 		loadComponent: () => import('./features/public/contacts/contacts').then(m => m.Contacts) },

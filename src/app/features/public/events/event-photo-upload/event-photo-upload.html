@@ -1,0 +1,244 @@
+<!-- Loading -->
+@if (pageState() === 'loading') {
+  <div class="min-h-screen flex items-center justify-center bg-surface">
+    <span class="material-symbols-outlined text-primary text-5xl spin">progress_activity</span>
+  </div>
+}
+
+<!-- Token non valido / scaduto -->
+@if (pageState() === 'invalid-token') {
+  <div class="min-h-screen flex flex-col items-center justify-center bg-surface px-6 text-center gap-5">
+    <div class="w-16 h-16 rounded-full bg-red-50 flex items-center justify-center">
+      <span class="material-symbols-outlined text-red-500 text-3xl">link_off</span>
+    </div>
+    <h1 class="font-romania font-extrabold text-primary text-2xl">Link non valido</h1>
+    <p class="font-inter text-on-surface-variant text-sm max-w-xs">
+      Questo link è scaduto o non è valido. Chiedi agli organizzatori un nuovo codice.
+    </p>
+  </div>
+}
+
+<!-- Limite raggiunto -->
+@if (pageState() === 'limit-reached') {
+  <div class="min-h-screen flex flex-col items-center justify-center bg-surface px-6 text-center gap-5">
+    <div class="w-16 h-16 rounded-full bg-amber-50 flex items-center justify-center">
+      <span class="material-symbols-outlined text-amber-500 text-3xl">photo_library</span>
+    </div>
+    <h1 class="font-romania font-extrabold text-primary text-2xl">Limite raggiunto</h1>
+    <p class="font-inter text-on-surface-variant text-sm max-w-xs">
+      Hai già inviato il numero massimo di foto per questo evento. Grazie!
+    </p>
+  </div>
+}
+
+<!-- Schermata identificazione -->
+@if (pageState() === 'identify' && event(); as ev) {
+  <div class="min-h-screen bg-surface flex flex-col">
+
+    <div class="bg-primary/5 border-b border-outline-variant/20 px-5 pt-10 pb-6">
+      <div class="flex items-center gap-2 mb-3">
+        <span class="material-symbols-outlined text-primary text-base" style="font-variation-settings:'FILL' 1">photo_camera</span>
+        <span class="font-inter text-xs text-primary font-semibold uppercase tracking-wider">Condividi le tue foto</span>
+      </div>
+      <h1 class="font-romania font-extrabold text-on-surface text-xl leading-tight mb-1">{{ ev.name }}</h1>
+      <p class="font-inter text-xs text-on-surface-variant capitalize">{{ formatDate(ev.date) }} · {{ ev.location }}</p>
+    </div>
+
+    <div class="px-5 py-8 flex flex-col gap-5">
+      <div>
+        <h2 class="font-romania font-bold text-on-surface text-lg mb-1">Chi sei?</h2>
+        <p class="font-inter text-sm text-on-surface-variant">Inserisci i tuoi dati per caricare le foto.</p>
+      </div>
+
+      <div class="flex flex-col gap-3">
+        <div class="flex flex-col gap-1.5">
+          <label class="font-inter text-sm font-medium text-on-surface">Nome e cognome</label>
+          <input type="text" [(ngModel)]="uploaderName" placeholder="Mario Rossi"
+                 class="w-full px-4 py-3 rounded-xl border border-outline-variant bg-surface font-inter text-sm text-on-surface placeholder:text-on-surface-variant/50 focus:outline-none focus:ring-2 focus:ring-primary/40" />
+        </div>
+
+        <div class="flex flex-col gap-1.5">
+          <label class="font-inter text-sm font-medium text-on-surface">
+            Email <span class="font-normal text-on-surface-variant/60">(opzionale — per il badge socio)</span>
+          </label>
+          <input type="email" [(ngModel)]="uploaderEmail" placeholder="mario@email.com"
+                 class="w-full px-4 py-3 rounded-xl border border-outline-variant bg-surface font-inter text-sm text-on-surface placeholder:text-on-surface-variant/50 focus:outline-none focus:ring-2 focus:ring-primary/40" />
+        </div>
+
+        @if (identifyError()) {
+          <p class="font-inter text-sm text-red-600 flex items-center gap-1.5">
+            <span class="material-symbols-outlined text-base">error</span>
+            {{ identifyError() }}
+          </p>
+        }
+
+        <button (click)="confirmIdentity()"
+                class="w-full py-3.5 rounded-2xl bg-primary text-white font-inter font-semibold text-base transition-opacity flex items-center justify-center gap-2">
+          <span class="material-symbols-outlined text-base">arrow_forward</span>
+          Continua
+        </button>
+      </div>
+
+      <p class="font-inter text-xs text-on-surface-variant/60 text-center">
+        Solo il nome è obbligatorio. L'email serve solo per il badge socio.
+      </p>
+    </div>
+  </div>
+}
+
+<!-- Pagina upload -->
+@if ((pageState() === 'ready' || pageState() === 'done') && event(); as ev) {
+  <div class="min-h-screen bg-surface flex flex-col">
+
+    <!-- Header evento -->
+    <div class="bg-primary/5 border-b border-outline-variant/20 px-5 pt-10 pb-6">
+      <div class="flex items-center gap-2 mb-3">
+        <span class="material-symbols-outlined text-primary text-base" style="font-variation-settings:'FILL' 1">photo_camera</span>
+        <span class="font-inter text-xs text-primary font-semibold uppercase tracking-wider">Condividi le tue foto</span>
+      </div>
+      <h1 class="font-romania font-extrabold text-on-surface text-xl leading-tight mb-1">{{ ev.name }}</h1>
+      <p class="font-inter text-xs text-on-surface-variant capitalize">{{ formatDate(ev.date) }} · {{ ev.location }}</p>
+      <p class="font-inter text-xs text-primary font-medium mt-2">Ciao, {{ uploaderName() }}</p>
+    </div>
+
+    <!-- Body -->
+    <div class="px-5 py-6 flex flex-col gap-6">
+
+      <!-- Successo invio -->
+      @if (pageState() === 'done') {
+        <div class="flex items-center gap-3 bg-green-50 rounded-2xl px-4 py-3.5">
+          <span class="material-symbols-outlined text-green-500 text-xl flex-shrink-0" style="font-variation-settings:'FILL' 1">check_circle</span>
+          <p class="font-inter text-sm font-semibold text-green-800">Foto caricate con successo!</p>
+        </div>
+      }
+
+      <!-- Selezione foto -->
+      @if (pageState() === 'ready') {
+        <label class="flex flex-col items-center justify-center gap-3 rounded-2xl border-2 border-dashed border-primary/30 bg-primary/3 p-8 cursor-pointer active:bg-primary/8 transition-colors">
+          <span class="material-symbols-outlined text-primary/60 text-4xl">add_photo_alternate</span>
+          <span class="font-inter text-sm font-semibold text-primary">Scegli o scatta foto</span>
+          <span class="font-inter text-xs text-on-surface-variant">Puoi selezionarne fino a 10</span>
+          <input type="file" accept="image/*" multiple
+                 class="sr-only" (change)="onFilesSelected($event)" />
+        </label>
+
+        <!-- Anteprima foto selezionate -->
+        @if (previews().length > 0) {
+          <div>
+            <h2 class="font-romania font-bold text-primary text-lg mb-3">Selezionate</h2>
+            <div class="grid grid-cols-3 gap-2">
+              @for (p of previews(); track p.objectUrl; let i = $index) {
+                <div class="relative aspect-square rounded-2xl overflow-hidden bg-surface-container">
+                  <button class="w-full h-full" (click)="openLightbox(previews().map(x => x.objectUrl), i)">
+                    <img [src]="p.objectUrl" alt="anteprima" class="w-full h-full object-cover" />
+                  </button>
+
+                  @if (p.state === 'uploading') {
+                    <div class="absolute inset-0 bg-black/40 flex items-center justify-center pointer-events-none">
+                      <span class="material-symbols-outlined text-white text-xl spin">progress_activity</span>
+                    </div>
+                  }
+                  @if (p.state === 'error') {
+                    <div class="absolute inset-0 bg-red-900/40 flex items-center justify-center pointer-events-none">
+                      <span class="material-symbols-outlined text-white text-xl">error</span>
+                    </div>
+                  }
+
+                  @if (p.state === 'pending') {
+                    <button (click)="removePhoto(p)"
+                            class="absolute top-1 right-1 w-6 h-6 rounded-full bg-black/50 flex items-center justify-center">
+                      <span class="material-symbols-outlined text-white" style="font-size:14px">close</span>
+                    </button>
+                  }
+                </div>
+              }
+            </div>
+          </div>
+
+          @if (errorMsg()) {
+            <div class="flex items-center gap-2 text-sm font-inter text-red-700 bg-red-50 rounded-xl px-4 py-3">
+              <span class="material-symbols-outlined text-base">error</span>
+              {{ errorMsg() }}
+            </div>
+          }
+
+          <button (click)="send()"
+                  [disabled]="sending() || pendingCount() === 0"
+                  class="w-full py-3.5 rounded-2xl bg-primary text-white font-inter font-semibold text-base disabled:opacity-50 transition-opacity flex items-center justify-center gap-2">
+            @if (sending()) {
+              <span class="material-symbols-outlined text-base spin">progress_activity</span>
+              Invio in corso...
+            } @else {
+              <span class="material-symbols-outlined text-base">upload</span>
+              Invia {{ pendingCount() }} {{ pendingCount() === 1 ? 'foto' : 'foto' }}
+            }
+          </button>
+        }
+      }
+
+      <!-- Galleria foto già caricate -->
+      @if (existingPhotos().length > 0) {
+        <div>
+          <h2 class="font-romania font-bold text-primary text-lg mb-3">Galleria dell'evento</h2>
+          <div class="grid grid-cols-2 gap-3">
+            @for (photo of existingPhotos(); track photo.id; let i = $index) {
+              <div class="relative">
+                <button (click)="openLightbox(existingPhotos().map(p => p.url), i)"
+                        class="w-full aspect-square rounded-2xl overflow-hidden bg-surface-container hover:opacity-90 transition-opacity focus:outline-none focus:ring-2 focus:ring-primary/40">
+                  <img [src]="photo.url" [alt]="ev.name" class="w-full h-full object-cover" />
+                </button>
+                @if (photo.isMember) {
+                  <div class="absolute top-2 left-2 flex items-center gap-1 bg-primary text-white rounded-full px-2 py-0.5 shadow">
+                    <span class="material-symbols-outlined text-white" style="font-size:12px;font-variation-settings:'FILL' 1">verified</span>
+                    <span class="font-inter text-[10px] font-semibold">Socio</span>
+                  </div>
+                }
+                @if (photo.uploaderName) {
+                  <p class="font-inter text-[10px] text-on-surface-variant truncate mt-1 px-1">{{ photo.uploaderName }}</p>
+                }
+              </div>
+            }
+          </div>
+        </div>
+      }
+
+      <p class="font-inter text-xs text-on-surface-variant/60 text-center pb-4">
+        Le foto vengono pubblicate con watermark © A.C.R.
+      </p>
+    </div>
+  </div>
+}
+
+<!-- Lightbox -->
+@if (lightboxIndex() !== null && lightboxUrls().length > 0) {
+  <div class="fixed inset-0 z-50 bg-black/90 flex items-center justify-center"
+       (click)="closeLightbox()">
+
+    <button (click)="closeLightbox()"
+            class="absolute top-4 right-4 w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-white hover:bg-white/20 transition-colors z-10">
+      <span class="material-symbols-outlined">close</span>
+    </button>
+
+    <span class="absolute top-4 left-1/2 -translate-x-1/2 font-inter text-white/60 text-sm z-10">
+      {{ lightboxIndex()! + 1 }} / {{ lightboxUrls().length }}
+    </span>
+
+    @if (lightboxUrls().length > 1) {
+      <button (click)="$event.stopPropagation(); prevLightbox()"
+              class="absolute left-4 w-11 h-11 rounded-full bg-white/10 flex items-center justify-center text-white hover:bg-white/25 transition-colors z-10">
+        <span class="material-symbols-outlined">chevron_left</span>
+      </button>
+    }
+
+    <img [src]="lightboxUrls()[lightboxIndex()!]" alt="foto"
+         class="max-w-[calc(100%-8rem)] max-h-[calc(100vh-4rem)] rounded-2xl object-contain"
+         (click)="$event.stopPropagation()" />
+
+    @if (lightboxUrls().length > 1) {
+      <button (click)="$event.stopPropagation(); nextLightbox()"
+              class="absolute right-4 w-11 h-11 rounded-full bg-white/10 flex items-center justify-center text-white hover:bg-white/25 transition-colors z-10">
+        <span class="material-symbols-outlined">chevron_right</span>
+      </button>
+    }
+  </div>
+}

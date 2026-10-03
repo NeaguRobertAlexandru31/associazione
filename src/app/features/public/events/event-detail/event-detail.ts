@@ -1,7 +1,7 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, RouterLink } from '@angular/router';
-import { CalendarEvent } from '../../../../core/models/event.model';
+import { CalendarEvent, EventPhoto } from '../../../../core/models/event.model';
 import { EventsService } from '../../../../core/services/events/events';
 import { environment } from '../../../../../environments/environment';
 
@@ -29,7 +29,11 @@ export class EventDetail implements OnInit {
   rsvpEmail     = signal('');
   rsvpSending   = signal(false);
 
-  rsvpStats = signal<{ attending: number; interested: number; total: number } | null>(null);
+  rsvpStats              = signal<{ attending: number; interested: number; total: number } | null>(null);
+  participantPhotos      = signal<EventPhoto[]>([]);
+  participantLightboxIndex = signal<number | null>(null);
+  uploadUrl              = signal<string | null>(null);
+  shareLinkCopied        = signal(false);
 
   ngOnInit(): void {
     const slug = this.route.snapshot.paramMap.get('slug')!;
@@ -38,8 +42,36 @@ export class EventDetail implements OnInit {
         this.event.set(ev);
         this.loading.set(false);
         this.svc.getRsvpStats(ev.id).subscribe({ next: s => this.rsvpStats.set(s), error: () => {} });
+        this.svc.getPublicPhotos(slug).subscribe({ next: photos => this.participantPhotos.set(photos), error: () => {} });
+        this.svc.getShareLink(slug).subscribe({
+          next: ({ uploadUrl }) => {
+            const fullUrl = `${window.location.origin}${uploadUrl}`;
+            this.uploadUrl.set(fullUrl);
+          },
+          error: () => {},
+        });
       },
       error: () => { this.notFound.set(true); this.loading.set(false); },
+    });
+  }
+
+  openParticipantLightbox(index: number): void  { this.participantLightboxIndex.set(index); }
+  closeParticipantLightbox(): void              { this.participantLightboxIndex.set(null); }
+  prevParticipant(): void {
+    const len = this.participantPhotos().length;
+    this.participantLightboxIndex.update(i => i !== null ? (i - 1 + len) % len : 0);
+  }
+  nextParticipant(): void {
+    const len = this.participantPhotos().length;
+    this.participantLightboxIndex.update(i => i !== null ? (i + 1) % len : 0);
+  }
+
+  copyShareLink(): void {
+    const url = this.uploadUrl();
+    if (!url) return;
+    navigator.clipboard.writeText(url).then(() => {
+      this.shareLinkCopied.set(true);
+      setTimeout(() => this.shareLinkCopied.set(false), 2000);
     });
   }
 
@@ -129,6 +161,10 @@ export class EventDetail implements OnInit {
     return new Date(iso).toLocaleDateString('it-IT', {
       weekday: 'long', day: 'numeric', month: 'long', year: 'numeric',
     });
+  }
+
+  formatDayNumber(iso: string): number {
+    return new Date(iso).getDate();
   }
 
   private toGCalDate(dateIso: string, time: string, addHours = 0): string {

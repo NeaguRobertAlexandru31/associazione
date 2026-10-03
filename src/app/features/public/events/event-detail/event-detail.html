@@ -140,6 +140,34 @@
             }
           </div>
         }
+
+        @if (participantPhotos().length > 0) {
+          <div class="mt-10">
+            <div class="flex items-center gap-2 mb-4">
+              <span class="material-symbols-outlined text-primary text-xl" style="font-variation-settings:'FILL' 1">photo_camera</span>
+              <h2 class="font-romania font-bold text-primary text-xl">Foto dei partecipanti</h2>
+            </div>
+            <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
+              @for (photo of participantPhotos(); track photo.id; let i = $index) {
+                <div class="relative">
+                  <button (click)="openParticipantLightbox(i)"
+                          class="w-full aspect-square rounded-2xl overflow-hidden bg-surface-container hover:opacity-90 transition-opacity focus:outline-none focus:ring-2 focus:ring-primary/40">
+                    <img [src]="photo.url" [alt]="ev.name" class="w-full h-full object-cover" />
+                  </button>
+                  @if (photo.isMember) {
+                    <div class="absolute top-2 left-2 flex items-center gap-1 bg-primary text-white rounded-full px-2 py-0.5 shadow">
+                      <span class="material-symbols-outlined text-white" style="font-size:12px;font-variation-settings:'FILL' 1">verified</span>
+                      <span class="font-inter text-[10px] font-semibold">Socio</span>
+                    </div>
+                  }
+                  @if (photo.uploaderName) {
+                    <p class="font-inter text-[10px] text-on-surface-variant truncate mt-1 px-1">{{ photo.uploaderName }}</p>
+                  }
+                </div>
+              }
+            </div>
+          </div>
+        }
       </div>
 
       <!-- Right: info card -->
@@ -180,19 +208,50 @@
           <p class="font-inter text-xs text-on-surface-variant uppercase tracking-wider font-semibold mb-1">Aggiungi al calendario</p>
 
           <a [href]="googleCalendarUrl(ev)" target="_blank" rel="noopener"
-             class="flex items-center gap-2.5 w-full py-2.5 px-4 rounded-xl bg-[#4285F4] text-white font-inter font-semibold text-sm hover:bg-[#3367d6] transition-colors">
-            <svg class="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/>
+             class="flex items-center gap-2.5 w-full py-2.5 px-4 rounded-xl bg-white border border-[#dadce0] font-inter font-semibold text-sm text-[#3c4043] hover:bg-[#f8f9fa] hover:shadow-sm transition-all">
+            <!-- Google Calendar official logo -->
+            <svg class="w-[18px] h-[18px] flex-shrink-0" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+              <rect x="6" y="6" width="36" height="36" rx="3" fill="white" stroke="#dadce0" stroke-width="2"/>
+              <rect x="6" y="6" width="36" height="10" rx="3" fill="#4285F4"/>
+              <rect x="6" y="13" width="36" height="3" fill="#4285F4"/>
+              <text x="24" y="34" text-anchor="middle" font-family="Arial,sans-serif" font-size="14" font-weight="bold" fill="#4285F4">{{ formatDayNumber(ev.date) }}</text>
+              <line x1="14" y1="6" x2="14" y2="18" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+              <line x1="34" y1="6" x2="34" y2="18" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
             </svg>
             Google Calendar
           </a>
 
           <button (click)="downloadIcs(ev)"
-                  class="flex items-center gap-2.5 w-full py-2.5 px-4 rounded-xl border border-outline-variant font-inter font-semibold text-sm text-on-surface hover:bg-surface-container transition-colors">
-            <span class="material-symbols-outlined text-base">calendar_add_on</span>
+                  class="flex items-center gap-2.5 w-full py-2.5 px-4 rounded-xl border border-[#dadce0] font-inter font-semibold text-sm text-[#3c4043] hover:bg-[#f8f9fa] hover:shadow-sm transition-all">
+            <!-- Apple Calendar logo -->
+            <svg class="w-[18px] h-[18px] flex-shrink-0" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+              <rect x="4" y="8" width="40" height="36" rx="5" fill="white" stroke="#dadce0" stroke-width="2"/>
+              <rect x="4" y="8" width="40" height="12" rx="5" fill="#FA3E3E"/>
+              <rect x="4" y="17" width="40" height="3" fill="#FA3E3E"/>
+              <line x1="14" y1="6" x2="14" y2="16" stroke="#555" stroke-width="2.5" stroke-linecap="round"/>
+              <line x1="34" y1="6" x2="34" y2="16" stroke="#555" stroke-width="2.5" stroke-linecap="round"/>
+              <text x="24" y="37" text-anchor="middle" font-family="Arial,sans-serif" font-size="13" font-weight="bold" fill="#1a1a1a">{{ formatDayNumber(ev.date) }}</text>
+            </svg>
             Apple / Outlook (.ics)
           </button>
         </div>
+
+        @if (uploadUrl()) {
+          <div class="border-t border-outline-variant/20 pt-4 flex flex-col gap-2">
+            <p class="font-inter text-xs text-on-surface-variant uppercase tracking-wider font-semibold mb-1">Condividi le tue foto</p>
+            <div class="flex gap-2">
+              <a [href]="uploadUrl()" target="_blank" rel="noopener"
+                 class="flex items-center gap-2.5 flex-1 py-2.5 px-4 rounded-xl border border-outline-variant/40 font-inter font-semibold text-sm text-on-surface hover:bg-surface-container transition-all">
+                <span class="material-symbols-outlined text-base text-primary" style="font-variation-settings:'FILL' 1">photo_camera</span>
+                <span class="flex-1 text-left">Carica le tue foto</span>
+              </a>
+              <button (click)="copyShareLink()"
+                      class="flex items-center justify-center w-10 h-10 rounded-xl border border-outline-variant/40 text-on-surface-variant hover:bg-surface-container transition-all flex-shrink-0">
+                <span class="material-symbols-outlined text-base">{{ shareLinkCopied() ? 'check' : 'content_copy' }}</span>
+              </button>
+            </div>
+          </div>
+        }
 
         <div class="pt-1">
           <a routerLink="/events"
@@ -240,6 +299,41 @@
     <!-- Next -->
     @if (ev.images.length > 1) {
       <button (click)="$event.stopPropagation(); next(ev.images)"
+              class="absolute right-4 w-11 h-11 rounded-full bg-white/10 flex items-center justify-center text-white hover:bg-white/25 transition-colors z-10">
+        <span class="material-symbols-outlined">chevron_right</span>
+      </button>
+    }
+
+  </div>
+}
+
+<!-- Lightbox foto partecipanti -->
+@if (participantLightboxIndex() !== null) {
+  <div class="fixed inset-0 z-50 bg-black/90 flex items-center justify-center"
+       (click)="closeParticipantLightbox()">
+
+    <button (click)="closeParticipantLightbox()"
+            class="absolute top-4 right-4 w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-white hover:bg-white/20 transition-colors z-10">
+      <span class="material-symbols-outlined">close</span>
+    </button>
+
+    <span class="absolute top-4 left-1/2 -translate-x-1/2 font-inter text-white/60 text-sm z-10">
+      {{ participantLightboxIndex()! + 1 }} / {{ participantPhotos().length }}
+    </span>
+
+    @if (participantPhotos().length > 1) {
+      <button (click)="$event.stopPropagation(); prevParticipant()"
+              class="absolute left-4 w-11 h-11 rounded-full bg-white/10 flex items-center justify-center text-white hover:bg-white/25 transition-colors z-10">
+        <span class="material-symbols-outlined">chevron_left</span>
+      </button>
+    }
+
+    <img [src]="participantPhotos()[participantLightboxIndex()!].url" alt="Foto partecipante"
+         class="max-w-[calc(100%-8rem)] max-h-[calc(100vh-4rem)] rounded-2xl object-contain"
+         (click)="$event.stopPropagation()" />
+
+    @if (participantPhotos().length > 1) {
+      <button (click)="$event.stopPropagation(); nextParticipant()"
               class="absolute right-4 w-11 h-11 rounded-full bg-white/10 flex items-center justify-center text-white hover:bg-white/25 transition-colors z-10">
         <span class="material-symbols-outlined">chevron_right</span>
       </button>
