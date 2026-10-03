@@ -1,0 +1,66 @@
+<div class="min-h-[80vh] flex items-center justify-center px-6">
+  <div class="w-full max-w-md">
+
+    <!-- Confirm -->
+    @if (step() === 'confirm') {
+      <div class="bg-surface-container-lowest rounded-2xl shadow-sm p-8 text-center">
+        <div class="w-16 h-16 rounded-full bg-amber-100 flex items-center justify-center mx-auto mb-5">
+          <span class="material-symbols-outlined text-amber-600 text-3xl" style="font-variation-settings:'FILL' 1">event_busy</span>
+        </div>
+        <h1 class="font-romania font-extrabold text-primary text-2xl mb-2">Annulla prenotazione</h1>
+        <p class="font-inter text-on-surface-variant text-sm mb-8">
+          Sei sicuro di voler annullare la tua prenotazione?<br>
+          Se ci sono persone in lista d'attesa, il posto verrà automaticamente offerto a loro.
+        </p>
+        <div class="flex flex-col gap-3">
+          <button (click)="confirm()" [disabled]="sending()"
+                  class="w-full py-3 rounded-xl bg-red-600 text-white font-inter font-semibold text-sm hover:bg-red-700 disabled:opacity-50 transition-colors">
+            {{ sending() ? 'Annullamento...' : 'Sì, annulla prenotazione' }}
+          </button>
+          <a routerLink="/events"
+             class="w-full py-3 rounded-xl border border-outline-variant font-inter font-semibold text-sm text-on-surface hover:bg-surface-container transition-colors text-center block">
+            No, torna agli eventi
+          </a>
+        </div>
+      </div>
+    }
+
+    <!-- Success -->
+    @if (step() === 'success') {
+      <div class="bg-surface-container-lowest rounded-2xl shadow-sm p-8 text-center">
+        <div class="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-5">
+          <span class="material-symbols-outlined text-green-600 text-3xl" style="font-variation-settings:'FILL' 1">check_circle</span>
+        </div>
+        <h1 class="font-romania font-extrabold text-primary text-2xl mb-2">Prenotazione annullata</h1>
+        <p class="font-inter text-on-surface-variant text-sm mb-8">
+          La tua prenotazione è stata annullata con successo.
+          Se il primo in lista d'attesa verrà promosso, riceverà una notifica via email.
+        </p>
+        <a routerLink="/events"
+           class="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-primary text-white font-inter font-semibold text-sm hover:bg-primary/90 transition-colors">
+          <span class="material-symbols-outlined text-base">arrow_back</span>
+          Vai agli eventi
+        </a>
+      </div>
+    }
+
+    <!-- Error -->
+    @if (step() === 'error') {
+      <div class="bg-surface-container-lowest rounded-2xl shadow-sm p-8 text-center">
+        <div class="w-16 h-16 rounded-full bg-red-100 flex items-center justify-center mx-auto mb-5">
+          <span class="material-symbols-outlined text-red-600 text-3xl">error</span>
+        </div>
+        <h1 class="font-romania font-extrabold text-primary text-2xl mb-2">Link non valido</h1>
+        <p class="font-inter text-on-surface-variant text-sm mb-8">
+          Il link di annullamento non è valido o la prenotazione è già stata annullata.
+        </p>
+        <a routerLink="/events"
+           class="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-primary text-white font-inter font-semibold text-sm hover:bg-primary/90 transition-colors">
+          <span class="material-symbols-outlined text-base">arrow_back</span>
+          Vai agli eventi
+        </a>
+      </div>
+    }
+
+  </div>
+</div>

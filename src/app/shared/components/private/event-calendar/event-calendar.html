@@ -150,14 +150,26 @@
         </button>
         <button (click)="switchTab('photos')"
                 [class]="detailTab() === 'photos'
-                  ? 'font-inter font-semibold text-sm text-primary border-b-2 border-primary pb-3 pt-3 flex items-center gap-1.5'
-                  : 'font-inter text-sm text-on-surface-variant pb-3 pt-3 flex items-center gap-1.5 hover:text-on-surface transition-colors'">
+                  ? 'font-inter font-semibold text-sm text-primary border-b-2 border-primary pb-3 pt-3 mr-6 flex items-center gap-1.5'
+                  : 'font-inter text-sm text-on-surface-variant pb-3 pt-3 mr-6 flex items-center gap-1.5 hover:text-on-surface transition-colors'">
           <span class="material-symbols-outlined text-sm">photo_camera</span>
           Foto
           @if (pendingPhotos().length > 0) {
             <span class="text-[10px] font-inter font-bold bg-amber-500 text-white rounded-full px-1.5 py-0.5 leading-none">{{ pendingPhotos().length }}</span>
           }
         </button>
+        @if (evt.hasCapacity) {
+          <button (click)="switchTab('bookings')"
+                  [class]="detailTab() === 'bookings'
+                    ? 'font-inter font-semibold text-sm text-primary border-b-2 border-primary pb-3 pt-3 flex items-center gap-1.5'
+                    : 'font-inter text-sm text-on-surface-variant pb-3 pt-3 flex items-center gap-1.5 hover:text-on-surface transition-colors'">
+            <span class="material-symbols-outlined text-sm">confirmation_number</span>
+            Prenotazioni
+            @if (confirmedBookings().length > 0) {
+              <span class="text-[10px] font-inter font-bold bg-primary text-white rounded-full px-1.5 py-0.5 leading-none">{{ confirmedBookings().length }}</span>
+            }
+          </button>
+        }
       </div>
 
       <!-- Body -->
@@ -397,6 +409,90 @@
 
         }
 
+        <!-- Tab Prenotazioni -->
+        @if (detailTab() === 'bookings') {
+          @if (bookingsLoading()) {
+            <div class="flex items-center justify-center py-8">
+              <span class="material-symbols-outlined text-primary text-3xl spin">progress_activity</span>
+            </div>
+          } @else {
+            <!-- Riepilogo posti -->
+            <div class="grid grid-cols-3 gap-3">
+              <div class="bg-surface-container rounded-xl p-3 text-center">
+                <p class="font-inter text-2xl font-bold text-primary">{{ bookingsCapacity() }}</p>
+                <p class="font-inter text-xs text-on-surface-variant">Totale</p>
+              </div>
+              <div class="bg-green-50 rounded-xl p-3 text-center">
+                <p class="font-inter text-2xl font-bold text-green-700">{{ bookingsAvailable() }}</p>
+                <p class="font-inter text-xs text-green-600">Disponibili</p>
+              </div>
+              <div class="bg-amber-50 rounded-xl p-3 text-center">
+                <p class="font-inter text-2xl font-bold text-amber-700">{{ waitlistBookings().length }}</p>
+                <p class="font-inter text-xs text-amber-600">In attesa</p>
+              </div>
+            </div>
+
+            <!-- Prenotazioni confermate -->
+            @if (confirmedBookings().length > 0) {
+              <div>
+                <p class="font-inter font-semibold text-xs text-green-600 uppercase tracking-wider mb-2 flex items-center gap-1">
+                  <span class="material-symbols-outlined text-xs" style="font-variation-settings:'FILL' 1">check_circle</span>
+                  CONFERMATE ({{ bookingsOccupied() }} posti)
+                </p>
+                <div class="flex flex-col gap-2">
+                  @for (b of confirmedBookings(); track b.id) {
+                    <div class="flex items-center gap-3 bg-surface-container rounded-xl px-3 py-2.5">
+                      <div class="flex-1 min-w-0">
+                        <p class="font-inter font-semibold text-sm text-on-surface truncate">{{ b.name }}</p>
+                        <p class="font-inter text-xs text-on-surface-variant truncate">{{ b.email }}{{ b.phone ? ' · ' + b.phone : '' }}</p>
+                      </div>
+                      <span class="font-inter text-sm font-bold text-primary flex-shrink-0">{{ b.seats }} {{ b.seats === 1 ? 'posto' : 'posti' }}</span>
+                    </div>
+                  }
+                </div>
+              </div>
+            }
+
+            <!-- Lista d'attesa -->
+            @if (waitlistBookings().length > 0) {
+              <div>
+                <p class="font-inter font-semibold text-xs text-amber-600 uppercase tracking-wider mb-2 flex items-center gap-1">
+                  <span class="material-symbols-outlined text-xs">schedule</span>
+                  LISTA D'ATTESA
+                </p>
+                <div class="flex flex-col gap-2">
+                  @for (b of waitlistBookings(); track b.id) {
+                    <div class="flex items-center gap-3 bg-amber-50 rounded-xl px-3 py-2.5">
+                      <span class="font-inter text-lg font-bold text-amber-600 w-6 text-center flex-shrink-0">#{{ b.position }}</span>
+                      <div class="flex-1 min-w-0">
+                        <p class="font-inter font-semibold text-sm text-on-surface truncate">{{ b.name }}</p>
+                        <p class="font-inter text-xs text-on-surface-variant truncate">{{ b.email }}</p>
+                      </div>
+                      <span class="font-inter text-sm font-bold text-amber-700 flex-shrink-0">{{ b.seats }} {{ b.seats === 1 ? 'posto' : 'posti' }}</span>
+                    </div>
+                  }
+                </div>
+              </div>
+            }
+
+            @if (bookings().length === 0) {
+              <div class="flex flex-col items-center gap-3 py-8 text-center">
+                <span class="material-symbols-outlined text-on-surface-variant/30 text-4xl">confirmation_number</span>
+                <p class="font-inter text-sm text-on-surface-variant">Nessuna prenotazione ancora.</p>
+              </div>
+            }
+
+            <!-- Verifica biglietto -->
+            <div class="border-t border-outline-variant/20 pt-4 mt-2">
+              <button (click)="showScanner.set(true)"
+                      class="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl border border-primary text-primary font-inter font-semibold text-sm hover:bg-primary/5 transition-colors">
+                <span class="material-symbols-outlined text-base">qr_code_scanner</span>
+                Verifica biglietto con QR
+              </button>
+            </div>
+          }
+        }
+
       </div>
     </div>
   </div>
@@ -450,6 +546,24 @@
           <label class="font-inter font-semibold text-xs text-on-surface-variant uppercase tracking-wider">Descrizione</label>
           <textarea [(ngModel)]="form.description" rows="3" placeholder="Opzionale"
                     class="w-full px-3 py-2.5 rounded-xl bg-surface-container border border-outline-variant/30 font-inter text-sm text-on-surface placeholder:text-on-surface-variant/50 outline-none focus:ring-2 focus:ring-primary/30 transition-all resize-none"></textarea>
+        </div>
+
+        <!-- Posti limitati -->
+        <div class="flex flex-col gap-2">
+          <label class="font-inter font-semibold text-xs text-on-surface-variant uppercase tracking-wider">Posti</label>
+          <label class="flex items-center gap-3 cursor-pointer">
+            <div (click)="form.hasCapacity = !form.hasCapacity"
+                 class="relative w-10 h-6 rounded-full transition-colors"
+                 [class]="form.hasCapacity ? 'bg-primary' : 'bg-outline-variant'">
+              <div class="absolute top-1 w-4 h-4 rounded-full bg-white shadow transition-transform"
+                   [class]="form.hasCapacity ? 'translate-x-5' : 'translate-x-1'"></div>
+            </div>
+            <span class="font-inter text-sm text-on-surface">Evento a posti limitati</span>
+          </label>
+          @if (form.hasCapacity) {
+            <input [(ngModel)]="form.capacity" type="number" min="1" placeholder="Numero di posti"
+                   class="w-full px-3 py-2.5 rounded-xl bg-surface-container border border-outline-variant/30 font-inter text-sm text-on-surface outline-none focus:ring-2 focus:ring-primary/30 transition-all" />
+          }
         </div>
 
         <div class="flex flex-col gap-2">
@@ -541,4 +655,9 @@
       </div>
     </div>
   </div>
+}
+
+<!-- Scanner verifica biglietto -->
+@if (showScanner()) {
+  <app-booking-scanner (close)="showScanner.set(false)"></app-booking-scanner>
 }

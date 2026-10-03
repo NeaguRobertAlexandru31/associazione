@@ -2,7 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../../environments/environment';
-import { CalendarEvent, CreateEventDto, EventPhoto, EventRsvp, RsvpStats } from '../../models/event.model';
+import { Booking, BookingAvailability, CalendarEvent, CreateEventDto, EventPhoto, EventRsvp, RsvpStats } from '../../models/event.model';
 
 @Injectable({ providedIn: 'root' })
 export class EventsService {
@@ -76,5 +76,37 @@ export class EventsService {
 
   getShareLink(slug: string): Observable<{ token: string; uploadUrl: string }> {
     return this.http.get<{ token: string; uploadUrl: string }>(`${environment.apiUrl}/events/${slug}/photos/share-link`);
+  }
+
+  getAvailability(slug: string): Observable<BookingAvailability> {
+    return this.http.get<BookingAvailability>(`${environment.apiUrl}/events/${slug}/availability`);
+  }
+
+  book(slug: string, dto: { name: string; email: string; phone?: string; seats: number }): Observable<{ status: 'confirmed' | 'waitlist'; position?: number; bookingId: string }> {
+    return this.http.post<{ status: 'confirmed' | 'waitlist'; position?: number; bookingId: string }>(`${environment.apiUrl}/events/${slug}/book`, dto);
+  }
+
+  getBookingsAdmin(slug: string): Observable<{ bookings: Booking[]; capacity: number; occupied: number; available: number }> {
+    return this.http.get<{ bookings: Booking[]; capacity: number; occupied: number; available: number }>(`${environment.apiUrl}/events/${slug}/bookings`);
+  }
+
+  cancelBooking(cancelToken: string): Observable<void> {
+    return this.http.delete<void>(`${environment.apiUrl}/bookings/cancel/${cancelToken}`);
+  }
+
+  verifyBooking(bookingId: string): Observable<{
+    valid: boolean;
+    id: string;
+    name: string;
+    email: string;
+    seats: number;
+    status: string;
+    eventName: string;
+    eventDate: string;
+    eventTime: string;
+    eventLocation: string;
+    createdAt: string;
+  }> {
+    return this.http.get<any>(`${environment.apiUrl}/bookings/verify/${bookingId}`);
   }
 }

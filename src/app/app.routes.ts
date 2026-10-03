@@ -13,6 +13,7 @@ export const routes: Routes = [
 	{ path: 'events', 			loadComponent: () => import('./features/public/events/events').then(m => m.Events) },
 	{ path: 'events/:slug/upload', loadComponent: () => import('./features/public/events/event-photo-upload/event-photo-upload').then(m => m.EventPhotoUpload) },
 	{ path: 'events/:slug', 	loadComponent: () => import('./features/public/events/event-detail/event-detail').then(m => m.EventDetail) },
+	{ path: 'bookings/cancel/:cancelToken', loadComponent: () => import('./features/public/events/booking-cancel/booking-cancel').then(m => m.BookingCancel) },
 	{ path: 'donations', 		loadComponent: () => import('./features/public/donations/donations').then(m => m.Donations) },
 	{ path: 'contacts', 		loadComponent: () => import('./features/public/contacts/contacts').then(m => m.Contacts) },
 	{ path: 'documents', 		loadComponent: () => import('./features/public/documents/documents').then(m => m.Documents) },

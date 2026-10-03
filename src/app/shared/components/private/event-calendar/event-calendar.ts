@@ -2,9 +2,10 @@ import { Component, ElementRef, OnInit, ViewChild, computed, inject, signal } fr
 import { DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
-import { CalendarEvent, CreateEventDto, EventPhoto, EventRsvp, RsvpStats } from '../../../../core/models/event.model';
+import { Booking, CalendarEvent, CreateEventDto, EventPhoto, EventRsvp, RsvpStats } from '../../../../core/models/event.model';
 import { EventsService } from '../../../../core/services/events/events';
 import { environment } from '../../../../../environments/environment';
+import { BookingScanner } from '../../../../features/private/events/booking-scanner/booking-scanner';
 
 export interface ImagePreview {
   file:      File;
@@ -14,11 +15,11 @@ export interface ImagePreview {
   error:     boolean;
 }
 
-type DetailTab = 'info' | 'rsvp' | 'photos';
+type DetailTab = 'info' | 'rsvp' | 'photos' | 'bookings';
 
 @Component({
   selector: 'app-event-calendar',
-  imports: [FormsModule, DatePipe],
+  imports: [FormsModule, DatePipe, BookingScanner],
   templateUrl: './event-calendar.html',
   styleUrl: './event-calendar.css',
 })
@@ -61,9 +62,19 @@ export class EventCalendar implements OnInit {
     return ip ? `http://${ip}:4200` : null;
   });
 
+  // ── Prenotazioni ──────────────────────────────────────────────────────
+  bookings         = signal<Booking[]>([]);
+  bookingsLoading  = signal(false);
+  bookingsCapacity = signal<number | null>(null);
+  bookingsOccupied = signal(0);
+  bookingsAvailable = signal(0);
+  showScanner      = signal(false);
+  readonly confirmedBookings = computed(() => this.bookings().filter(b => b.status === 'confirmed'));
+  readonly waitlistBookings  = computed(() => this.bookings().filter(b => b.status === 'waitlist'));
+
   imagePreviews = signal<ImagePreview[]>([]);
   coverPreview  = signal<ImagePreview | null>(null);
-  form: CreateEventDto = { name: '', date: '', time: '', location: '', description: '', images: [], cover: undefined };
+  form: CreateEventDto = { name: '', date: '', time: '', location: '', description: '', images: [], cover: undefined, hasCapacity: false, capacity: undefined };
 
   readonly allUploaded = computed(() =>
     this.imagePreviews().every(p => p.url !== null || p.error) &&
@@ -147,10 +158,27 @@ export class EventCalendar implements OnInit {
 
     if (tab === 'photos') {
       this.loadPhotos(ev.slug ?? '');
-      // Ridisegna il QR se già presente
       const url = this.qrUploadUrl();
       if (url) setTimeout(() => this.drawBrandedQr(url, ev.name), 50);
     }
+
+    if (tab === 'bookings') {
+      this.loadBookings(ev.slug ?? '');
+    }
+  }
+
+  private loadBookings(slug: string): void {
+    this.bookingsLoading.set(true);
+    this.eventsService.getBookingsAdmin(slug).subscribe({
+      next: ({ bookings, capacity, occupied, available }) => {
+        this.bookings.set(bookings);
+        this.bookingsCapacity.set(capacity);
+        this.bookingsOccupied.set(occupied);
+        this.bookingsAvailable.set(available);
+        this.bookingsLoading.set(false);
+      },
+      error: () => this.bookingsLoading.set(false),
+    });
   }
 
   private loadPhotos(slug: string): void {
