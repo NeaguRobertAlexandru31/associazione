@@ -2,7 +2,7 @@ import { Component, ElementRef, OnInit, ViewChild, computed, inject, signal } fr
 import { DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
-import { Booking, CalendarEvent, CreateEventDto, EventPhoto, EventRsvp, RsvpStats } from '../../../../core/models/event.model';
+import { Booking, CalendarEvent, CreateEventDto, EventAccessType, EventPhoto, EventRsvp, RsvpStats } from '../../../../core/models/event.model';
 import { EventsService } from '../../../../core/services/events/events';
 import { environment } from '../../../../../environments/environment';
 import { BookingScanner } from '../../../../features/private/events/booking-scanner/booking-scanner';
@@ -74,7 +74,8 @@ export class EventCalendar implements OnInit {
 
   imagePreviews = signal<ImagePreview[]>([]);
   coverPreview  = signal<ImagePreview | null>(null);
-  form: CreateEventDto = { name: '', date: '', time: '', location: '', description: '', images: [], cover: undefined, hasCapacity: false, capacity: undefined };
+  form: CreateEventDto = { name: '', date: '', time: '', location: '', description: '', images: [], cover: undefined, accessType: 'public', capacity: undefined };
+
 
   readonly allUploaded = computed(() =>
     this.imagePreviews().every(p => p.url !== null || p.error) &&
@@ -117,7 +118,7 @@ export class EventCalendar implements OnInit {
   }
 
   openCreate(): void {
-    this.form = { name: '', date: '', time: '', location: '', description: '', images: [], cover: undefined };
+    this.form = { name: '', date: '', time: '', location: '', description: '', images: [], cover: undefined, accessType: 'public', capacity: undefined };
     this.clearPreviews();
     this.showCreateModal.set(true);
   }
@@ -134,7 +135,8 @@ export class EventCalendar implements OnInit {
     this.eventPhotos.set([]);
     // Ripristina QR salvato se presente
     if (evt.uploadUrl) {
-      const fullUrl = `${window.location.origin}${evt.uploadUrl}`;
+      const origin = this.lanUrl() ?? window.location.origin;
+      const fullUrl = `${origin}${evt.uploadUrl}`;
       this.qrUploadUrl.set(fullUrl);
     } else {
       this.qrUploadUrl.set(null);
@@ -221,7 +223,8 @@ export class EventCalendar implements OnInit {
 
     // Usa il token già salvato sull'evento se presente
     if (ev.uploadUrl) {
-      const fullUrl = `${window.location.origin}${ev.uploadUrl}`;
+      const origin = this.lanUrl() ?? window.location.origin;
+      const fullUrl = `${origin}${ev.uploadUrl}`;
       this.qrUploadUrl.set(fullUrl);
       setTimeout(() => this.drawBrandedQr(fullUrl, ev.name), 50);
       return;
@@ -230,7 +233,8 @@ export class EventCalendar implements OnInit {
     this.qrLoading.set(true);
     this.eventsService.getUploadToken(ev.slug).subscribe({
       next: ({ uploadUrl }) => {
-        const fullUrl = `${window.location.origin}${uploadUrl}`;
+        const origin = this.lanUrl() ?? window.location.origin;
+        const fullUrl = `${origin}${uploadUrl}`;
         this.qrUploadUrl.set(fullUrl);
         // Aggiorna detailEvent con il nuovo uploadUrl
         this.detailEvent.update(e => e ? { ...e, uploadUrl } : e);
@@ -245,125 +249,36 @@ export class EventCalendar implements OnInit {
     const canvas = this.qrCanvas?.nativeElement;
     if (!canvas) return;
 
-    const QRCodeLib = await import('qrcode');
+    const SIZE = 320;
+    const { default: QRCodeStyling } = await import('qr-code-styling');
 
-    // Step 1: leggi matrice dal QR su canvas probe
-    const PROBE = 200;
-    const probe = document.createElement('canvas');
-    await QRCodeLib.toCanvas(probe, url, { width: PROBE, margin: 0, color: { dark: '#000000', light: '#ffffff' } });
-    const pCtx  = probe.getContext('2d')!;
-    const pixels = pCtx.getImageData(0, 0, PROBE, PROBE).data;
+    const qr = new QRCodeStyling({
+      width:  SIZE,
+      height: SIZE,
+      type:   'canvas',
+      data:   url,
+      margin: 10,
+      qrOptions:   { errorCorrectionLevel: 'H' },
+      dotsOptions: { type: 'rounded', color: '#1a2e5a' },
+      cornersSquareOptions: { type: 'extra-rounded', color: '#1a2e5a' },
+      cornersDotOptions:    { type: 'dot',           color: '#1a2e5a' },
+      backgroundOptions:    { color: '#ffffff' },
+      image: 'data:image/svg+xml;utf8,' + encodeURIComponent(`
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 60">
+          <circle cx="30" cy="30" r="30" fill="#1a2e5a"/>
+          <text x="30" y="35" font-family="Arial" font-weight="bold" font-size="13"
+                fill="white" text-anchor="middle">A.C.R.</text>
+        </svg>`),
+      imageOptions: { hideBackgroundDots: true, imageSize: 0.28, margin: 4, crossOrigin: 'anonymous' },
+    });
 
-    // Trova dimensione cella: primo pixel scuro nella prima riga
-    let cellPx = 1;
-    for (let x = 0; x < PROBE; x++) {
-      if (pixels[x * 4] < 128) { cellPx = x; break; }
-    }
-    if (cellPx < 1) cellPx = 1;
-    const N = Math.round(PROBE / cellPx);
+    const blob = await qr.getRawData('png');
+    if (!blob) return;
 
-    const grid: boolean[][] = [];
-    for (let r = 0; r < N; r++) {
-      grid[r] = [];
-      for (let c = 0; c < N; c++) {
-        const py = Math.floor((r + 0.5) * cellPx);
-        const px = Math.floor((c + 0.5) * cellPx);
-        grid[r][c] = pixels[(py * PROBE + px) * 4] < 128;
-      }
-    }
-
-    // Step 2: disegna
-    const SIZE  = 320;
-    const PAD   = 18;  // padding esterno
-    const inner = SIZE - PAD * 2;
-    const cell  = inner / N;
-    const mr    = cell * 0.32; // raggio angoli moduli normali
-
+    const bmp = await createImageBitmap(blob as Blob);
     canvas.width  = SIZE;
     canvas.height = SIZE;
-    const ctx = canvas.getContext('2d')!;
-
-    // Sfondo con bordo arrotondato
-    ctx.fillStyle = '#ffffff';
-    ctx.beginPath();
-    ctx.roundRect(0, 0, SIZE, SIZE, 20);
-    ctx.fill();
-
-    // Helper: disegna rettangolo arrotondato
-    const fillRR = (x: number, y: number, w: number, h: number, r: number) => {
-      ctx.beginPath();
-      ctx.roundRect(x, y, w, h, r);
-      ctx.fill();
-    };
-
-    // Finder pattern (i 3 quadrati angolo) — disegnati a mano con stile
-    const drawFinder = (row: number, col: number) => {
-      const x = PAD + col * cell;
-      const y = PAD + row * cell;
-      const outerS = cell * 7;
-      const innerS = cell * 3;
-      const gap    = cell * 2;
-
-      // Anello esterno
-      ctx.fillStyle = '#1a2e5a';
-      fillRR(x, y, outerS, outerS, cell * 1.4);
-
-      // Buco bianco
-      ctx.fillStyle = '#ffffff';
-      fillRR(x + cell, y + cell, outerS - cell * 2, outerS - cell * 2, cell * 0.8);
-
-      // Quadrato interno
-      ctx.fillStyle = '#1a2e5a';
-      fillRR(x + gap, y + gap, innerS, innerS, cell * 0.7);
-    };
-
-    drawFinder(0, 0);
-    drawFinder(0, N - 7);
-    drawFinder(N - 7, 0);
-
-    // Zona finder da escludere (più timing pattern)
-    const isFinder = (r: number, c: number) =>
-      (r < 8 && c < 8) || (r < 8 && c >= N - 8) || (r >= N - 8 && c < 8);
-
-    // Zona badge centrale da escludere
-    const cx      = SIZE / 2;
-    const cy      = SIZE / 2;
-    const badgeR  = cell * 2.6;
-    const centerM = (N - 1) / 2;
-    const isBadge = (r: number, c: number) =>
-      Math.hypot(r - centerM, c - centerM) < badgeR / cell + 0.5;
-
-    // Moduli dati
-    ctx.fillStyle = '#1a2e5a';
-    for (let r = 0; r < N; r++) {
-      for (let c = 0; c < N; c++) {
-        if (!grid[r][c]) continue;
-        if (isFinder(r, c)) continue;
-        if (isBadge(r, c)) continue;
-        const x = PAD + c * cell;
-        const y = PAD + r * cell;
-        const s = cell * 0.78;
-        const o = (cell - s) / 2;
-        fillRR(x + o, y + o, s, s, mr);
-      }
-    }
-
-    // Badge centrale: cerchio bianco + cerchio blu + testo
-    ctx.beginPath();
-    ctx.arc(cx, cy, badgeR + 4, 0, Math.PI * 2);
-    ctx.fillStyle = '#ffffff';
-    ctx.fill();
-
-    ctx.beginPath();
-    ctx.arc(cx, cy, badgeR, 0, Math.PI * 2);
-    ctx.fillStyle = '#1a2e5a';
-    ctx.fill();
-
-    ctx.font = `bold ${Math.round(cell * 1.05)}px Arial`;
-    ctx.fillStyle = '#ffffff';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillText('A.C.R.', cx, cy);
+    canvas.getContext('2d')!.drawImage(bmp, 0, 0);
   }
 
   downloadQr(): void {

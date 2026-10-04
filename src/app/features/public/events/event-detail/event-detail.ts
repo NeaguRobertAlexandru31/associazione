@@ -1,7 +1,7 @@
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, RouterLink } from '@angular/router';
-import { BookingAvailability, CalendarEvent, EventPhoto } from '../../../../core/models/event.model';
+import { BookingAvailability, CalendarEvent, EventPhoto, EventAccessType } from '../../../../core/models/event.model';
 import { EventsService } from '../../../../core/services/events/events';
 import { environment } from '../../../../../environments/environment';
 
@@ -52,6 +52,9 @@ export class EventDetail implements OnInit {
     return a?.hasCapacity && (a.available ?? 0) === 0;
   });
 
+  readonly isMembersOnly = computed(() => this.event()?.accessType === 'members_only');
+  readonly isLimited     = computed(() => this.event()?.accessType === 'limited');
+
   ngOnInit(): void {
     const slug = this.route.snapshot.paramMap.get('slug')!;
     this.svc.getBySlug(slug).subscribe({
@@ -64,7 +67,7 @@ export class EventDetail implements OnInit {
           next: ({ uploadUrl }) => this.uploadUrl.set(`${window.location.origin}${uploadUrl}`),
           error: () => {},
         });
-        if (ev.hasCapacity) {
+        if (ev.hasCapacity || ev.accessType === 'members_only') {
           this.svc.getAvailability(slug).subscribe({
             next: a => this.availability.set(a),
             error: () => {},
@@ -142,13 +145,14 @@ export class EventDetail implements OnInit {
   }
 
   submitRsvp(): void {
-    const name = this.rsvpName().trim();
+    const name  = this.rsvpName().trim();
+    const email = this.rsvpEmail().trim();
     if (!name) return;
+    if (this.isMembersOnly() && !email) return;
     const ev = this.event();
     if (!ev) return;
     this.rsvpSending.set(true);
     const body: { name: string; email?: string; status: RsvpStatus } = { name, status: this.rsvpStatus() };
-    const email = this.rsvpEmail().trim();
     if (email) body.email = email;
     this.svc.rsvp(ev.id, body).subscribe({
       next: () => { this.rsvpStep.set('success'); this.rsvpSending.set(false); },
@@ -162,8 +166,8 @@ export class EventDetail implements OnInit {
   googleCalendarUrl(ev: CalendarEvent): string {
     const start = this.toGCalDate(ev.date, ev.time);
     const end   = this.toGCalDate(ev.date, ev.time, 2);
-    const params = new URLSearchParams({ action: 'TEMPLATE', text: ev.name, dates: `${start}/${end}`, location: ev.location, details: ev.description ?? '' });
-    return `https://calendar.google.com/calendar/render?${params.toString()}`;
+    const params = new URLSearchParams({ action: 'TEMPLATE', text: ev.name, location: ev.location, details: ev.description ?? '' });
+    return `https://calendar.google.com/calendar/render?${params.toString()}&dates=${start}/${end}`;
   }
 
   downloadIcs(ev: CalendarEvent): void {
@@ -194,12 +198,18 @@ export class EventDetail implements OnInit {
 
   private toGCalDate(dateIso: string, time: string, addHours = 0): string {
     const [h, m] = time.replace('.', ':').split(':').map(Number);
-    const d = new Date(dateIso);
-    d.setUTCHours((h || 0) + addHours, m || 0, 0, 0);
-    return d.toISOString().replace(/[-:]/g, '').replace('.000', '');
+    // Estrae anno/mese/giorno dalla stringa ISO senza conversioni di fuso orario
+    const [year, month, day] = dateIso.slice(0, 10).split('-').map(Number);
+    const d = new Date(year, month - 1, day, (h || 0) + addHours, m || 0, 0);
+    const pad = (n: number) => String(n).padStart(2, '0');
+    return `${year}${pad(month)}${pad(day)}T${pad(d.getHours())}${pad(d.getMinutes())}00`;
   }
 
   private toIcsDate(dateIso: string, time: string, addHours = 0): string {
-    return this.toGCalDate(dateIso, time, addHours);
+    const [h, m] = time.replace('.', ':').split(':').map(Number);
+    const [year, month, day] = dateIso.slice(0, 10).split('-').map(Number);
+    const d = new Date(year, month - 1, day, (h || 0) + addHours, m || 0, 0);
+    const pad = (n: number) => String(n).padStart(2, '0');
+    return `${year}${pad(month)}${pad(day)}T${pad(d.getHours())}${pad(d.getMinutes())}00`;
   }
 }

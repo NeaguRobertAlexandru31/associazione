@@ -1,3 +1,5 @@
+export type EventAccessType = 'public' | 'limited' | 'members_only';
+
 export interface CalendarEvent {
   id: string;
   slug: string | null;
@@ -10,6 +12,7 @@ export interface CalendarEvent {
   cover?: string;
   uploadToken?: string | null;
   uploadUrl?: string | null;
+  accessType?: EventAccessType;
   hasCapacity?: boolean;
   capacity?: number | null;
 }
@@ -55,7 +58,7 @@ export interface CreateEventDto {
   description?: string;
   images?: string[];
   cover?: string;
-  hasCapacity?: boolean;
+  accessType?: EventAccessType;
   capacity?: number;
 }
 

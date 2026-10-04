@@ -53,8 +53,8 @@
           <p class="font-inter text-on-surface text-base leading-relaxed mb-10 max-w-2xl">{{ ev.description }}</p>
         }
 
-        <!-- Prenotazione (eventi a posti limitati) -->
-        @if (ev.hasCapacity) {
+        <!-- Prenotazione (eventi a numero chiuso o solo soci) -->
+        @if (ev.accessType === 'limited' || ev.accessType === 'members_only' || ev.hasCapacity) {
           <div class="mb-10 bg-surface-container-lowest rounded-2xl p-6 shadow-sm">
             <div class="flex items-start gap-3 mb-4">
               <div class="w-10 h-10 rounded-xl bg-primary/8 flex items-center justify-center flex-shrink-0">
@@ -62,7 +62,13 @@
               </div>
               <div>
                 <h2 class="font-romania font-bold text-primary text-xl">Prenota il tuo posto</h2>
-                <p class="font-inter text-sm text-on-surface-variant mt-0.5">Evento a numero limitato — la prenotazione è obbligatoria.</p>
+                <p class="font-inter text-sm text-on-surface-variant mt-0.5">
+                  @if (ev.accessType === 'members_only') {
+                    Evento riservato ai soci — inserisci l'email con cui sei iscritto.
+                  } @else {
+                    Evento a numero limitato — la prenotazione è obbligatoria.
+                  }
+                </p>
               </div>
             </div>
 
@@ -192,8 +198,8 @@
           </div>
         }
 
-        <!-- RSVP section (eventi senza posti limitati) -->
-        @if (!ev.hasCapacity) {
+        <!-- RSVP section (solo eventi pubblici) -->
+        @if (ev.accessType === 'public' || (!ev.accessType && !ev.hasCapacity)) {
           <div class="mb-10 bg-surface-container-lowest rounded-2xl p-6 shadow-sm">
             <h2 class="font-romania font-bold text-primary text-xl mb-1">Parteciperai?</h2>
             <p class="font-inter text-sm text-on-surface-variant mb-5">Facci sapere se verrai, così potremo organizzarci meglio.</p>
@@ -232,14 +238,15 @@
                   {{ rsvpStatus() === 'attending' ? 'Conferma partecipazione' : 'Registra interesse' }}
                 </p>
                 <input [(ngModel)]="rsvpName" [ngModelOptions]="{standalone:true}"
-                       placeholder="Il tuo nome *"
+                       placeholder="Nome e cognome *"
                        class="w-full px-4 py-2.5 rounded-xl border border-outline-variant font-inter text-sm text-on-surface bg-surface focus:outline-none focus:ring-2 focus:ring-primary/30" />
                 <input [(ngModel)]="rsvpEmail" [ngModelOptions]="{standalone:true}"
-                       placeholder="Email (opzionale)"
+                       [placeholder]="isMembersOnly() ? 'Email *' : 'Email (opzionale)'"
                        type="email"
-                       class="w-full px-4 py-2.5 rounded-xl border border-outline-variant font-inter text-sm text-on-surface bg-surface focus:outline-none focus:ring-2 focus:ring-primary/30" />
+                       class="w-full px-4 py-2.5 rounded-xl border border-outline-variant font-inter text-sm text-on-surface bg-surface focus:outline-none focus:ring-2 focus:ring-primary/30"
+                       [class.border-primary]="isMembersOnly()" />
                 <div class="flex gap-2 pt-1">
-                  <button (click)="submitRsvp()" [disabled]="rsvpSending() || !rsvpName().trim()"
+                  <button (click)="submitRsvp()" [disabled]="rsvpSending() || !rsvpName().trim() || (isMembersOnly() && !rsvpEmail().trim())"
                           class="flex-1 py-2.5 rounded-xl bg-primary text-white font-inter font-semibold text-sm hover:bg-primary/90 disabled:opacity-50 transition-colors">
                     {{ rsvpSending() ? 'Invio...' : 'Conferma' }}
                   </button>
@@ -313,6 +320,19 @@
 
       <!-- Right: info card -->
       <div class="bg-surface-container-lowest rounded-2xl shadow-sm p-6 flex flex-col gap-4 sticky top-6">
+
+        <!-- Badge tipo accesso -->
+        @if (ev.accessType === 'members_only') {
+          <div class="flex items-center gap-2 bg-primary/8 rounded-xl px-3 py-2">
+            <span class="material-symbols-outlined text-primary text-base" style="font-variation-settings:'FILL' 1">group</span>
+            <span class="font-inter font-semibold text-xs text-primary">Solo soci</span>
+          </div>
+        } @else if (ev.accessType === 'limited' || ev.hasCapacity) {
+          <div class="flex items-center gap-2 bg-amber-50 rounded-xl px-3 py-2">
+            <span class="material-symbols-outlined text-amber-600 text-base" style="font-variation-settings:'FILL' 1">confirmation_number</span>
+            <span class="font-inter font-semibold text-xs text-amber-700">Prenotazione obbligatoria</span>
+          </div>
+        }
 
         <div class="flex items-start gap-3">
           <div class="w-10 h-10 rounded-xl bg-primary/8 flex items-center justify-center flex-shrink-0">
