@@ -42,3 +42,12 @@ __screenshots__/
 # System files
 .DS_Store
 Thumbs.db
+
+# Environment files (contengono segreti — usare .env.example come template)
+.env
+.env.prod
+.env.*.local
+
+# File environments generati (prodotti da scripts/generate-env.sh)
+/src/environments/environment.ts
+/src/environments/environment.prod.ts

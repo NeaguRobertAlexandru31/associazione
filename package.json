@@ -3,7 +3,11 @@
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
+    "env:dev": "bash scripts/generate-env.sh dev",
+    "env:prod": "bash scripts/generate-env.sh prod",
+    "prestart": "npm run env:dev",
     "start": "node -e \"const{networkInterfaces:n}=require('os');const i=Object.values(n()).flat().find(x=>x.family==='IPv4'&&!x.internal);console.log('\\n📱 Accesso da telefono: http://'+i?.address+':4200\\n')\" && ng serve --host 0.0.0.0",
+    "prebuild": "npm run env:prod",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test"
