@@ -4,6 +4,7 @@ import { Observable, tap } from 'rxjs';
 import { environment } from '../../../../environments/environment';
 import { AuthUser, MemberDetail, TesseraInfo, UpdateMemberRequest, UserRole } from '../../models/member.model';
 import { LoginRequest, LoginResponse } from '../../models/login.model';
+import { Analytics } from '../analytics/analytics';
 
 const TOKEN_KEY = 'acr_token';
 const USER_KEY  = 'acr_user';
@@ -12,6 +13,7 @@ const API       = environment.apiUrl;
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private http = inject(HttpClient);
+  private analytics = inject(Analytics);
 
   private _token = signal<string | null>(localStorage.getItem(TOKEN_KEY));
   private _user  = signal<AuthUser | null>(this.restoreUser());
@@ -36,7 +38,11 @@ export class AuthService {
 
   login(dto: LoginRequest): Observable<LoginResponse> {
     return this.http.post<LoginResponse>(`${API}/auth/login`, dto, { withCredentials: true }).pipe(
-      tap(res => this.persist(res)),
+      tap(res => {
+        this.persist(res);
+        this.analytics.identify(res.user.id, { role: res.user.role });
+        this.analytics.capture('login');
+      }),
     );
   }
 
@@ -60,6 +66,8 @@ export class AuthService {
     localStorage.removeItem(USER_KEY);
     this._token.set(null);
     this._user.set(null);
+    this.analytics.capture('logout');
+    this.analytics.reset();
   }
 
   // ── Check email / set password (primo accesso soci) ───────────────────────

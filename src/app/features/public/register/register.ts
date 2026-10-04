@@ -11,6 +11,7 @@ import {
 } from '../../../core/models/registration.model';
 import { RegistrationResultService } from '../../../core/services/registration-result/registration-result';
 import { RegistrationsService } from '../../../core/services/registrations/registrations';
+import { Analytics } from '../../../core/services/analytics/analytics';
 
 const CATEGORY_LABELS: Record<MemberCategory, string> = {
   ordinario:   'Ordinario',
@@ -25,10 +26,11 @@ const CATEGORY_LABELS: Record<MemberCategory, string> = {
   styleUrl: './register.css',
 })
 export class Register implements OnInit {
-  private route   = inject(ActivatedRoute);
-  private router  = inject(Router);
-  private svc     = inject(RegistrationsService);
-  private result  = inject(RegistrationResultService);
+  private route     = inject(ActivatedRoute);
+  private router    = inject(Router);
+  private svc       = inject(RegistrationsService);
+  private result    = inject(RegistrationResultService);
+  private analytics = inject(Analytics);
 
   step    = signal(1);
   loading = signal(false);
@@ -164,6 +166,7 @@ export class Register implements OnInit {
     this.svc.create(dto).subscribe({
       next: (res) => {
         this.loading.set(false);
+        this.analytics.capture('membership_registered', { category: this.category });
         if (res.payment_url) {
           window.location.href = res.payment_url;
         } else {

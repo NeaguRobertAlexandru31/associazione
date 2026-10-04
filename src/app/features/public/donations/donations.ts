@@ -3,6 +3,7 @@ import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { TranslatePipe } from '../../../i18n/translate.pipe';
 import { SiteSettingsService } from '../../../core/services/site-settings/site-settings';
+import { Analytics } from '../../../core/services/analytics/analytics';
 import { environment } from '../../../../environments/environment';
 
 @Component({
@@ -13,7 +14,8 @@ import { environment } from '../../../../environments/environment';
 })
 export class Donations implements OnInit {
   readonly siteSettings = inject(SiteSettingsService);
-  private http = inject(HttpClient);
+  private http          = inject(HttpClient);
+  private analytics     = inject(Analytics);
   loadingCheckout = signal(false);
   readonly amounts = [10, 25, 50, 100, 250];
   readonly impacts = [
@@ -58,6 +60,7 @@ export class Donations implements OnInit {
     const amount = this.customAmount() ? Number(this.customAmount()) : this.selectedAmount();
     if (!amount || amount <= 0) return;
 
+    this.analytics.capture('donation_checkout_started', { amount, frequency: this.frequency() });
     this.loadingCheckout.set(true);
     this.http.post<{ url: string }>(`${environment.apiUrl}/stripe/donation-checkout`, {
       amount,

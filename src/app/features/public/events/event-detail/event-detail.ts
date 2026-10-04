@@ -3,6 +3,7 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { BookingAvailability, CalendarEvent, EventPhoto, EventAccessType } from '../../../../core/models/event.model';
 import { EventsService } from '../../../../core/services/events/events';
+import { Analytics } from '../../../../core/services/analytics/analytics';
 import { environment } from '../../../../../environments/environment';
 
 type RsvpStatus = 'attending' | 'interested';
@@ -16,8 +17,9 @@ type BookingStep = 'idle' | 'form' | 'success' | 'waitlist' | 'error';
   styleUrl: './event-detail.css',
 })
 export class EventDetail implements OnInit {
-  private route = inject(ActivatedRoute);
-  private svc   = inject(EventsService);
+  private route     = inject(ActivatedRoute);
+  private svc       = inject(EventsService);
+  private analytics = inject(Analytics);
 
   event         = signal<CalendarEvent | null>(null);
   loading       = signal(true);
@@ -102,10 +104,11 @@ export class EventDetail implements OnInit {
       next: res => {
         this.bookingSending.set(false);
         if (res.status === 'confirmed') {
+          this.analytics.capture('event_booked', { event: ev.name, seats });
           this.bookingStep.set('success');
-          // Aggiorna disponibilità
           this.svc.getAvailability(ev.slug!).subscribe({ next: a => this.availability.set(a), error: () => {} });
         } else {
+          this.analytics.capture('event_booked_waitlist', { event: ev.name, seats, position: res.position ?? 0 });
           this.bookingPosition.set(res.position ?? null);
           this.bookingStep.set('waitlist');
         }

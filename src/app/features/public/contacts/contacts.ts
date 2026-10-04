@@ -3,6 +3,7 @@ import { FormsModule } from '@angular/forms';
 import { TranslatePipe } from '../../../i18n/translate.pipe';
 import { ContactService } from '../../../core/services/contact/contact';
 import { SiteSettingsService } from '../../../core/services/site-settings/site-settings';
+import { Analytics } from '../../../core/services/analytics/analytics';
 
 @Component({
   selector: 'app-contacts',
@@ -12,6 +13,7 @@ import { SiteSettingsService } from '../../../core/services/site-settings/site-s
 })
 export class Contacts implements OnInit {
   private contactService = inject(ContactService);
+  private analytics      = inject(Analytics);
   readonly siteSettings  = inject(SiteSettingsService);
   ngOnInit(): void { this.siteSettings.load(); }
 
@@ -30,6 +32,7 @@ export class Contacts implements OnInit {
       next: () => {
         this.sending.set(false);
         this.sent.set(true);
+        this.analytics.capture('contact_form_submitted');
         setTimeout(() => {
           this.sent.set(false);
           this.name = this.email = this.subject = this.message = '';
