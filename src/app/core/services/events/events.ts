@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, switchMap } from 'rxjs';
 import { environment } from '../../../../environments/environment';
 import { Booking, BookingAvailability, CalendarEvent, CreateEventDto, EventPhoto, EventRsvp, RsvpStats } from '../../models/event.model';
 
@@ -16,10 +16,31 @@ export class EventsService {
     return this.http.get<CalendarEvent>(`${environment.apiUrl}/events/${slug}`);
   }
 
-  uploadImages(files: File[]): Observable<{ urls: string[] }> {
-    const fd = new FormData();
-    files.forEach(f => fd.append('files', f));
-    return this.http.post<{ urls: string[] }>(`${environment.apiUrl}/uploads/events`, fd);
+  uploadImages(files: File[], folder = 'events'): Observable<{ urls: string[] }> {
+    // Presign → upload diretto su S3 → process (resize+webp+watermark)
+    return this.http.post<{ presignedUrls: { uploadUrl: string; key: string }[] }>(
+      `${environment.apiUrl}/uploads/presign`,
+      { folder, files: files.map(f => ({ name: f.name, type: f.type || 'image/jpeg' })) },
+    ).pipe(
+      switchMap(({ presignedUrls }) =>
+        new Observable<{ urls: string[] }>(observer => {
+          Promise.all(
+            presignedUrls.map(({ uploadUrl }, i) =>
+              fetch(uploadUrl, {
+                method: 'PUT',
+                body: files[i],
+                headers: { 'Content-Type': files[i].type || 'image/jpeg' },
+              }).then(r => { if (!r.ok) throw new Error(`S3 ${r.status}`); }),
+            ),
+          ).then(() => {
+            this.http.post<{ urls: string[] }>(
+              `${environment.apiUrl}/uploads/process`,
+              { folder, keys: presignedUrls.map(p => p.key), watermark: true },
+            ).subscribe({ next: v => { observer.next(v); observer.complete(); }, error: e => observer.error(e) });
+          }).catch(e => observer.error(e));
+        }),
+      ),
+    );
   }
 
   create(dto: CreateEventDto): Observable<CalendarEvent> {
@@ -54,6 +75,22 @@ export class EventsService {
     return this.http.post<{ uploaded: number }>(
       `${environment.apiUrl}/events/${slug}/photos/upload`,
       fd,
+      { headers: { 'x-upload-token': token } },
+    );
+  }
+
+  presignPhotoUploads(slug: string, token: string, files: File[], uploaderName: string, uploaderEmail: string): Observable<{ presignedUrls: { uploadUrl: string; key: string }[] }> {
+    return this.http.post<{ presignedUrls: { uploadUrl: string; key: string }[] }>(
+      `${environment.apiUrl}/events/${slug}/photos/presign`,
+      { uploaderName, uploaderEmail, files: files.map(f => ({ name: f.name, type: f.type || 'image/jpeg' })) },
+      { headers: { 'x-upload-token': token } },
+    );
+  }
+
+  confirmPhotoUploads(slug: string, token: string, keys: string[], uploaderName: string, uploaderEmail: string): Observable<{ uploaded: number }> {
+    return this.http.post<{ uploaded: number }>(
+      `${environment.apiUrl}/events/${slug}/photos/confirm`,
+      { uploaderName, uploaderEmail, keys },
       { headers: { 'x-upload-token': token } },
     );
   }

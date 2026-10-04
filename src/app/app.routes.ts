@@ -18,7 +18,7 @@ export const routes: Routes = [
 	{ path: 'contacts', 		loadComponent: () => import('./features/public/contacts/contacts').then(m => m.Contacts) },
 	{ path: 'documents', 		loadComponent: () => import('./features/public/documents/documents').then(m => m.Documents) },
 	{ path: 'membership', 		loadComponent: () => import('./features/public/membership/membership').then(m => m.Membership) },
-	{ path: 'boutique', 		loadComponent: () => import('./features/public/boutique/boutique').then(m => m.Boutique) },
+	// { path: 'boutique', 		loadComponent: () => import('./features/public/boutique/boutique').then(m => m.Boutique) },
 	{ path: 'tessera-preview', 		loadComponent: () => import('./features/public/tessera-preview/tessera-preview').then(m => m.TesseraPreview) },
 	{ path: 'unisciti', 			loadComponent: () => import('./features/public/register/register').then(m => m.Register) },
 	{ path: 'iscrizione/successo', 	loadComponent: () => import('./features/public/iscrizione-successo/iscrizione-successo').then(m => m.IscrizioneSuccesso) },

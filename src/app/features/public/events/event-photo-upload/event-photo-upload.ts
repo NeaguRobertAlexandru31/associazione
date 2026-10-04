@@ -110,28 +110,63 @@ export class EventPhotoUpload implements OnInit {
   }
 
   send() {
-    const slug  = this.route.snapshot.paramMap.get('slug') ?? '';
-    const token = this.token();
+    const slug    = this.route.snapshot.paramMap.get('slug') ?? '';
+    const token   = this.token();
     const pending = this.previews().filter(p => p.state === 'pending');
     if (!pending.length || this.sending()) return;
 
     this.sending.set(true);
     this.errorMsg.set('');
-
     this.previews.update(list =>
       list.map(p => p.state === 'pending' ? { ...p, state: 'uploading' } : p),
     );
 
-    this.svc.uploadPhotoPublic(slug, token, pending.map(p => p.file), this.uploaderName(), this.uploaderEmail()).subscribe({
-      next: () => {
-        pending.forEach(p => URL.revokeObjectURL(p.objectUrl));
-        this.previews.set([]);
-        this.sending.set(false);
-        this.svc.getPublicPhotos(slug).subscribe({
-          next: photos => this.existingPhotos.set(photos),
-          error: () => {},
-        });
-        this.pageState.set('done');
+    // Step 1: chiedi presigned URL al backend
+    this.svc.presignPhotoUploads(slug, token, pending.map(p => p.file), this.uploaderName(), this.uploaderEmail()).subscribe({
+      next: async ({ presignedUrls }) => {
+        try {
+          // Step 2: carica ogni file direttamente su S3
+          await Promise.all(
+            presignedUrls.map(({ uploadUrl }, i) =>
+              fetch(uploadUrl, {
+                method: 'PUT',
+                body: pending[i].file,
+                headers: { 'Content-Type': pending[i].file.type || 'image/jpeg' },
+              }).then(r => { if (!r.ok) throw new Error(`S3 upload failed: ${r.status}`); }),
+            ),
+          );
+
+          // Step 3: notifica il backend per watermark + salvataggio DB
+          this.svc.confirmPhotoUploads(
+            slug, token,
+            presignedUrls.map(p => p.key),
+            this.uploaderName(), this.uploaderEmail(),
+          ).subscribe({
+            next: () => {
+              pending.forEach(p => URL.revokeObjectURL(p.objectUrl));
+              this.previews.set([]);
+              this.sending.set(false);
+              this.svc.getPublicPhotos(slug).subscribe({
+                next: photos => this.existingPhotos.set(photos),
+                error: () => {},
+              });
+              this.pageState.set('done');
+            },
+            error: () => {
+              this.errorMsg.set('Errore durante il salvataggio. Riprova.');
+              this.previews.update(list =>
+                list.map(p => p.state === 'uploading' ? { ...p, state: 'error' } : p),
+              );
+              this.sending.set(false);
+            },
+          });
+        } catch {
+          this.errorMsg.set('Errore durante il caricamento. Riprova.');
+          this.previews.update(list =>
+            list.map(p => p.state === 'uploading' ? { ...p, state: 'error' } : p),
+          );
+          this.sending.set(false);
+        }
       },
       error: (err) => {
         const msg: string = err?.error?.message ?? '';
@@ -140,7 +175,7 @@ export class EventPhotoUpload implements OnInit {
         } else if (err.status === 401) {
           this.pageState.set('invalid-token');
         } else {
-          this.errorMsg.set('Errore durante l\'invio. Riprova.');
+          this.errorMsg.set('Errore durante la preparazione. Riprova.');
           this.previews.update(list =>
             list.map(p => p.state === 'uploading' ? { ...p, state: 'error' } : p),
           );

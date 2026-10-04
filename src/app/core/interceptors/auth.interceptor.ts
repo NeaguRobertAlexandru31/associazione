@@ -18,9 +18,18 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
       if (err.status !== 401) return throwError(() => err);
 
       // Non riprovare se è già una chiamata al refresh (evita loop)
-      if (req.url.includes('/auth/refresh') || req.url.includes('/auth/login')) {
-        auth.logout();
-        router.navigate(['/login']);
+      // Non interferire con endpoint pubblici che hanno propria autenticazione (token QR)
+      if (
+        req.url.includes('/auth/refresh') ||
+        req.url.includes('/auth/login') ||
+        req.url.includes('/photos/presign') ||
+        req.url.includes('/photos/confirm') ||
+        req.url.includes('/photos/upload')
+      ) {
+        if (req.url.includes('/auth/refresh') || req.url.includes('/auth/login')) {
+          auth.logout();
+          router.navigate(['/login']);
+        }
         return throwError(() => err);
       }
 

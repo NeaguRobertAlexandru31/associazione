@@ -1,6 +1,6 @@
 import { Injectable, inject, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, switchMap } from 'rxjs';
 import { environment } from '../../../../environments/environment';
 
 export const PLACEHOLDER_KEYS = [
@@ -75,14 +75,30 @@ export class SiteSettingsService {
   }
 
   uploadImage(file: File): Observable<{ urls: string[] }> {
-    const fd = new FormData();
-    fd.append('files', file);
-    return this.http.post<{ urls: string[] }>(`${environment.apiUrl}/uploads/settings`, fd);
+    return this._presignAndProcess([file], 'settings');
   }
 
   uploadPlaceholder(file: File): Observable<{ urls: string[] }> {
-    const fd = new FormData();
-    fd.append('files', file);
-    return this.http.post<{ urls: string[] }>(`${environment.apiUrl}/uploads/placeholders`, fd);
+    return this._presignAndProcess([file], 'placeholders');
+  }
+
+  private _presignAndProcess(files: File[], folder: string): Observable<{ urls: string[] }> {
+    return this.http.post<{ presignedUrls: { uploadUrl: string; key: string }[] }>(
+      `${environment.apiUrl}/uploads/presign`,
+      { folder, files: files.map(f => ({ name: f.name, type: f.type || 'image/jpeg' })) },
+    ).pipe(
+      switchMap(({ presignedUrls }) =>
+        new Observable<{ urls: string[] }>(observer => {
+          Promise.all(presignedUrls.map(({ uploadUrl }, i) =>
+            fetch(uploadUrl, { method: 'PUT', body: files[i], headers: { 'Content-Type': files[i].type || 'image/jpeg' } })
+              .then(r => { if (!r.ok) throw new Error(`S3 ${r.status}`); }),
+          )).then(() => {
+            this.http.post<{ urls: string[] }>(`${environment.apiUrl}/uploads/process`,
+              { folder, keys: presignedUrls.map(p => p.key), watermark: false },
+            ).subscribe({ next: v => { observer.next(v); observer.complete(); }, error: e => observer.error(e) });
+          }).catch(e => observer.error(e));
+        }),
+      ),
+    );
   }
 }
