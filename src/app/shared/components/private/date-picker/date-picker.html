@@ -1,0 +1,61 @@
+<div class="relative w-full">
+
+  <!-- Input trigger -->
+  <button type="button" (click)="toggle()"
+          class="w-full flex items-center gap-2 px-3 py-2.5 rounded-xl bg-surface-container border border-outline-variant/30 font-inter text-sm text-on-surface outline-none focus:ring-2 focus:ring-primary/30 transition-all text-left">
+    <span class="material-symbols-outlined text-base text-on-surface-variant" style="font-variation-settings:'FILL' 1">calendar_today</span>
+    @if (displayValue()) {
+      <span>{{ displayValue() }}</span>
+    } @else {
+      <span class="text-on-surface-variant/50">{{ placeholder() }}</span>
+    }
+  </button>
+
+  <!-- Dropdown calendario -->
+  @if (open()) {
+    <div class="absolute z-50 mt-1 w-72 bg-surface rounded-2xl shadow-xl border border-outline-variant/20 p-4">
+
+      <!-- Header mese/anno -->
+      <div class="flex items-center justify-between mb-3">
+        <button type="button" (click)="prevMonth()"
+                class="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-surface-container transition-colors">
+          <span class="material-symbols-outlined text-base text-on-surface-variant">chevron_left</span>
+        </button>
+        <span class="font-inter font-semibold text-sm text-on-surface">
+          {{ MONTHS[viewMonth()] }} {{ viewYear() }}
+        </span>
+        <button type="button" (click)="nextMonth()"
+                class="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-surface-container transition-colors">
+          <span class="material-symbols-outlined text-base text-on-surface-variant">chevron_right</span>
+        </button>
+      </div>
+
+      <!-- Intestazione giorni -->
+      <div class="grid grid-cols-7 mb-1">
+        @for (d of DAYS; track d) {
+          <div class="text-center font-inter text-[10px] font-semibold text-on-surface-variant/60 uppercase py-1">{{ d }}</div>
+        }
+      </div>
+
+      <!-- Celle giorni -->
+      <div class="grid grid-cols-7 gap-y-0.5">
+        @for (day of cells(); track $index) {
+          <button type="button"
+                  [disabled]="!day"
+                  (click)="select(day)"
+                  [ngClass]="{
+                    'bg-primary text-on-primary font-bold': day === selectedDay(),
+                    'bg-primary/10 text-primary font-semibold': isToday(day) && day !== selectedDay(),
+                    'hover:bg-surface-container text-on-surface cursor-pointer': !!day && day !== selectedDay(),
+                    'pointer-events-none invisible': !day
+                  }"
+                  class="h-8 w-full rounded-lg font-inter text-sm transition-colors flex items-center justify-center">
+            {{ day ?? '' }}
+          </button>
+        }
+      </div>
+
+    </div>
+  }
+
+</div>

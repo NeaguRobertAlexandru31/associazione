@@ -6,6 +6,9 @@ import { Booking, CalendarEvent, CreateEventDto, EventAccessType, EventPhoto, Ev
 import { EventsService } from '../../../../core/services/events/events';
 import { environment } from '../../../../../environments/environment';
 import { BookingScanner } from '../../../../features/private/events/booking-scanner/booking-scanner';
+import { DatePicker } from '../../../../shared/components/private/date-picker/date-picker';
+import { TimePicker } from '../../../../shared/components/private/time-picker/time-picker';
+import { LocationAutocomplete } from '../../../../shared/components/private/location-autocomplete/location-autocomplete';
 
 export interface ImagePreview {
   file:      File;
@@ -19,7 +22,7 @@ type DetailTab = 'info' | 'rsvp' | 'photos' | 'bookings';
 
 @Component({
   selector: 'app-event-calendar',
-  imports: [FormsModule, DatePipe, BookingScanner],
+  imports: [FormsModule, DatePipe, BookingScanner, DatePicker, TimePicker, LocationAutocomplete],
   templateUrl: './event-calendar.html',
   styleUrl: './event-calendar.css',
 })
