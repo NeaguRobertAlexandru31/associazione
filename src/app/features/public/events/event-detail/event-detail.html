@@ -218,7 +218,7 @@
             }
 
             @if (rsvpStep() === 'idle') {
-              <div class="flex flex-col gap-3">
+              <div class="flex flex-col sm:flex-row gap-3">
                 <button (click)="openRsvpForm('attending')"
                         class="w-full flex items-center justify-center gap-2 py-3.5 rounded-xl bg-primary text-white font-inter font-semibold text-base hover:bg-primary/90 transition-colors shadow-lg">
                   <span class="material-symbols-outlined text-base">check_circle</span>
@@ -369,16 +369,8 @@
           <p class="font-inter text-xs text-on-surface-variant uppercase tracking-wider font-semibold mb-2">Aggiungi al calendario</p>
 
           <a [href]="googleCalendarUrl(ev)" target="_blank" rel="noopener"
-             class="flex items-center justify-center gap-2.5 w-full py-2.5 px-4 rounded-xl bg-[#1a73e8] font-inter font-semibold text-sm text-white hover:bg-[#1765cc] transition-all">
-            <!-- Google Calendar icon -->
-            <svg class="w-5 h-5 flex-shrink-0" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
-              <rect x="5" y="5" width="38" height="38" rx="3" fill="white"/>
-              <rect x="5" y="5" width="38" height="11" rx="3" fill="white" opacity="0.25"/>
-              <rect x="5" y="13" width="38" height="3" fill="white" opacity="0.25"/>
-              <line x1="15" y1="3" x2="15" y2="13" stroke="white" stroke-width="3" stroke-linecap="round"/>
-              <line x1="33" y1="3" x2="33" y2="13" stroke="white" stroke-width="3" stroke-linecap="round"/>
-              <text x="24" y="36" text-anchor="middle" font-family="Arial,sans-serif" font-size="15" font-weight="bold" fill="#1a73e8">{{ formatDayNumber(ev.date) }}</text>
-            </svg>
+             class="flex items-center justify-center gap-2.5 w-full py-2.5 px-4 rounded-xl bg-[#e8f0fe] text-[#1a73e8] font-inter font-semibold text-sm hover:bg-[#d2e3fc] transition-all">
+            <img src="/icons8-google-calendar-48.png" alt="Google Calendar" class="w-5 h-5 flex-shrink-0" />
             Google Calendar
           </a>
         </div>

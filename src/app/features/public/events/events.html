@@ -58,7 +58,7 @@
                 {{ formatDay(feat.date) }} {{ formatMonth(feat.date) }}
               </div>
             </div>
-            <div class="p-7 flex flex-col flex-1">
+            <div class="p-7 flex flex-col flex-1 min-h-0">
               <p class="font-inter font-bold text-on-surface-variant text-[10px] uppercase tracking-widest mb-3">
                 {{ 'events.featured_label' | translate }}
               </p>
@@ -74,7 +74,7 @@
                 </span>
               </div>
               @if (feat.description) {
-                <p class="font-inter text-on-surface-variant text-sm leading-relaxed line-clamp-6 mb-5">{{ feat.description }}</p>
+                <p class="font-inter text-on-surface-variant text-sm leading-relaxed line-clamp-3 mb-5">{{ feat.description }}</p>
               }
             </div>
           </div>
@@ -155,7 +155,7 @@
             <p class="font-inter text-on-surface-variant text-xs mb-1">{{ formatFullDate(a.date) }}</p>
             <h3 class="font-romania font-bold text-primary text-lg mb-2 group-hover:underline underline-offset-2">{{ a.name }}</h3>
             @if (a.description) {
-              <p class="font-inter text-on-surface-variant text-sm leading-relaxed">{{ a.description }}</p>
+              <p class="font-inter text-on-surface-variant text-sm leading-relaxed line-clamp-3">{{ a.description }}</p>
             }
           </a>
         }

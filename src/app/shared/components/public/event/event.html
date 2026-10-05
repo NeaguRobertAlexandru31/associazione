@@ -10,7 +10,7 @@
   </div>
   <h3 class="font-romania font-bold text-primary text-lg">{{ event().name }}</h3>
   @if (event().description) {
-    <p class="font-inter text-on-surface-variant text-sm leading-relaxed flex-1">{{ event().description }}</p>
+    <p class="font-inter text-on-surface-variant text-sm leading-relaxed line-clamp-3">{{ event().description }}</p>
   }
   <div class="flex items-center justify-between pt-2 border-t border-outline-variant/20">
     <span class="font-inter text-xs text-on-surface-variant flex items-center gap-1">
