@@ -1,11 +1,12 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { LucideAngularModule } from 'lucide-angular';
 import { TranslatePipe } from '../../../../i18n/translate.pipe';
 import { PublicStats, StatsService } from '../../../../core/services/stats/stats';
 
 @Component({
   selector: 'app-footer',
-  imports: [RouterLink, TranslatePipe],
+  imports: [RouterLink, TranslatePipe, LucideAngularModule],
   templateUrl: './footer.html',
   styleUrl: './footer.css',
 })
