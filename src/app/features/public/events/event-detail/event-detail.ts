@@ -36,6 +36,25 @@ export class EventDetail implements OnInit, OnDestroy {
     this.bookingObserver.observe(el.nativeElement);
   }
 
+  private rsvpObserver?: IntersectionObserver;
+  private rsvpEl?: HTMLElement;
+  readonly rsvpSectionVisible = signal(false);
+
+  @ViewChild('rsvpSection') set rsvpSectionRef(el: ElementRef<HTMLElement> | undefined) {
+    this.rsvpObserver?.disconnect();
+    this.rsvpEl = el?.nativeElement;
+    if (!el) return;
+    this.rsvpObserver = new IntersectionObserver(
+      ([entry]) => this.rsvpSectionVisible.set(entry.isIntersecting),
+      { threshold: 0.1 }
+    );
+    this.rsvpObserver.observe(el.nativeElement);
+  }
+
+  scrollToRsvp(): void {
+    this.rsvpEl?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
   scrollToBooking(): void {
     this.openBookingForm();
     this.bookingEl?.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -84,6 +103,7 @@ export class EventDetail implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.bookingObserver?.disconnect();
+    this.rsvpObserver?.disconnect();
   }
 
   ngOnInit(): void {

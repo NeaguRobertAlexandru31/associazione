@@ -14,6 +14,12 @@
   <div class="absolute inset-x-0 bottom-0 p-4">
     <div class="flex items-end justify-between gap-3">
       <div>
+        @if (isMembersOnly()) {
+          <span class="inline-flex items-center gap-1 mb-1.5 px-2 py-0.5 bg-secondary text-white font-inter font-bold text-[10px] uppercase tracking-wider rounded-full">
+            <span class="material-symbols-outlined text-[10px]">star</span>
+            Solo soci
+          </span>
+        }
         <h3 class="font-romania font-bold text-white text-lg leading-tight">{{ event().name }}</h3>
         <div class="flex flex-wrap items-center gap-x-3 gap-y-0.5 mt-1 text-white/90 font-inter text-xs">
           <span class="flex items-center gap-1">
@@ -24,6 +30,12 @@
             <span class="material-symbols-outlined text-xs">schedule</span>
             {{ event().time }}
           </span>
+          @if (isLimited()) {
+            <span class="flex items-center gap-1">
+              <span class="material-symbols-outlined text-xs">group</span>
+              {{ event().capacity }} posti
+            </span>
+          }
         </div>
       </div>
       <span class="flex-shrink-0 flex items-center text-white">
@@ -33,31 +45,58 @@
   </div>
 </a>
 
-<!-- Desktop: layout orizzontale originale -->
+<!-- Desktop: layout metà foto / metà info -->
 <a [routerLink]="event().slug ? ['/events', event().slug] : ['/events']"
-   class="hidden sm:flex sm:items-center gap-4 bg-surface-container-lowest rounded-2xl px-5 py-5 shadow-sm border-l-4 hover:shadow-md transition-shadow"
+   class="hidden sm:grid sm:grid-cols-2 bg-surface-container-lowest rounded-2xl overflow-hidden shadow-sm border-l-4 hover:shadow-md transition-shadow"
    [class]="accentClass()">
-  <div class="flex items-center gap-4 flex-1 min-w-0">
-    <div class="text-center min-w-[3rem] flex-shrink-0">
-      <div class="font-romania font-extrabold text-primary text-3xl leading-none">{{ day() }}</div>
-      <div class="font-inter font-semibold text-on-surface-variant text-xs uppercase tracking-wider mt-0.5">{{ month() }}</div>
+
+  <!-- Sinistra: foto -->
+  <div class="relative aspect-[16/9] sm:aspect-auto overflow-hidden">
+    <img [src]="coverImg()" [alt]="event().name"
+         class="w-full h-full object-cover hover:scale-105 transition-transform duration-500" />
+    <div class="absolute top-3 left-3 bg-secondary text-white font-romania font-bold text-xs px-2.5 py-1 rounded-full">
+      {{ day() }} {{ month() }}
     </div>
-    <div class="flex-1 min-w-0">
-      <h3 class="font-romania font-bold text-primary text-lg leading-tight">{{ event().name }}</h3>
-      <div class="flex flex-wrap items-center gap-x-4 gap-y-1 mt-1 text-on-surface-variant font-inter text-sm">
-        <span class="flex items-center gap-1">
+  </div>
+
+  <!-- Destra: info -->
+  <div class="flex flex-col justify-between p-6">
+    <div>
+      @if (isMembersOnly()) {
+        <span class="inline-flex items-center gap-1 mb-2 px-2.5 py-0.5 bg-secondary text-white font-inter font-bold text-[10px] uppercase tracking-wider rounded-full">
+          <span class="material-symbols-outlined text-[10px]">star</span>
+          Solo soci
+        </span>
+      }
+      <h3 class="font-romania font-bold text-primary text-xl leading-tight mb-3">{{ event().name }}</h3>
+      <div class="flex flex-col gap-2 text-on-surface-variant font-inter text-sm">
+        <span class="flex items-center gap-1.5">
           <span class="material-symbols-outlined text-sm">location_on</span>
           {{ event().location }}
         </span>
-        <span class="flex items-center gap-1">
+        <span class="flex items-center gap-1.5">
           <span class="material-symbols-outlined text-sm">schedule</span>
           {{ event().time }}
         </span>
+        @if (isLimited()) {
+          <span class="flex items-center gap-1.5">
+            <span class="material-symbols-outlined text-sm">group</span>
+            {{ event().capacity }} posti disponibili
+          </span>
+        }
       </div>
     </div>
+    @if (isPublicOpen()) {
+      <span class="mt-4 self-end inline-flex items-center gap-1.5 px-4 py-2 bg-primary text-on-primary font-inter font-semibold text-xs rounded-full">
+        {{ 'home.event_discover_btn' | translate }}
+        <span class="material-symbols-outlined text-sm">arrow_forward</span>
+      </span>
+    } @else {
+      <span class="mt-4 self-end inline-flex items-center gap-1.5 px-4 py-2 bg-primary text-on-primary font-inter font-semibold text-xs rounded-full">
+        {{ 'home.event_1_btn' | translate }}
+        <span class="material-symbols-outlined text-sm">arrow_forward</span>
+      </span>
+    }
   </div>
-  <span class="self-center flex items-center gap-1 font-inter font-semibold text-sm text-primary flex-shrink-0">
-    {{ 'home.event_1_btn' | translate }}
-    <span class="material-symbols-outlined text-base">arrow_forward</span>
-  </span>
+
 </a>

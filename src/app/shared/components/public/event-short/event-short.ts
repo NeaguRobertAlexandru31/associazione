@@ -31,4 +31,8 @@ export class EventShort {
     if (!path) return this.siteSettings.placeholder('placeholder_page_hero');
     return path.startsWith('http') ? path : `${environment.apiUrl}${path}`;
   });
+
+  readonly isMembersOnly = computed(() => this.event().accessType === 'members_only');
+  readonly isLimited     = computed(() => this.event().hasCapacity && this.event().capacity != null);
+  readonly isPublicOpen  = computed(() => this.event().accessType === 'public' && !this.event().hasCapacity);
 }
