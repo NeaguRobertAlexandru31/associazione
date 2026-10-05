@@ -37,6 +37,7 @@ export class EventDetail implements OnInit, OnDestroy {
   }
 
   scrollToBooking(): void {
+    this.openBookingForm();
     this.bookingEl?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
@@ -55,7 +56,6 @@ export class EventDetail implements OnInit, OnDestroy {
   participantPhotos      = signal<EventPhoto[]>([]);
   participantLightboxIndex = signal<number | null>(null);
   uploadUrl              = signal<string | null>(null);
-  shareLinkCopied        = signal(false);
 
   // ── Prenotazione ──────────────────────────────────────────────────────
   availability    = signal<BookingAvailability | null>(null);
@@ -73,8 +73,14 @@ export class EventDetail implements OnInit, OnDestroy {
     return a?.hasCapacity && (a.available ?? 0) === 0;
   });
 
-  readonly isMembersOnly = computed(() => this.event()?.accessType === 'members_only');
-  readonly isLimited     = computed(() => this.event()?.accessType === 'limited');
+  readonly isMembersOnly  = computed(() => this.event()?.accessType === 'members_only');
+  readonly isLimited      = computed(() => this.event()?.accessType === 'limited');
+  readonly eventStarted   = computed(() => {
+    const date = this.event()?.date;
+    if (!date) return false;
+    const today = new Date().toISOString().slice(0, 10);
+    return new Date(date).toISOString().slice(0, 10) <= today;
+  });
 
   ngOnDestroy(): void {
     this.bookingObserver?.disconnect();
@@ -155,14 +161,6 @@ export class EventDetail implements OnInit, OnDestroy {
     this.participantLightboxIndex.update(i => i !== null ? (i + 1) % len : 0);
   }
 
-  copyShareLink(): void {
-    const url = this.uploadUrl();
-    if (!url) return;
-    navigator.clipboard.writeText(url).then(() => {
-      this.shareLinkCopied.set(true);
-      setTimeout(() => this.shareLinkCopied.set(false), 2000);
-    });
-  }
 
   // ── RSVP ──────────────────────────────────────────────────────────────
   openRsvpForm(status: RsvpStatus): void {
@@ -196,16 +194,6 @@ export class EventDetail implements OnInit, OnDestroy {
     return `https://calendar.google.com/calendar/render?${params.toString()}&dates=${start}/${end}`;
   }
 
-  downloadIcs(ev: CalendarEvent): void {
-    const start = this.toIcsDate(ev.date, ev.time);
-    const end   = this.toIcsDate(ev.date, ev.time, 2);
-    const ics = ['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//ACR//Events//IT','BEGIN:VEVENT',`DTSTART:${start}`,`DTEND:${end}`,`SUMMARY:${ev.name}`,`LOCATION:${ev.location}`,`DESCRIPTION:${ev.description ?? ''}`, 'END:VEVENT','END:VCALENDAR'].join('\r\n');
-    const blob = new Blob([ics], { type: 'text/calendar' });
-    const url  = URL.createObjectURL(blob);
-    const a    = document.createElement('a');
-    a.href = url; a.download = `${ev.name.replace(/\s+/g, '-')}.ics`; a.click();
-    URL.revokeObjectURL(url);
-  }
 
   resolveImg(path: string): string {
     return path.startsWith('http') ? path : `${environment.apiUrl}${path}`;
@@ -231,11 +219,4 @@ export class EventDetail implements OnInit, OnDestroy {
     return `${year}${pad(month)}${pad(day)}T${pad(d.getHours())}${pad(d.getMinutes())}00`;
   }
 
-  private toIcsDate(dateIso: string, time: string, addHours = 0): string {
-    const [h, m] = time.replace('.', ':').split(':').map(Number);
-    const [year, month, day] = dateIso.slice(0, 10).split('-').map(Number);
-    const d = new Date(year, month - 1, day, (h || 0) + addHours, m || 0, 0);
-    const pad = (n: number) => String(n).padStart(2, '0');
-    return `${year}${pad(month)}${pad(day)}T${pad(d.getHours())}${pad(d.getMinutes())}00`;
-  }
 }

@@ -365,62 +365,39 @@
         </div>
 
         <!-- Calendar buttons -->
-        <div class="border-t border-outline-variant/20 pt-4 mt-2 flex flex-col gap-2">
-          <p class="font-inter text-xs text-on-surface-variant uppercase tracking-wider font-semibold mb-1">Aggiungi al calendario</p>
+        <div class="border-t border-outline-variant/20 pt-4 mt-2">
+          <p class="font-inter text-xs text-on-surface-variant uppercase tracking-wider font-semibold mb-2">Aggiungi al calendario</p>
 
           <a [href]="googleCalendarUrl(ev)" target="_blank" rel="noopener"
-             class="flex items-center gap-2.5 w-full py-2.5 px-4 rounded-xl bg-white border border-[#dadce0] font-inter font-semibold text-sm text-[#3c4043] hover:bg-[#f8f9fa] hover:shadow-sm transition-all">
-            <!-- Google Calendar official logo -->
-            <svg class="w-[18px] h-[18px] flex-shrink-0" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
-              <rect x="6" y="6" width="36" height="36" rx="3" fill="white" stroke="#dadce0" stroke-width="2"/>
-              <rect x="6" y="6" width="36" height="10" rx="3" fill="#4285F4"/>
-              <rect x="6" y="13" width="36" height="3" fill="#4285F4"/>
-              <text x="24" y="34" text-anchor="middle" font-family="Arial,sans-serif" font-size="14" font-weight="bold" fill="#4285F4">{{ formatDayNumber(ev.date) }}</text>
-              <line x1="14" y1="6" x2="14" y2="18" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
-              <line x1="34" y1="6" x2="34" y2="18" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+             class="flex items-center justify-center gap-2.5 w-full py-2.5 px-4 rounded-xl bg-[#1a73e8] font-inter font-semibold text-sm text-white hover:bg-[#1765cc] transition-all">
+            <!-- Google Calendar icon -->
+            <svg class="w-5 h-5 flex-shrink-0" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+              <rect x="5" y="5" width="38" height="38" rx="3" fill="white"/>
+              <rect x="5" y="5" width="38" height="11" rx="3" fill="white" opacity="0.25"/>
+              <rect x="5" y="13" width="38" height="3" fill="white" opacity="0.25"/>
+              <line x1="15" y1="3" x2="15" y2="13" stroke="white" stroke-width="3" stroke-linecap="round"/>
+              <line x1="33" y1="3" x2="33" y2="13" stroke="white" stroke-width="3" stroke-linecap="round"/>
+              <text x="24" y="36" text-anchor="middle" font-family="Arial,sans-serif" font-size="15" font-weight="bold" fill="#1a73e8">{{ formatDayNumber(ev.date) }}</text>
             </svg>
             Google Calendar
           </a>
-
-          <button (click)="downloadIcs(ev)"
-                  class="flex items-center gap-2.5 w-full py-2.5 px-4 rounded-xl border border-[#dadce0] font-inter font-semibold text-sm text-[#3c4043] hover:bg-[#f8f9fa] hover:shadow-sm transition-all">
-            <!-- Apple Calendar logo -->
-            <svg class="w-[18px] h-[18px] flex-shrink-0" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
-              <rect x="4" y="8" width="40" height="36" rx="5" fill="white" stroke="#dadce0" stroke-width="2"/>
-              <rect x="4" y="8" width="40" height="12" rx="5" fill="#FA3E3E"/>
-              <rect x="4" y="17" width="40" height="3" fill="#FA3E3E"/>
-              <line x1="14" y1="6" x2="14" y2="16" stroke="#555" stroke-width="2.5" stroke-linecap="round"/>
-              <line x1="34" y1="6" x2="34" y2="16" stroke="#555" stroke-width="2.5" stroke-linecap="round"/>
-              <text x="24" y="37" text-anchor="middle" font-family="Arial,sans-serif" font-size="13" font-weight="bold" fill="#1a1a1a">{{ formatDayNumber(ev.date) }}</text>
-            </svg>
-            Apple / Outlook (.ics)
-          </button>
         </div>
 
-        @if (uploadUrl()) {
-          <div class="border-t border-outline-variant/20 pt-4 flex flex-col gap-2">
-            <p class="font-inter text-xs text-on-surface-variant uppercase tracking-wider font-semibold mb-1">Condividi le tue foto</p>
-            <div class="flex gap-2">
-              <a [href]="uploadUrl()" target="_blank" rel="noopener"
-                 class="flex items-center gap-2.5 flex-1 py-2.5 px-4 rounded-xl border border-outline-variant/40 font-inter font-semibold text-sm text-on-surface hover:bg-surface-container transition-all">
-                <span class="material-symbols-outlined text-base text-primary" style="font-variation-settings:'FILL' 1">photo_camera</span>
-                <span class="flex-1 text-left">Carica le tue foto</span>
-              </a>
-              <button (click)="copyShareLink()"
-                      class="flex items-center justify-center w-10 h-10 rounded-xl border border-outline-variant/40 text-on-surface-variant hover:bg-surface-container transition-all flex-shrink-0">
-                <span class="material-symbols-outlined text-base">{{ shareLinkCopied() ? 'check' : 'content_copy' }}</span>
-              </button>
-            </div>
-          </div>
-        }
-
-        <div class="pt-1">
-          <a routerLink="/events"
-             class="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl border border-outline-variant font-inter font-semibold text-sm text-primary hover:bg-surface-container transition-colors">
-            <span class="material-symbols-outlined text-base">arrow_back</span>
-            Tutti gli eventi
-          </a>
+        <div class="border-t border-outline-variant/20 pt-4">
+          <p class="font-inter text-xs text-on-surface-variant uppercase tracking-wider font-semibold mb-2">Condividi le tue foto</p>
+          @if (!eventStarted()) {
+            <p class="font-inter text-sm text-on-surface-variant leading-relaxed">
+              Durante l'evento potrai caricare le tue foto e condividerle con tutti i partecipanti.
+            </p>
+          } @else if (uploadUrl()) {
+            <a [href]="uploadUrl()" target="_blank" rel="noopener"
+               class="flex items-center justify-center gap-2.5 w-full py-2.5 px-4 rounded-xl border border-outline-variant/40 font-inter font-semibold text-sm text-on-surface hover:bg-surface-container transition-all">
+              <span class="material-symbols-outlined text-base text-primary" style="font-variation-settings:'FILL' 1">photo_camera</span>
+              Carica le tue foto
+            </a>
+          }
         </div>
+
       </div>
 
     </div>
@@ -431,9 +408,9 @@
 <!-- FAB sticky "Prenota ora" — solo mobile, solo se prenotazione richiesta e sezione non visibile -->
 @if (event(); as ev) {
   @if ((ev.accessType === 'limited' || ev.accessType === 'members_only' || ev.hasCapacity) && bookingStep() === 'idle' && !bookingSectionVisible()) {
-    <div class="fixed bottom-0 left-0 right-0 z-40 px-4 pt-12 pb-5 md:hidden" style="background: linear-gradient(to top, var(--color-surface) 40%, transparent)">
+    <div class="fixed bottom-0 left-0 right-0 z-40 flex justify-center px-4 pt-12 pb-5" style="background: linear-gradient(to top, var(--color-surface) 40%, transparent)">
       <button (click)="scrollToBooking()"
-              class="flex items-center justify-center gap-2 w-full py-3.5 rounded-xl bg-primary text-white font-inter font-semibold text-base hover:bg-primary/90 transition-colors shadow-lg">
+              class="flex items-center justify-center gap-2 w-full max-w-xs py-3.5 rounded-xl bg-primary text-white font-inter font-semibold text-base hover:bg-primary/90 transition-colors shadow-lg">
         <span class="material-symbols-outlined text-base">event_seat</span>
         {{ isSoldOut() ? 'Lista d\'attesa' : 'Prenota ora' }}
       </button>
