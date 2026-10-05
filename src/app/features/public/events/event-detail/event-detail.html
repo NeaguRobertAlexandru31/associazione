@@ -55,7 +55,7 @@
 
         <!-- Prenotazione (eventi a numero chiuso o solo soci) -->
         @if (ev.accessType === 'limited' || ev.accessType === 'members_only' || ev.hasCapacity) {
-          <div class="mb-10 bg-surface-container-lowest rounded-2xl p-6 shadow-sm">
+          <div #bookingSection class="mb-10 bg-surface-container-lowest rounded-2xl p-6 shadow-sm">
             <div class="flex items-start gap-3 mb-4">
               <div class="w-10 h-10 rounded-xl bg-primary/8 flex items-center justify-center flex-shrink-0">
                 <span class="material-symbols-outlined text-primary" style="font-variation-settings:'FILL' 1">confirmation_number</span>
@@ -102,7 +102,7 @@
                 </button>
               } @else {
                 <button (click)="openBookingForm()"
-                        class="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-primary text-white font-inter font-semibold text-sm hover:bg-primary/90 transition-colors">
+                        class="flex items-center justify-center gap-2 w-full sm:w-auto px-5 py-2.5 rounded-xl bg-primary text-white font-inter font-semibold text-sm hover:bg-primary/90 transition-colors">
                   <span class="material-symbols-outlined text-base">event_seat</span>
                   Prenota ora
                 </button>
@@ -426,6 +426,19 @@
     </div>
   </div>
 
+}
+
+<!-- FAB sticky "Prenota ora" — solo mobile, solo se prenotazione richiesta e sezione non visibile -->
+@if (event(); as ev) {
+  @if ((ev.accessType === 'limited' || ev.accessType === 'members_only' || ev.hasCapacity) && bookingStep() === 'idle' && !bookingSectionVisible()) {
+    <div class="fixed bottom-0 left-0 right-0 z-40 px-4 pt-12 pb-5 md:hidden" style="background: linear-gradient(to top, var(--color-surface) 40%, transparent)">
+      <button (click)="scrollToBooking()"
+              class="flex items-center justify-center gap-2 w-full py-3.5 rounded-xl bg-primary text-white font-inter font-semibold text-base hover:bg-primary/90 transition-colors shadow-lg">
+        <span class="material-symbols-outlined text-base">event_seat</span>
+        {{ isSoldOut() ? 'Lista d\'attesa' : 'Prenota ora' }}
+      </button>
+    </div>
+  }
 }
 
 <!-- Lightbox -->

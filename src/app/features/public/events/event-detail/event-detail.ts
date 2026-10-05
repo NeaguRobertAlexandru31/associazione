@@ -1,4 +1,4 @@
-import { Component, OnInit, computed, inject, signal } from '@angular/core';
+import { Component, OnInit, OnDestroy, computed, inject, signal, ElementRef, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { BookingAvailability, CalendarEvent, EventPhoto, EventAccessType } from '../../../../core/models/event.model';
@@ -16,10 +16,29 @@ type BookingStep = 'idle' | 'form' | 'success' | 'waitlist' | 'error';
   templateUrl: './event-detail.html',
   styleUrl: './event-detail.css',
 })
-export class EventDetail implements OnInit {
+export class EventDetail implements OnInit, OnDestroy {
   private route     = inject(ActivatedRoute);
   private svc       = inject(EventsService);
   private analytics = inject(Analytics);
+
+  private bookingObserver?: IntersectionObserver;
+  private bookingEl?: HTMLElement;
+  readonly bookingSectionVisible = signal(false);
+
+  @ViewChild('bookingSection') set bookingSectionRef(el: ElementRef<HTMLElement> | undefined) {
+    this.bookingObserver?.disconnect();
+    this.bookingEl = el?.nativeElement;
+    if (!el) return;
+    this.bookingObserver = new IntersectionObserver(
+      ([entry]) => this.bookingSectionVisible.set(entry.isIntersecting),
+      { threshold: 0.1 }
+    );
+    this.bookingObserver.observe(el.nativeElement);
+  }
+
+  scrollToBooking(): void {
+    this.bookingEl?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
 
   event         = signal<CalendarEvent | null>(null);
   loading       = signal(true);
@@ -56,6 +75,10 @@ export class EventDetail implements OnInit {
 
   readonly isMembersOnly = computed(() => this.event()?.accessType === 'members_only');
   readonly isLimited     = computed(() => this.event()?.accessType === 'limited');
+
+  ngOnDestroy(): void {
+    this.bookingObserver?.disconnect();
+  }
 
   ngOnInit(): void {
     const slug = this.route.snapshot.paramMap.get('slug')!;
