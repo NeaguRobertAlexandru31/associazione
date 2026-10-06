@@ -27,6 +27,7 @@ const ALL_PAGES: Omit<NavPage, 'badge'>[] = [
   { page: 'settings',     route: '/dashboard/settings',     icon: 'settings',           label: 'Impostazioni'  },
   { page: 'permissions',  route: '/dashboard/permissions',  icon: 'admin_panel_settings', label: 'Permessi'    },
   { page: 'services',    route: '/dashboard/services',    icon: 'grid_view',            label: 'Servizi'     },
+  { page: 'doc-scan',   route: '/dashboard/doc-scan',    icon: 'badge',                label: 'Scansione ID' },
 ];
 
 @Injectable({ providedIn: 'root' })
