@@ -50,9 +50,16 @@
 			@if (nextEvent(); as ev) {
 			<a [routerLink]="ev.slug ? ['/events', ev.slug] : ['/events']"
 				class="absolute -bottom-8 -left-8 p-8 bg-surface-container-lowest rounded-3xl shadow-2xl max-w-xs border border-outline-variant/20 hover:shadow-3xl hover:-translate-y-0.5 transition-all">
-				<p class="text-secondary font-inter font-bold text-sm uppercase tracking-widest mb-2">
-					{{ 'home.hero_next_event_label' | translate }}
-				</p>
+				@if (isNextEventOngoing()) {
+					<p class="inline-flex items-center gap-1.5 text-secondary font-inter font-bold text-sm uppercase tracking-widest mb-2">
+						<span class="w-1.5 h-1.5 rounded-full bg-secondary animate-pulse inline-block"></span>
+						In corso
+					</p>
+				} @else {
+					<p class="text-secondary font-inter font-bold text-sm uppercase tracking-widest mb-2">
+						{{ 'home.hero_next_event_label' | translate }}
+					</p>
+				}
 				<h3 class="text-primary font-romania font-bold text-xl mb-4">{{ ev.name }}</h3>
 				<div class="flex items-center gap-2 text-on-surface-variant font-inter text-sm">
 					<span class="material-symbols-outlined text-sm">calendar_today</span>

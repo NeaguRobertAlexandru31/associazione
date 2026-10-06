@@ -29,11 +29,26 @@ export class Home implements OnInit {
   readonly upcoming = computed(() => {
     const events = this.allEvents();
     if (events === null) return null;
-    const now = new Date();
-    return events.filter(e => new Date(e.date) >= now).slice(0, 3);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    return events.filter(e => {
+      const d = new Date(e.date);
+      d.setHours(0, 0, 0, 0);
+      return d >= today;
+    }).slice(0, 3);
   });
 
   readonly nextEvent = computed(() => this.upcoming()?.[0] ?? null);
+
+  readonly isNextEventOngoing = computed(() => {
+    const ev = this.nextEvent();
+    if (!ev) return false;
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const d = new Date(ev.date);
+    d.setHours(0, 0, 0, 0);
+    return d.getTime() === today.getTime();
+  });
 
   readonly latestNews = computed(() => this.allNews()?.slice(0, 3) ?? null);
 

@@ -46,7 +46,7 @@ export class Events implements OnInit {
       .slice(0, 6);
   });
 
-  readonly featured = computed(() => this.upcoming()[0] ?? null);
+  readonly featured = computed(() => this.ongoing()[0] ?? this.upcoming()[0] ?? null);
 
   readonly archived = computed(() => {
     const today = new Date();
