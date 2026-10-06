@@ -38,6 +38,12 @@
         <span class="material-symbols-outlined text-xs">chevron_right</span>
         <span class="text-white truncate">{{ ev.name }}</span>
       </nav>
+      @if (isOngoing()) {
+        <div class="inline-flex items-center gap-1.5 mb-3 px-3 py-1 bg-secondary text-white font-inter font-bold text-xs uppercase tracking-wider rounded-full">
+          <span class="w-1.5 h-1.5 rounded-full bg-white animate-pulse inline-block"></span>
+          In corso
+        </div>
+      }
       <h1 class="font-romania font-extrabold text-white leading-tight"
           style="font-size: clamp(2rem, 5vw, 3.5rem)">{{ ev.name }}</h1>
     </div>

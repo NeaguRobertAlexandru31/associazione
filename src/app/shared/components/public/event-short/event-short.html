@@ -5,10 +5,17 @@
    style="background-size: cover; background-position: center">
   <div class="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent"></div>
 
-  <!-- Badge data in alto a sinistra -->
-  <div class="absolute top-3 left-3 bg-secondary text-white font-romania font-bold text-xs px-2.5 py-1 rounded-full">
-    {{ day() }} {{ month() }}
-  </div>
+  <!-- Badge data / in corso in alto a sinistra -->
+  @if (isOngoing()) {
+    <div class="absolute top-3 left-3 bg-secondary text-white font-inter font-bold text-xs px-2.5 py-1 rounded-full flex items-center gap-1">
+      <span class="w-1.5 h-1.5 rounded-full bg-white animate-pulse inline-block"></span>
+      In corso
+    </div>
+  } @else {
+    <div class="absolute top-3 left-3 bg-secondary text-white font-romania font-bold text-xs px-2.5 py-1 rounded-full">
+      {{ day() }} {{ month() }}
+    </div>
+  }
 
   <!-- Contenuto in basso -->
   <div class="absolute inset-x-0 bottom-0 p-4">
@@ -54,9 +61,16 @@
   <div class="relative aspect-[16/9] sm:aspect-auto overflow-hidden">
     <img [src]="coverImg()" [alt]="event().name"
          class="w-full h-full object-cover hover:scale-105 transition-transform duration-500" />
-    <div class="absolute top-3 left-3 bg-secondary text-white font-romania font-bold text-xs px-2.5 py-1 rounded-full">
-      {{ day() }} {{ month() }}
-    </div>
+    @if (isOngoing()) {
+      <div class="absolute top-3 left-3 bg-secondary text-white font-inter font-bold text-xs px-2.5 py-1 rounded-full flex items-center gap-1">
+        <span class="w-1.5 h-1.5 rounded-full bg-white animate-pulse inline-block"></span>
+        In corso
+      </div>
+    } @else {
+      <div class="absolute top-3 left-3 bg-secondary text-white font-romania font-bold text-xs px-2.5 py-1 rounded-full">
+        {{ day() }} {{ month() }}
+      </div>
+    }
   </div>
 
   <!-- Destra: info -->

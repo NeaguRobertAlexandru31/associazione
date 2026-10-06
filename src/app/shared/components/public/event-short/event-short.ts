@@ -35,4 +35,11 @@ export class EventShort {
   readonly isMembersOnly = computed(() => this.event().accessType === 'members_only');
   readonly isLimited     = computed(() => this.event().hasCapacity && this.event().capacity != null);
   readonly isPublicOpen  = computed(() => this.event().accessType === 'public' && !this.event().hasCapacity);
+  readonly isOngoing     = computed(() => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const d = new Date(this.event().date);
+    d.setHours(0, 0, 0, 0);
+    return d.getTime() === today.getTime();
+  });
 }
