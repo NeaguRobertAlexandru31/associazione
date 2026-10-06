@@ -32,7 +32,7 @@ export class TesseraPreview {
     const r = this.result();
     const year = r?.membershipYear ?? new Date().getFullYear();
     const num  = r?.id ? r.id.slice(-4).toUpperCase() : '0042';
-    return `ACR · ${year} · ${num}`;
+    return `APS Marama · ${year} · ${num}`;
   });
 
   readonly validityLabel = computed(() => {

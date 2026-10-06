@@ -1,4 +1,4 @@
-<div class="min-h-screen bg-surface flex items-center justify-center p-4 relative overflow-hidden">
+<div class="min-h-screen bg-surface flex flex-col p-6 relative overflow-hidden">
 
   <!-- Dot pattern -->
   <div class="absolute inset-0 pointer-events-none opacity-[0.04]"
@@ -6,132 +6,133 @@
   <div class="absolute -top-40 -right-40 w-96 h-96 bg-primary/5 rounded-full blur-3xl pointer-events-none"></div>
   <div class="absolute -bottom-40 -left-40 w-96 h-96 bg-secondary/5 rounded-full blur-3xl pointer-events-none"></div>
 
-  <div class="login-card relative z-10 w-full max-w-sm">
-
+  <!-- Back -->
+  <div class="relative z-10">
     <a routerLink="/home"
-       class="inline-flex items-center gap-1.5 font-inter text-xs text-on-surface-variant hover:text-primary transition-colors mb-8">
+       class="inline-flex items-center gap-1.5 font-inter text-xs text-on-surface-variant hover:text-primary transition-colors">
       <span class="material-symbols-outlined text-sm">arrow_back</span>
       Torna al sito
     </a>
+  </div>
 
-    <div class="bg-surface-container-lowest rounded-3xl shadow-xl border border-outline-variant/20 p-8">
+  <!-- Form -->
+  <div class="relative z-10 flex-1 flex flex-col justify-center w-full max-w-sm mx-auto">
 
-      <div class="text-center mb-8">
-        <div class="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-primary mb-4">
-          <span class="material-symbols-outlined text-on-primary text-2xl" style="font-variation-settings:'FILL' 1">lock</span>
-        </div>
-        <h1 class="font-romania font-extrabold text-primary text-2xl tracking-tight">A.C.R.</h1>
-        <p class="font-inter text-on-surface-variant text-sm mt-1">Area Riservata</p>
+    <div class="mb-10">
+      <div class="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-primary mb-5">
+        <span class="material-symbols-outlined text-on-primary text-2xl" style="font-variation-settings:'FILL' 1">lock</span>
       </div>
-
-      @if (error()) {
-        <div class="login-error flex items-center gap-2 bg-secondary/10 text-secondary border border-secondary/20 rounded-xl px-4 py-3 mb-5 font-inter text-sm">
-          <span class="material-symbols-outlined text-base flex-shrink-0" style="font-variation-settings:'FILL' 1">error</span>
-          {{ error() }}
-        </div>
-      }
-
-      <!-- ── FASE 1: email ──────────────────────────────────────────────── -->
-      @if (phase() === 'email') {
-        <form (ngSubmit)="submitEmail()" class="flex flex-col gap-4">
-          <div>
-            <label class="font-inter font-semibold text-[10px] text-on-surface-variant uppercase tracking-widest block mb-2">Email</label>
-            <input type="email" [(ngModel)]="email" name="email" required autofocus
-                   placeholder="la-tua@email.it"
-                   class="w-full px-4 py-3 rounded-xl border border-outline-variant bg-surface font-inter text-sm focus:outline-none focus:border-primary transition-colors placeholder:text-on-surface-variant/40" />
-          </div>
-          <button type="submit" [disabled]="loading() || !email.trim()"
-                  class="mt-2 w-full py-3.5 bg-primary text-on-primary font-inter font-bold text-sm rounded-xl hover:opacity-90 transition-all uppercase tracking-wide flex items-center justify-center gap-2 disabled:opacity-60">
-            @if (loading()) {
-              <span class="material-symbols-outlined text-base spin">progress_activity</span>
-              Verifica…
-            } @else {
-              Continua
-              <span class="material-symbols-outlined text-base">arrow_forward</span>
-            }
-          </button>
-        </form>
-      }
-
-      <!-- ── FASE 2: password ──────────────────────────────────────────── -->
-      @if (phase() === 'password') {
-        <div class="mb-5 flex items-center gap-2 px-3 py-2 rounded-xl bg-surface-container">
-          <span class="material-symbols-outlined text-base text-on-surface-variant" style="font-variation-settings:'FILL' 1">person</span>
-          <span class="font-inter text-sm text-on-surface flex-1 truncate">{{ email }}</span>
-          <button (click)="backToEmail()" class="font-inter text-xs text-primary hover:underline flex-shrink-0">Cambia</button>
-        </div>
-        <form (ngSubmit)="submitPassword()" class="flex flex-col gap-4">
-          <div>
-            <label class="font-inter font-semibold text-[10px] text-on-surface-variant uppercase tracking-widest block mb-2">Password</label>
-            <div class="relative">
-              <input [type]="showPassword() ? 'text' : 'password'" [(ngModel)]="password" name="password" required autofocus
-                     placeholder="••••••••"
-                     class="w-full px-4 py-3 pr-11 rounded-xl border border-outline-variant bg-surface font-inter text-sm focus:outline-none focus:border-primary transition-colors placeholder:text-on-surface-variant/40" />
-              <button type="button" (click)="showPassword.set(!showPassword())"
-                      class="absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-on-surface transition-colors">
-                <span class="material-symbols-outlined text-lg">{{ showPassword() ? 'visibility_off' : 'visibility' }}</span>
-              </button>
-            </div>
-          </div>
-          <button type="submit" [disabled]="loading() || !password"
-                  class="mt-2 w-full py-3.5 bg-primary text-on-primary font-inter font-bold text-sm rounded-xl hover:opacity-90 transition-all uppercase tracking-wide flex items-center justify-center gap-2 disabled:opacity-60">
-            @if (loading()) {
-              <span class="material-symbols-outlined text-base spin">progress_activity</span>
-              Accesso in corso…
-            } @else {
-              <span class="material-symbols-outlined text-base" style="font-variation-settings:'FILL' 1">login</span>
-              Accedi
-            }
-          </button>
-        </form>
-      }
-
-      <!-- ── FASE 3: imposta password (primo accesso) ──────────────────── -->
-      @if (phase() === 'set-password') {
-        <div class="mb-5 flex items-center gap-2 px-3 py-2 rounded-xl bg-surface-container">
-          <span class="material-symbols-outlined text-base text-on-surface-variant" style="font-variation-settings:'FILL' 1">person</span>
-          <span class="font-inter text-sm text-on-surface flex-1 truncate">{{ email }}</span>
-          <button (click)="backToEmail()" class="font-inter text-xs text-primary hover:underline flex-shrink-0">Cambia</button>
-        </div>
-        <p class="font-inter text-xs text-on-surface-variant mb-5">È il tuo primo accesso. Scegli una password per proteggere il tuo account.</p>
-        <form (ngSubmit)="submitSetPassword()" class="flex flex-col gap-4">
-          <div>
-            <label class="font-inter font-semibold text-[10px] text-on-surface-variant uppercase tracking-widest block mb-2">Imposta password</label>
-            <div class="relative">
-              <input [type]="showPassword() ? 'text' : 'password'" [(ngModel)]="password" name="password" required autofocus
-                     placeholder="Min. 6 caratteri"
-                     class="w-full px-4 py-3 pr-11 rounded-xl border border-outline-variant bg-surface font-inter text-sm focus:outline-none focus:border-primary transition-colors placeholder:text-on-surface-variant/40" />
-              <button type="button" (click)="showPassword.set(!showPassword())"
-                      class="absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-on-surface transition-colors">
-                <span class="material-symbols-outlined text-lg">{{ showPassword() ? 'visibility_off' : 'visibility' }}</span>
-              </button>
-            </div>
-          </div>
-          <div>
-            <label class="font-inter font-semibold text-[10px] text-on-surface-variant uppercase tracking-widest block mb-2">Conferma password</label>
-            <div class="relative">
-              <input [type]="showConfirm() ? 'text' : 'password'" [(ngModel)]="confirm" name="confirm" required
-                     placeholder="Ripeti la password"
-                     class="w-full px-4 py-3 pr-11 rounded-xl border border-outline-variant bg-surface font-inter text-sm focus:outline-none focus:border-primary transition-colors placeholder:text-on-surface-variant/40" />
-              <button type="button" (click)="showConfirm.set(!showConfirm())"
-                      class="absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-on-surface transition-colors">
-                <span class="material-symbols-outlined text-lg">{{ showConfirm() ? 'visibility_off' : 'visibility' }}</span>
-              </button>
-            </div>
-          </div>
-          <button type="submit" [disabled]="loading() || !password || !confirm"
-                  class="mt-2 w-full py-3.5 bg-primary text-on-primary font-inter font-bold text-sm rounded-xl hover:opacity-90 transition-all uppercase tracking-wide flex items-center justify-center gap-2 disabled:opacity-60">
-            @if (loading()) {
-              <span class="material-symbols-outlined text-base spin">progress_activity</span>
-              Salvataggio…
-            } @else {
-              <span class="material-symbols-outlined text-base" style="font-variation-settings:'FILL' 1">lock_open</span>
-              Imposta e accedi
-            }
-          </button>
-        </form>
-      }
-
+      <h1 class="font-romania font-extrabold text-primary text-3xl tracking-tight">APS Marama</h1>
+      <p class="font-inter text-on-surface-variant text-sm mt-1">Area Riservata</p>
     </div>
+
+    @if (error()) {
+      <div class="login-error flex items-center gap-2 bg-secondary/10 text-secondary border border-secondary/20 rounded-xl px-4 py-3 mb-6 font-inter text-sm">
+        <span class="material-symbols-outlined text-base flex-shrink-0" style="font-variation-settings:'FILL' 1">error</span>
+        {{ error() }}
+      </div>
+    }
+
+    <!-- ── FASE 1: email ──────────────────────────────────────────────── -->
+    @if (phase() === 'email') {
+      <form (ngSubmit)="submitEmail()" class="flex flex-col gap-4">
+        <div>
+          <label class="font-inter font-semibold text-[10px] text-on-surface-variant uppercase tracking-widest block mb-2">Email</label>
+          <input type="email" [(ngModel)]="email" name="email" required autofocus
+                 placeholder="la-tua@email.it"
+                 class="w-full px-4 py-3 rounded-xl border border-outline-variant bg-surface font-inter text-sm focus:outline-none focus:border-primary transition-colors placeholder:text-on-surface-variant/40" />
+        </div>
+        <button type="submit" [disabled]="loading() || !email.trim()"
+                class="mt-2 w-full py-3.5 bg-primary text-on-primary font-inter font-bold text-sm rounded-xl hover:opacity-90 transition-all uppercase tracking-wide flex items-center justify-center gap-2 disabled:opacity-60">
+          @if (loading()) {
+            <span class="material-symbols-outlined text-base spin">progress_activity</span>
+            Verifica…
+          } @else {
+            Continua
+            <span class="material-symbols-outlined text-base">arrow_forward</span>
+          }
+        </button>
+      </form>
+    }
+
+    <!-- ── FASE 2: password ──────────────────────────────────────────── -->
+    @if (phase() === 'password') {
+      <div class="mb-6 flex items-center gap-2 px-3 py-2 rounded-xl bg-surface-container">
+        <span class="material-symbols-outlined text-base text-on-surface-variant" style="font-variation-settings:'FILL' 1">person</span>
+        <span class="font-inter text-sm text-on-surface flex-1 truncate">{{ email }}</span>
+        <button (click)="backToEmail()" class="font-inter text-xs text-primary hover:underline flex-shrink-0">Cambia</button>
+      </div>
+      <form (ngSubmit)="submitPassword()" class="flex flex-col gap-4">
+        <div>
+          <label class="font-inter font-semibold text-[10px] text-on-surface-variant uppercase tracking-widest block mb-2">Password</label>
+          <div class="relative">
+            <input [type]="showPassword() ? 'text' : 'password'" [(ngModel)]="password" name="password" required autofocus
+                   placeholder="••••••••"
+                   class="w-full px-4 py-3 pr-11 rounded-xl border border-outline-variant bg-surface font-inter text-sm focus:outline-none focus:border-primary transition-colors placeholder:text-on-surface-variant/40" />
+            <button type="button" (click)="showPassword.set(!showPassword())"
+                    class="absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-on-surface transition-colors">
+              <span class="material-symbols-outlined text-lg">{{ showPassword() ? 'visibility_off' : 'visibility' }}</span>
+            </button>
+          </div>
+        </div>
+        <button type="submit" [disabled]="loading() || !password"
+                class="mt-2 w-full py-3.5 bg-primary text-on-primary font-inter font-bold text-sm rounded-xl hover:opacity-90 transition-all uppercase tracking-wide flex items-center justify-center gap-2 disabled:opacity-60">
+          @if (loading()) {
+            <span class="material-symbols-outlined text-base spin">progress_activity</span>
+            Accesso in corso…
+          } @else {
+            <span class="material-symbols-outlined text-base" style="font-variation-settings:'FILL' 1">login</span>
+            Accedi
+          }
+        </button>
+      </form>
+    }
+
+    <!-- ── FASE 3: imposta password (primo accesso) ──────────────────── -->
+    @if (phase() === 'set-password') {
+      <div class="mb-6 flex items-center gap-2 px-3 py-2 rounded-xl bg-surface-container">
+        <span class="material-symbols-outlined text-base text-on-surface-variant" style="font-variation-settings:'FILL' 1">person</span>
+        <span class="font-inter text-sm text-on-surface flex-1 truncate">{{ email }}</span>
+        <button (click)="backToEmail()" class="font-inter text-xs text-primary hover:underline flex-shrink-0">Cambia</button>
+      </div>
+      <p class="font-inter text-xs text-on-surface-variant mb-6">È il tuo primo accesso. Scegli una password per proteggere il tuo account.</p>
+      <form (ngSubmit)="submitSetPassword()" class="flex flex-col gap-4">
+        <div>
+          <label class="font-inter font-semibold text-[10px] text-on-surface-variant uppercase tracking-widest block mb-2">Imposta password</label>
+          <div class="relative">
+            <input [type]="showPassword() ? 'text' : 'password'" [(ngModel)]="password" name="password" required autofocus
+                   placeholder="Min. 6 caratteri"
+                   class="w-full px-4 py-3 pr-11 rounded-xl border border-outline-variant bg-surface font-inter text-sm focus:outline-none focus:border-primary transition-colors placeholder:text-on-surface-variant/40" />
+            <button type="button" (click)="showPassword.set(!showPassword())"
+                    class="absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-on-surface transition-colors">
+              <span class="material-symbols-outlined text-lg">{{ showPassword() ? 'visibility_off' : 'visibility' }}</span>
+            </button>
+          </div>
+        </div>
+        <div>
+          <label class="font-inter font-semibold text-[10px] text-on-surface-variant uppercase tracking-widest block mb-2">Conferma password</label>
+          <div class="relative">
+            <input [type]="showConfirm() ? 'text' : 'password'" [(ngModel)]="confirm" name="confirm" required
+                   placeholder="Ripeti la password"
+                   class="w-full px-4 py-3 pr-11 rounded-xl border border-outline-variant bg-surface font-inter text-sm focus:outline-none focus:border-primary transition-colors placeholder:text-on-surface-variant/40" />
+            <button type="button" (click)="showConfirm.set(!showConfirm())"
+                    class="absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-on-surface transition-colors">
+              <span class="material-symbols-outlined text-lg">{{ showConfirm() ? 'visibility_off' : 'visibility' }}</span>
+            </button>
+          </div>
+        </div>
+        <button type="submit" [disabled]="loading() || !password || !confirm"
+                class="mt-2 w-full py-3.5 bg-primary text-on-primary font-inter font-bold text-sm rounded-xl hover:opacity-90 transition-all uppercase tracking-wide flex items-center justify-center gap-2 disabled:opacity-60">
+          @if (loading()) {
+            <span class="material-symbols-outlined text-base spin">progress_activity</span>
+            Salvataggio…
+          } @else {
+            <span class="material-symbols-outlined text-base" style="font-variation-settings:'FILL' 1">lock_open</span>
+            Imposta e accedi
+          }
+        </button>
+      </form>
+    }
+
   </div>
 </div>

@@ -1,5 +1,5 @@
 @if (showShell()) { <app-navbar /> }
-<main class="flex-1">
+<main class="flex-1" [style.paddingTop]="showShell() ? 'var(--navbar-height)' : '0'">
   <router-outlet />
 </main>
 @if (showShell()) { <app-footer /> }

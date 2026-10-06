@@ -34,7 +34,8 @@ export const routes: Routes = [
 		canActivate: [authGuard],
 		loadComponent: () => import('./features/private/dashboard/dashboard').then(m => m.Dashboard),
 		children: [
-			{ path: '', redirectTo: 'overview', pathMatch: 'full' },
+			{ path: '', redirectTo: 'menu', pathMatch: 'full' },
+			{ path: 'menu',          loadComponent: () => import('./features/private/menu/menu').then(m => m.Menu) },
 			{ path: 'overview',      canActivate: [roleGuard('overview')],     loadComponent: () => import('./features/private/overview/overview').then(m => m.Overview) },
 			{ path: 'tessera',       canActivate: [roleGuard('tessera')],      loadComponent: () => import('./features/private/tessera/tessera').then(m => m.Tessera) },
 			{ path: 'members',       canActivate: [roleGuard('members')],      loadComponent: () => import('./features/private/members/members').then(m => m.Members) },

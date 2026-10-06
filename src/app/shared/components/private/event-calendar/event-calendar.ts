@@ -270,7 +270,7 @@ export class EventCalendar implements OnInit {
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 60">
           <circle cx="30" cy="30" r="30" fill="#1a2e5a"/>
           <text x="30" y="35" font-family="Arial" font-weight="bold" font-size="13"
-                fill="white" text-anchor="middle">A.C.R.</text>
+                fill="white" text-anchor="middle">APS Marama</text>
         </svg>`),
       imageOptions: { hideBackgroundDots: true, imageSize: 0.28, margin: 4, crossOrigin: 'anonymous' },
     });
@@ -319,12 +319,12 @@ export class EventCalendar implements OnInit {
     ctx.font = 'bold 22px Arial';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'top';
-    ctx.fillText('A.C.R.', 140, 48);
+    ctx.fillText('APS Marama', 140, 48);
 
     ctx.font = 'bold 13px Arial';
     ctx.fillStyle = 'rgba(255,255,255,0.7)';
-    ctx.fillText('Associazione Culturale', 140, 80);
-    ctx.fillText('Romena', 140, 98);
+    ctx.fillText('APS Marama', 140, 80);
+    ctx.fillText('', 140, 98);
 
     // Divisore
     ctx.fillStyle = 'rgba(255,255,255,0.25)';

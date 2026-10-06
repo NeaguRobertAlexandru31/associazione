@@ -1,15 +1,15 @@
-import { Component, OnInit, computed, inject } from '@angular/core';
-import { Router, RouterLink, RouterOutlet } from '@angular/router';
+import { Component, OnInit, computed, inject, signal } from '@angular/core';
+import { NavigationEnd, Router, RouterLink, RouterOutlet } from '@angular/router';
+import { filter } from 'rxjs/operators';
 import { AuthService } from '../../../core/services/auth/auth';
 import { UnreadCountService } from '../../../core/services/contact/unread-count';
 import { PermissionsService } from '../../../core/services/permissions/permissions';
 import { SiteSettingsService } from '../../../core/services/site-settings/site-settings';
 import { SidebarUser } from '../../../shared/components/private/sidebar/sidebar';
-import { DashFab } from '../../../shared/components/private/dash-fab/dash-fab';
 
 @Component({
   selector: 'app-dashboard',
-  imports: [RouterOutlet, RouterLink, DashFab],
+  imports: [RouterOutlet, RouterLink],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.css',
 })
@@ -21,6 +21,9 @@ export class Dashboard implements OnInit {
   private perms        = inject(PermissionsService);
   readonly siteSettings = inject(SiteSettingsService);
 
+  menuOpen    = signal(false);
+  menuVisible = signal(false);
+
   readonly fabUser = computed((): SidebarUser | null => {
     const u = this.auth.user();
     if (!u) return null;
@@ -31,13 +34,34 @@ export class Dashboard implements OnInit {
     this.perms.getNavItems({ messages: this.unreadCount.count() })
   );
 
-  readonly assocName  = computed(() => this.siteSettings.settings()['association_name'] ?? '');
-  readonly assocLogo  = computed(() => this.siteSettings.settings()['association_logo'] ?? '');
+  constructor() {
+    this.router.events
+      .pipe(filter(e => e instanceof NavigationEnd))
+      .subscribe(() => this.closeMenu());
+  }
 
   ngOnInit(): void {
     this.unreadCount.load();
     this.siteSettings.load();
   }
 
-  logout(): void { this.auth.logout(); this.router.navigate(['/login']); }
+  toggleMenu(): void {
+    this.menuOpen() ? this.closeMenu() : this.openMenu();
+  }
+
+  openMenu(): void {
+    this.menuVisible.set(true);
+    requestAnimationFrame(() => this.menuOpen.set(true));
+  }
+
+  closeMenu(): void {
+    this.menuOpen.set(false);
+    setTimeout(() => this.menuVisible.set(false), 400);
+  }
+
+  logout(): void {
+    this.closeMenu();
+    this.auth.logout();
+    this.router.navigate(['/login']);
+  }
 }
