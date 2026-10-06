@@ -33,6 +33,7 @@ if [ "$MODE" = "prod" ]; then
 export const environment = {
   production: true,
   apiUrl: '${API_URL}',
+  cdnUrl: '${CDN_URL:-}',
   aptabaseKey: '${APTABASE_KEY:-}',
 };
 EOF
@@ -42,6 +43,7 @@ else
 export const environment = {
   production: false,
   apiUrl: \`http://\${typeof window !== 'undefined' ? window.location.hostname : 'localhost'}:3000\`,
+  cdnUrl: '${CDN_URL:-}',
   aptabaseKey: '${APTABASE_KEY:-}',
 };
 EOF

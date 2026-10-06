@@ -33,6 +33,7 @@ jobs:
         run: |
           cat > .env.prod <<EOF
           API_URL=${{ secrets.PROD_API_URL }}
+          CDN_URL=${{ secrets.PROD_CDN_URL }}
           APTABASE_KEY=${{ secrets.PROD_APTABASE_KEY }}
           EOF
 
