@@ -41,6 +41,7 @@ export const routes: Routes = [
 			{ path: 'members',       canActivate: [roleGuard('members')],      loadComponent: () => import('./features/private/members/members').then(m => m.Members) },
 			{ path: 'members/:id',   canActivate: [roleGuard('members')],      loadComponent: () => import('./features/private/members/members-detail/members-detail').then(m => m.MembersDetail) },
 			{ path: 'events',        canActivate: [roleGuard('events')],       loadComponent: () => import('./features/private/events/events').then(m => m.Events) },
+			{ path: 'events/:slug',  canActivate: [roleGuard('events')],       loadComponent: () => import('./features/private/events/event-detail/event-detail').then(m => m.EventDetail) },
 			{ path: 'messages',      canActivate: [roleGuard('messages')],     loadComponent: () => import('./features/private/messagges/messagges').then(m => m.Messagges) },
 			{ path: 'news',          canActivate: [roleGuard('news')],         loadComponent: () => import('./features/private/news/news').then(m => m.News) },
 			{ path: 'projects',      canActivate: [roleGuard('projects')],     loadComponent: () => import('./features/private/projects/projects').then(m => m.Projects) },

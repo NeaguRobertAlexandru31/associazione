@@ -47,6 +47,10 @@ export class EventsService {
     return this.http.post<CalendarEvent>(`${environment.apiUrl}/events`, dto);
   }
 
+  update(id: string, dto: Partial<CreateEventDto>): Observable<CalendarEvent> {
+    return this.http.patch<CalendarEvent>(`${environment.apiUrl}/events/${id}`, dto);
+  }
+
   delete(id: string): Observable<void> {
     return this.http.delete<void>(`${environment.apiUrl}/events/${id}`);
   }

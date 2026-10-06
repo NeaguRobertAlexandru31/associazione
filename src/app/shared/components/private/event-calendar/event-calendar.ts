@@ -2,6 +2,7 @@ import { Component, ElementRef, OnInit, ViewChild, computed, inject, signal } fr
 import { DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
+import { Router } from '@angular/router';
 import { Booking, CalendarEvent, CreateEventDto, EventAccessType, EventPhoto, EventRsvp, RsvpStats } from '../../../../core/models/event.model';
 import { EventsService } from '../../../../core/services/events/events';
 import { environment } from '../../../../../environments/environment';
@@ -31,6 +32,7 @@ export class EventCalendar implements OnInit {
 
   private eventsService = inject(EventsService);
   private http          = inject(HttpClient);
+  private router        = inject(Router);
 
   events   = signal<CalendarEvent[]>([]);
   loading  = signal(false);
@@ -132,17 +134,8 @@ export class EventCalendar implements OnInit {
   }
 
   openDetail(evt: CalendarEvent): void {
-    this.detailEvent.set(evt);
-    this.detailTab.set('info');
-    this.detailRsvps.set([]);
-    this.eventPhotos.set([]);
-    // Ripristina QR salvato se presente
-    if (evt.uploadUrl) {
-      const origin = this.lanUrl() ?? window.location.origin;
-      const fullUrl = `${origin}${evt.uploadUrl}`;
-      this.qrUploadUrl.set(fullUrl);
-    } else {
-      this.qrUploadUrl.set(null);
+    if (evt.slug) {
+      this.router.navigate(['/dashboard/events', evt.slug]);
     }
   }
 
