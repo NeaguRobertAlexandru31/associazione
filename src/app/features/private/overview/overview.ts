@@ -1,5 +1,4 @@
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
-import { RouterLink } from '@angular/router';
 import { forkJoin } from 'rxjs';
 import { MemberListItem, MembersResponse } from '../../../core/models/member.model';
 import { CalendarEvent } from '../../../core/models/event.model';
@@ -13,7 +12,7 @@ import { Recents } from '../../../shared/components/private/recents/recents';
 
 @Component({
   selector: 'app-overview',
-  imports: [MetricCard, Recents, RouterLink],
+  imports: [MetricCard, Recents],
   templateUrl: './overview.html',
   styleUrl: './overview.css',
 })
@@ -87,15 +86,6 @@ export class Overview implements OnInit {
       loading: this.loading(),
     },
   ]);
-
-  readonly quickLinks = [
-    { route: '/dashboard/members',   icon: 'group',              label: 'Soci'        },
-    { route: '/dashboard/events',    icon: 'calendar_month',     label: 'Calendario'  },
-    { route: '/dashboard/messages',  icon: 'mail',               label: 'Messaggi'    },
-    { route: '/dashboard/news',      icon: 'article',            label: 'Contenuti'   },
-    { route: '/dashboard/donations', icon: 'volunteer_activism', label: 'Donazioni'   },
-    { route: '/dashboard/settings',  icon: 'settings',           label: 'Impostazioni'},
-  ];
 
   ngOnInit(): void {
     forkJoin({
