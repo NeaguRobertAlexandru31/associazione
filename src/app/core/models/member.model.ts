@@ -13,7 +13,8 @@ export type DashboardPage =
   | 'settings'
   | 'permissions'
   | 'tessera'
-  | 'services';
+  | 'services'
+  | 'doc-scan';
 
 export type PagePermissions = Partial<Record<DashboardPage, boolean>>;
 export type MemberCategory = 'ordinario' | 'under26' | 'sostenitore';

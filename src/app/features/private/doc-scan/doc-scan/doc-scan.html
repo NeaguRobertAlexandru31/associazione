@@ -1,0 +1,129 @@
+<app-toolbar title="Scansione Documenti" />
+
+<div class="p-6 max-w-3xl mx-auto flex flex-col gap-8">
+
+  <!-- Genera nuovo link -->
+  <div class="bg-surface-container-lowest rounded-2xl p-6 shadow-sm">
+    <h2 class="font-romania font-bold text-primary text-lg mb-1">Genera link di caricamento</h2>
+    <p class="font-inter text-sm text-on-surface-variant mb-5">
+      Il link è valido 48 ore e può essere usato una sola volta. Invialo al membro via WhatsApp o email.
+    </p>
+    <div class="flex gap-3">
+      <input type="text" [value]="newLabel()" (input)="newLabel.set($any($event.target).value)"
+             placeholder="Etichetta opzionale (es. Mario Rossi)"
+             class="flex-1 px-4 py-2.5 rounded-xl border border-outline-variant bg-surface font-inter text-sm text-on-surface placeholder:text-on-surface-variant/50 focus:outline-none focus:ring-2 focus:ring-primary/30" />
+      <button (click)="createToken()" [disabled]="creating()"
+              class="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-primary text-white font-inter font-semibold text-sm hover:bg-primary/90 disabled:opacity-50 transition-colors">
+        <span class="material-symbols-outlined text-base">add_link</span>
+        {{ creating() ? 'Creazione...' : 'Genera link' }}
+      </button>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  @if (loading()) {
+    <div class="flex justify-center py-10">
+      <span class="material-symbols-outlined text-primary text-4xl spin">progress_activity</span>
+    </div>
+  } @else {
+
+    <!-- Link attivi -->
+    @if (pending().length > 0) {
+      <div>
+        <h3 class="font-inter font-bold text-xs uppercase tracking-widest text-on-surface-variant mb-3">In attesa — {{ pending().length }}</h3>
+        <div class="flex flex-col gap-3">
+          @for (t of pending(); track t.id) {
+            <div class="bg-surface-container-lowest rounded-2xl p-4 shadow-sm flex flex-col gap-3">
+              <div class="flex items-start justify-between gap-3">
+                <div>
+                  <p class="font-inter font-semibold text-sm text-on-surface">{{ t.label ?? 'Nessuna etichetta' }}</p>
+                  <p class="font-inter text-xs text-on-surface-variant mt-0.5">Scade: {{ formatDate(t.expiresAt) }}</p>
+                </div>
+                <span class="px-2 py-0.5 rounded-full bg-amber-100 text-amber-700 font-inter font-bold text-[10px] uppercase tracking-wider flex-shrink-0">
+                  In attesa
+                </span>
+              </div>
+              <div class="flex gap-2">
+                <button (click)="copy(t)"
+                        class="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl border border-outline-variant font-inter text-sm text-primary hover:bg-surface-container transition-colors">
+                  <span class="material-symbols-outlined text-base">{{ copiedId() === t.id ? 'check' : 'content_copy' }}</span>
+                  {{ copiedId() === t.id ? 'Copiato!' : 'Copia link' }}
+                </button>
+                <button (click)="delete(t.id)"
+                        class="w-10 flex items-center justify-center rounded-xl border border-outline-variant text-on-surface-variant hover:bg-red-50 hover:text-red-500 hover:border-red-200 transition-colors">
+                  <span class="material-symbols-outlined text-base">delete</span>
+                </button>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+    }
+
+    <!-- Documenti ricevuti -->
+    @if (used().length > 0) {
+      <div>
+        <h3 class="font-inter font-bold text-xs uppercase tracking-widest text-on-surface-variant mb-3">Documenti ricevuti — {{ used().length }}</h3>
+        <div class="flex flex-col gap-3">
+          @for (t of used(); track t.id) {
+            <div class="bg-surface-container-lowest rounded-2xl p-4 shadow-sm flex flex-col gap-2">
+              <div class="flex items-start justify-between gap-3">
+                <div class="flex-1 min-w-0">
+                  <p class="font-inter font-semibold text-sm text-on-surface">{{ t.submittedBy ?? '—' }}</p>
+                  @if (t.submittedEmail) {
+                    <p class="font-inter text-xs text-on-surface-variant">{{ t.submittedEmail }}</p>
+                  }
+                  <p class="font-inter text-xs text-on-surface-variant/60 mt-0.5">{{ t.label ? '(' + t.label + ') · ' : '' }}Inviato: {{ formatDate(t.usedAt!) }}</p>
+                </div>
+                <span class="px-2 py-0.5 rounded-full bg-green-100 text-green-700 font-inter font-bold text-[10px] uppercase tracking-wider flex-shrink-0">
+                  Ricevuto
+                </span>
+              </div>
+              <div class="flex gap-2">
+                @if (t.fileUrl) {
+                  <a [href]="t.fileUrl" target="_blank" rel="noopener"
+                     class="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl border border-outline-variant font-inter text-sm text-primary hover:bg-surface-container transition-colors">
+                    <span class="material-symbols-outlined text-base">open_in_new</span>
+                    Visualizza ({{ formatSize(t.fileSize) }})
+                  </a>
+                }
+                <button (click)="delete(t.id)"
+                        class="w-10 flex items-center justify-center rounded-xl border border-outline-variant text-on-surface-variant hover:bg-red-50 hover:text-red-500 hover:border-red-200 transition-colors">
+                  <span class="material-symbols-outlined text-base">delete</span>
+                </button>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+    }
+
+    <!-- Scaduti -->
+    @if (expired().length > 0) {
+      <div>
+        <h3 class="font-inter font-bold text-xs uppercase tracking-widest text-on-surface-variant mb-3">Scaduti — {{ expired().length }}</h3>
+        <div class="flex flex-col gap-3">
+          @for (t of expired(); track t.id) {
+            <div class="bg-surface-container-lowest rounded-2xl p-4 shadow-sm flex items-center justify-between gap-3 opacity-50">
+              <div>
+                <p class="font-inter font-semibold text-sm text-on-surface">{{ t.label ?? 'Nessuna etichetta' }}</p>
+                <p class="font-inter text-xs text-on-surface-variant">Scaduto: {{ formatDate(t.expiresAt) }}</p>
+              </div>
+              <button (click)="delete(t.id)"
+                      class="w-8 h-8 flex items-center justify-center rounded-xl text-on-surface-variant hover:text-red-500 transition-colors">
+                <span class="material-symbols-outlined text-base">delete</span>
+              </button>
+            </div>
+          }
+        </div>
+      </div>
+    }
+
+    @if (tokens().length === 0) {
+      <div class="flex flex-col items-center gap-3 py-16 text-center">
+        <span class="material-symbols-outlined text-on-surface-variant/30 text-5xl">badge</span>
+        <p class="font-inter text-on-surface-variant text-sm">Nessun link generato ancora.</p>
+      </div>
+    }
+  }
+</div>

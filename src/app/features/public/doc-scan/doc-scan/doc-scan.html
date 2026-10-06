@@ -1,0 +1,162 @@
+<!-- Loading -->
+@if (state() === 'loading') {
+  <div class="min-h-screen flex items-center justify-center bg-surface">
+    <span class="material-symbols-outlined text-primary text-5xl spin">progress_activity</span>
+  </div>
+}
+
+<!-- Link non valido -->
+@if (state() === 'invalid') {
+  <div class="min-h-screen flex flex-col items-center justify-center bg-surface px-6 text-center gap-5">
+    <div class="w-16 h-16 rounded-full bg-red-50 flex items-center justify-center">
+      <span class="material-symbols-outlined text-red-500 text-3xl">link_off</span>
+    </div>
+    <h1 class="font-romania font-extrabold text-primary text-2xl">Link non valido</h1>
+    <p class="font-inter text-on-surface-variant text-sm max-w-xs">
+      Questo link non è valido. Contatta il direttivo per riceverne uno nuovo.
+    </p>
+  </div>
+}
+
+<!-- Link scaduto -->
+@if (state() === 'expired') {
+  <div class="min-h-screen flex flex-col items-center justify-center bg-surface px-6 text-center gap-5">
+    <div class="w-16 h-16 rounded-full bg-amber-50 flex items-center justify-center">
+      <span class="material-symbols-outlined text-amber-500 text-3xl">schedule</span>
+    </div>
+    <h1 class="font-romania font-extrabold text-primary text-2xl">Link scaduto</h1>
+    <p class="font-inter text-on-surface-variant text-sm max-w-xs">
+      Questo link è scaduto. Chiedi al direttivo di generarne uno nuovo.
+    </p>
+  </div>
+}
+
+<!-- Già usato -->
+@if (state() === 'already-used') {
+  <div class="min-h-screen flex flex-col items-center justify-center bg-surface px-6 text-center gap-5">
+    <div class="w-16 h-16 rounded-full bg-green-50 flex items-center justify-center">
+      <span class="material-symbols-outlined text-green-600 text-3xl">check_circle</span>
+    </div>
+    <h1 class="font-romania font-extrabold text-primary text-2xl">Documento già inviato</h1>
+    <p class="font-inter text-on-surface-variant text-sm max-w-xs">
+      Questo link è già stato utilizzato. Il documento è stato ricevuto con successo.
+    </p>
+  </div>
+}
+
+<!-- Form -->
+@if (state() === 'form') {
+  <div class="min-h-screen bg-surface flex flex-col">
+
+    <div class="bg-primary px-5 pt-10 pb-6">
+      <div class="flex items-center gap-2 mb-3">
+        <span class="material-symbols-outlined text-white/70 text-base" style="font-variation-settings:'FILL' 1">badge</span>
+        <span class="font-inter text-xs text-white/70 font-semibold uppercase tracking-wider">Carica documento d'identità</span>
+      </div>
+      <h1 class="font-romania font-extrabold text-white text-xl leading-tight mb-1">
+        Associazione Culturale Rumena
+      </h1>
+      @if (label()) {
+        <p class="font-inter text-xs text-white/60">{{ label() }}</p>
+      }
+    </div>
+
+    <div class="px-5 py-8 flex flex-col gap-6">
+      <div>
+        <h2 class="font-romania font-bold text-on-surface text-lg mb-1">I tuoi dati</h2>
+        <p class="font-inter text-sm text-on-surface-variant">Inserisci nome e cognome e scatta una foto del tuo documento d'identità.</p>
+      </div>
+
+      <div class="flex flex-col gap-3">
+        <div class="flex flex-col gap-1.5">
+          <label class="font-inter text-sm font-medium text-on-surface">Nome e cognome *</label>
+          <input type="text" [value]="name()" (input)="name.set($any($event.target).value)"
+                 placeholder="Mario Rossi"
+                 class="w-full px-4 py-3 rounded-xl border border-outline-variant bg-surface font-inter text-sm text-on-surface placeholder:text-on-surface-variant/50 focus:outline-none focus:ring-2 focus:ring-primary/40" />
+        </div>
+        <div class="flex flex-col gap-1.5">
+          <label class="font-inter text-sm font-medium text-on-surface">Email (opzionale)</label>
+          <input type="email" [value]="email()" (input)="email.set($any($event.target).value)"
+                 placeholder="mario@esempio.it"
+                 class="w-full px-4 py-3 rounded-xl border border-outline-variant bg-surface font-inter text-sm text-on-surface placeholder:text-on-surface-variant/50 focus:outline-none focus:ring-2 focus:ring-primary/40" />
+        </div>
+      </div>
+
+      <!-- Upload area -->
+      <div class="flex flex-col gap-1.5">
+        <label class="font-inter text-sm font-medium text-on-surface">Foto documento *</label>
+        @if (preview()) {
+          <div class="relative rounded-2xl overflow-hidden border border-outline-variant aspect-[3/2]">
+            <img [src]="preview()!" alt="Anteprima documento" class="w-full h-full object-cover" />
+            <button (click)="preview.set(null); file.set(null)"
+                    class="absolute top-2 right-2 w-8 h-8 rounded-full bg-black/60 flex items-center justify-center text-white">
+              <span class="material-symbols-outlined text-base">close</span>
+            </button>
+          </div>
+        } @else {
+          <label class="flex flex-col items-center justify-center gap-3 rounded-2xl border-2 border-dashed border-outline-variant bg-surface-container/40 py-10 cursor-pointer">
+            <span class="material-symbols-outlined text-primary text-4xl">photo_camera</span>
+            <span class="font-inter text-sm text-on-surface-variant text-center px-4">
+              Tocca per scattare una foto o scegliere un file
+            </span>
+            <input type="file" accept="image/*,application/pdf" capture="environment"
+                   (change)="onFileChange($event)" class="hidden" />
+          </label>
+        }
+      </div>
+
+      <button (click)="submit()"
+              [disabled]="!name().trim() || !file()"
+              class="w-full py-4 rounded-xl bg-primary text-white font-inter font-semibold text-base disabled:opacity-40 transition-opacity">
+        Invia documento
+      </button>
+
+      <p class="font-inter text-xs text-on-surface-variant/60 text-center">
+        Il documento sarà conservato in modo sicuro e utilizzato esclusivamente per la verifica dell'identità.
+      </p>
+    </div>
+  </div>
+}
+
+<!-- Uploading -->
+@if (state() === 'uploading') {
+  <div class="min-h-screen flex flex-col items-center justify-center bg-surface px-6 text-center gap-6">
+    <span class="material-symbols-outlined text-primary text-5xl spin">progress_activity</span>
+    <div class="w-full max-w-xs">
+      <div class="w-full bg-surface-container rounded-full h-2">
+        <div class="bg-primary h-2 rounded-full transition-all duration-300" [style.width.%]="progress()"></div>
+      </div>
+      <p class="font-inter text-sm text-on-surface-variant mt-3">Caricamento in corso... {{ progress() }}%</p>
+    </div>
+  </div>
+}
+
+<!-- Successo -->
+@if (state() === 'success') {
+  <div class="min-h-screen flex flex-col items-center justify-center bg-surface px-6 text-center gap-5">
+    <div class="w-20 h-20 rounded-full bg-green-50 flex items-center justify-center">
+      <span class="material-symbols-outlined text-green-600 text-4xl" style="font-variation-settings:'FILL' 1">check_circle</span>
+    </div>
+    <h1 class="font-romania font-extrabold text-primary text-2xl">Documento inviato!</h1>
+    <p class="font-inter text-on-surface-variant text-sm max-w-xs">
+      Grazie! Il documento è stato ricevuto e sarà verificato dal direttivo.
+    </p>
+  </div>
+}
+
+<!-- Errore -->
+@if (state() === 'error') {
+  <div class="min-h-screen flex flex-col items-center justify-center bg-surface px-6 text-center gap-5">
+    <div class="w-16 h-16 rounded-full bg-red-50 flex items-center justify-center">
+      <span class="material-symbols-outlined text-red-500 text-3xl">error</span>
+    </div>
+    <h1 class="font-romania font-extrabold text-primary text-2xl">Errore</h1>
+    <p class="font-inter text-on-surface-variant text-sm max-w-xs">
+      Si è verificato un errore durante il caricamento. Riprova.
+    </p>
+    <button (click)="state.set('form')"
+            class="px-6 py-2.5 rounded-xl bg-primary text-white font-inter font-semibold text-sm">
+      Riprova
+    </button>
+  </div>
+}
