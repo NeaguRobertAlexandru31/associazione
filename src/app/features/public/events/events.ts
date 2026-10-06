@@ -20,19 +20,45 @@ export class Events implements OnInit {
   events  = signal<CalendarEvent[]>([]);
   loading = signal(true);
 
+  readonly ongoing = computed(() => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    return this.events().filter(e => {
+      const d = new Date(e.date);
+      d.setHours(0, 0, 0, 0);
+      return d >= today && d <= today;
+    });
+  });
+
   readonly upcoming = computed(() => {
-    const now = new Date();
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
     return this.events()
-      .filter(e => new Date(e.date) >= now)
+      .filter(e => {
+        const d = new Date(e.date);
+        d.setHours(0, 0, 0, 0);
+        return d > today;
+      })
       .slice(0, 6);
   });
 
   readonly featured = computed(() => this.upcoming()[0] ?? null);
 
   readonly archived = computed(() => {
-    const now = new Date();
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const yesterday = new Date(today);
+    yesterday.setDate(yesterday.getDate() - 1);
     return this.events()
-      .filter(e => new Date(e.date) < now)
+      .filter(e => {
+        const d = new Date(e.date);
+        d.setHours(0, 0, 0, 0);
+        return d < today;
+      })
       .slice(0, 3);
   });
 
