@@ -8,6 +8,12 @@ import { CreateRegistrationRequest, RegistrationResult } from '../../models/regi
 export class RegistrationsService {
   private http = inject(HttpClient);
 
+  checkFiscalCode(fiscalCode: string): Observable<{ exists: boolean }> {
+    return this.http.get<{ exists: boolean }>(`${environment.apiUrl}/api/registrations/check-fiscal-code`, {
+      params: { fiscalCode: fiscalCode.toUpperCase() },
+    });
+  }
+
   create(dto: CreateRegistrationRequest): Observable<RegistrationResult> {
     return this.http.post<RegistrationResult>(`${environment.apiUrl}/api/registrations`, dto);
   }

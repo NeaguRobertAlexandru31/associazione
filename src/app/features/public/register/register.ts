@@ -101,6 +101,26 @@ export class Register implements OnInit {
   next(): void {
     this.error.set(null);
     if (!this.validateCurrent()) return;
+
+    if (this.step() === 2) {
+      this.loading.set(true);
+      this.svc.checkFiscalCode(this.fiscalCode).subscribe({
+        next: ({ exists }) => {
+          this.loading.set(false);
+          if (exists) {
+            this.error.set(`Esiste già un'iscrizione attiva per questo codice fiscale nell'anno corrente`);
+            return;
+          }
+          this.step.update(s => s + 1);
+        },
+        error: () => {
+          this.loading.set(false);
+          this.step.update(s => s + 1);
+        },
+      });
+      return;
+    }
+
     // skip tutore step (step 4) if not minor
     if (this.step() === 3 && !this.isMinor) {
       this.step.set(5);

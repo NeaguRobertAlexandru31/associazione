@@ -58,7 +58,6 @@ export class PlaceAutocomplete implements OnInit, OnChanges, OnDestroy {
           .set('format', 'json')
           .set('addressdetails', '1')
           .set('featuretype', 'city')
-          .set('countrycodes', 'it')
           .set('limit', '7');
         return this.http.get<NominatimPlace[]>(
           'https://nominatim.openstreetmap.org/search',
@@ -86,6 +85,11 @@ export class PlaceAutocomplete implements OnInit, OnChanges, OnDestroy {
     this.query.set(name);
     this.open.set(false);
     this.placeSelected.emit(name);
+  }
+
+  onBlur(): void {
+    const v = this.query().trim();
+    if (v) this.placeSelected.emit(v);
   }
 
   label(r: NominatimPlace): string {
