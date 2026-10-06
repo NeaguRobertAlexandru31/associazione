@@ -5,10 +5,14 @@ import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../../../core/services/auth/auth';
 import { BOARD_ROLE_LABELS, BoardRole, MemberDetail, UpdateMemberRequest } from '../../../../core/models/member.model';
 import { MembersService } from '../../../../core/services/members/members';
+import { AddressAutocomplete } from '../../../../shared/components/address-autocomplete/address-autocomplete';
+import { PlaceAutocomplete } from '../../../../shared/components/place-autocomplete/place-autocomplete';
+import { AddressFields } from '../../../../core/services/nominatim/nominatim';
+import { DatePicker } from '../../../../shared/components/private/date-picker/date-picker';
 
 @Component({
   selector: 'app-members-detail',
-  imports: [DatePipe, FormsModule],
+  imports: [DatePipe, FormsModule, AddressAutocomplete, DatePicker, PlaceAutocomplete],
   templateUrl: './members-detail.html',
   styleUrl: './members-detail.css',
 })
@@ -53,6 +57,8 @@ export class MembersDetail implements OnInit {
   boardRolesSelected = signal<string[]>([]);
   boardRoleSaving    = signal(false);
   boardRoleSuccess   = signal(false);
+
+  activeTab = signal<'anagrafica' | 'iscrizione' | 'ruolo'>('anagrafica');
 
   promoteRole   = signal<'MEMBER' | 'ADMIN' | 'SUPERADMIN' | ''>('');
   promoteSaving = signal(false);
@@ -116,6 +122,13 @@ export class MembersDetail implements OnInit {
     this.boardRolesSelected.update(roles =>
       roles.includes(value) ? roles.filter(r => r !== value) : [...roles, value]
     );
+  }
+
+  onAddressSelected(f: AddressFields): void {
+    this.editAddressStreet   = f.street;
+    this.editAddressZip      = f.zip;
+    this.editAddressCity     = f.city;
+    this.editAddressProvince = f.province;
   }
 
   togglePrivate(): void { this.showPrivate.update(v => !v); }

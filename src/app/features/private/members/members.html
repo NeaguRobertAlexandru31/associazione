@@ -237,13 +237,11 @@
             </div>
             <div>
               <label class="font-inter text-xs text-on-surface-variant mb-1 block">Data di nascita *</label>
-              <input [(ngModel)]="form.birthDate" name="birthDate" type="date"
-                     class="w-full rounded-xl border border-outline-variant bg-surface-container px-3 py-2.5 font-inter text-sm text-on-surface focus:outline-none focus:border-primary transition-colors" />
+              <app-date-picker [(value)]="form.birthDate" />
             </div>
             <div>
               <label class="font-inter text-xs text-on-surface-variant mb-1 block">Luogo di nascita *</label>
-              <input [(ngModel)]="form.birthPlace" name="birthPlace" type="text" placeholder="Roma"
-                     class="w-full rounded-xl border border-outline-variant bg-surface-container px-3 py-2.5 font-inter text-sm text-on-surface focus:outline-none focus:border-primary transition-colors" />
+              <app-place-autocomplete [initialValue]="form.birthPlace" (placeSelected)="form.birthPlace = $event" />
             </div>
             <div>
               <label class="font-inter text-xs text-on-surface-variant mb-1 block">Sesso *</label>
@@ -283,8 +281,7 @@
             </div>
             <div>
               <label class="font-inter text-xs text-on-surface-variant mb-1 block">Scadenza *</label>
-              <input [(ngModel)]="form.docExpiry" name="docExpiry" type="date"
-                     class="w-full rounded-xl border border-outline-variant bg-surface-container px-3 py-2.5 font-inter text-sm text-on-surface focus:outline-none focus:border-primary transition-colors" />
+              <app-date-picker [(value)]="form.docExpiry" />
             </div>
           </div>
         </div>
@@ -293,6 +290,10 @@
         <div>
           <p class="font-inter font-semibold text-[11px] text-on-surface-variant uppercase tracking-widest mb-3">Residenza</p>
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div class="sm:col-span-2">
+              <label class="font-inter text-xs text-on-surface-variant mb-1 block">Cerca indirizzo</label>
+              <app-address-autocomplete (addressSelected)="onAddressSelected($event)" />
+            </div>
             <div class="sm:col-span-2">
               <label class="font-inter text-xs text-on-surface-variant mb-1 block">Via / Indirizzo *</label>
               <input [(ngModel)]="form.addressStreet" name="addressStreet" type="text" placeholder="Via Roma 1"
@@ -404,8 +405,7 @@
               </div>
               <div>
                 <label class="font-inter text-xs text-on-surface-variant mb-1 block">Scadenza documento *</label>
-                <input [(ngModel)]="form.guardianDocExpiry" name="guardianDocExpiry" type="date"
-                       class="w-full rounded-xl border border-outline-variant bg-surface-container px-3 py-2.5 font-inter text-sm text-on-surface focus:outline-none focus:border-primary transition-colors" />
+                <app-date-picker [(value)]="form.guardianDocExpiry" />
               </div>
             </div>
           </div>

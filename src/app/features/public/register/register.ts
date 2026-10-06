@@ -12,6 +12,10 @@ import {
 import { RegistrationResultService } from '../../../core/services/registration-result/registration-result';
 import { RegistrationsService } from '../../../core/services/registrations/registrations';
 import { Analytics } from '../../../core/services/analytics/analytics';
+import { AddressAutocomplete } from '../../../shared/components/address-autocomplete/address-autocomplete';
+import { PlaceAutocomplete } from '../../../shared/components/place-autocomplete/place-autocomplete';
+import { AddressFields } from '../../../core/services/nominatim/nominatim';
+import { DatePicker } from '../../../shared/components/private/date-picker/date-picker';
 
 const CATEGORY_LABELS: Record<MemberCategory, string> = {
   ordinario:   'Ordinario',
@@ -21,7 +25,7 @@ const CATEGORY_LABELS: Record<MemberCategory, string> = {
 
 @Component({
   selector: 'app-register',
-  imports: [FormsModule, RouterLink],
+  imports: [FormsModule, RouterLink, AddressAutocomplete, DatePicker, PlaceAutocomplete],
   templateUrl: './register.html',
   styleUrl: './register.css',
 })
@@ -78,6 +82,13 @@ export class Register implements OnInit {
   }
 
   get categoryLabel(): string { return CATEGORY_LABELS[this.category]; }
+
+  onAddressSelected(f: AddressFields): void {
+    this.addressStreet   = f.street;
+    this.addressZip      = f.zip;
+    this.addressCity     = f.city;
+    this.addressProvince = f.province;
+  }
 
   // Step 3 is "Tutore" only if isMinor, otherwise step 3 = Contatti, step 4 = Privacy
   private get effectiveStep(): number {

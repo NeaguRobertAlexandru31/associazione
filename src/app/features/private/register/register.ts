@@ -11,12 +11,16 @@ import {
   MemberGender,
   PaymentMethod,
 } from '../../../core/models/registration.model';
+import { AddressAutocomplete } from '../../../shared/components/address-autocomplete/address-autocomplete';
+import { PlaceAutocomplete } from '../../../shared/components/place-autocomplete/place-autocomplete';
+import { AddressFields } from '../../../core/services/nominatim/nominatim';
+import { DatePicker } from '../../../shared/components/private/date-picker/date-picker';
 
 type Phase = 'email-check' | 'membership' | 'account';
 
 @Component({
   selector: 'app-register',
-  imports: [FormsModule],
+  imports: [FormsModule, AddressAutocomplete, DatePicker, PlaceAutocomplete],
   templateUrl: './register.html',
   styleUrl: './register.css',
 })
@@ -59,6 +63,13 @@ export class Register implements OnInit {
   paymentMethod: PaymentMethod = 'contanti';
 
   readonly memberTotalSteps = computed(() => this.isMinor ? 5 : 4);
+
+  onAddressSelected(f: AddressFields): void {
+    this.addressStreet   = f.street;
+    this.addressZip      = f.zip;
+    this.addressCity     = f.city;
+    this.addressProvince = f.province;
+  }
 
   readonly categoryOptions: { value: MemberCategory; label: string; price: string }[] = [
     { value: 'ordinario',   label: 'Ordinario',   price: '€ 30 / anno' },

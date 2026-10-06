@@ -4,10 +4,14 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../../../core/services/auth/auth';
 import { MemberDetail, UpdateMemberRequest } from '../../../core/models/member.model';
+import { AddressAutocomplete } from '../../../shared/components/address-autocomplete/address-autocomplete';
+import { PlaceAutocomplete } from '../../../shared/components/place-autocomplete/place-autocomplete';
+import { AddressFields } from '../../../core/services/nominatim/nominatim';
+import { DatePicker } from '../../../shared/components/private/date-picker/date-picker';
 
 @Component({
   selector: 'app-personal',
-  imports: [DatePipe, FormsModule],
+  imports: [DatePipe, FormsModule, AddressAutocomplete, DatePicker, PlaceAutocomplete],
   templateUrl: './personal.html',
   styleUrl: './personal.css',
 })
@@ -109,6 +113,13 @@ export class Personal implements OnInit {
   }
 
   cancelEdit(): void { this.editMode.set(false); this.saveError.set(null); }
+
+  onAddressSelected(f: AddressFields): void {
+    this.editAddressStreet   = f.street;
+    this.editAddressZip      = f.zip;
+    this.editAddressCity     = f.city;
+    this.editAddressProvince = f.province;
+  }
 
   saveEdit(): void {
     this.saving.set(true);

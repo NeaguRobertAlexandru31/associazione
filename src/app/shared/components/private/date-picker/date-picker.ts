@@ -1,18 +1,21 @@
-import { ChangeDetectionStrategy, Component, ElementRef, HostListener, computed, input, model, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, ElementRef, HostListener, computed, effect, input, model, signal } from '@angular/core';
 import { NgClass } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-date-picker',
   standalone: true,
-  imports: [NgClass],
+  imports: [NgClass, FormsModule],
   templateUrl: './date-picker.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DatePicker {
-  value = model<string>('');
+  value       = model<string>('');
   placeholder = input('gg/mm/aaaa');
 
-  open = signal(false);
+  open      = signal(false);
+  monthView = signal(false);
+  rawInput  = signal('');
 
   private today = new Date();
 
@@ -42,6 +45,26 @@ export class DatePicker {
     return `${d}/${m}/${y}`;
   });
 
+  onManualInput(raw: string): void {
+    this.rawInput.set(raw);
+    // Accetta dd/mm/yyyy o ddmmyyyy
+    const clean = raw.replace(/\D/g, '');
+    if (clean.length === 8) {
+      const d = clean.slice(0, 2), m = clean.slice(2, 4), y = clean.slice(4, 8);
+      const iso = `${y}-${m}-${d}`;
+      const date = new Date(iso + 'T00:00:00');
+      if (!isNaN(date.getTime()) && date.getFullYear() === +y) {
+        this.value.set(iso);
+        this.viewYear.set(+y);
+        this.viewMonth.set(+m - 1);
+      }
+    } else if (raw === '') {
+      this.value.set('');
+    }
+  }
+
+  openCalendar(): void { this.open.set(true); }
+
   readonly selectedDay = computed(() => {
     const v = this.value();
     if (!v) return null;
@@ -50,9 +73,32 @@ export class DatePicker {
       ? d.getDate() : null;
   });
 
-  constructor(private el: ElementRef) {}
+  constructor(private el: ElementRef) {
+    effect(() => {
+      const v = this.value();
+      if (v) {
+        const [y, m, d] = v.split('-');
+        this.rawInput.set(`${d}/${m}/${y}`);
+      } else {
+        this.rawInput.set('');
+      }
+    });
+  }
 
-  toggle(): void { this.open.update(v => !v); }
+  toggle(): void {
+    this.open.update(v => !v);
+    if (!this.open()) this.monthView.set(false);
+  }
+
+  toggleMonthView(): void { this.monthView.update(v => !v); }
+
+  selectMonth(m: number): void {
+    this.viewMonth.set(m);
+    this.monthView.set(false);
+  }
+
+  prevYear(): void { this.viewYear.update(y => y - 1); }
+  nextYear(): void { this.viewYear.update(y => y + 1); }
 
   prevMonth(): void {
     if (this.viewMonth() === 0) { this.viewMonth.set(11); this.viewYear.update(y => y - 1); }
@@ -81,6 +127,9 @@ export class DatePicker {
 
   @HostListener('document:click', ['$event'])
   onOutsideClick(e: MouseEvent): void {
-    if (!this.el.nativeElement.contains(e.target)) this.open.set(false);
+    if (!this.el.nativeElement.contains(e.target)) {
+      this.open.set(false);
+      this.monthView.set(false);
+    }
   }
 }

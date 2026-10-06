@@ -209,13 +209,11 @@
             <div class="grid grid-cols-2 gap-3">
               <div>
                 <label class="block font-inter text-xs text-on-surface-variant mb-1.5">Data di nascita</label>
-                <input type="date" [value]="editMemberBirthDate()" (input)="editMemberBirthDate.set($any($event.target).value)"
-                       class="w-full px-4 py-2.5 rounded-xl border border-outline-variant bg-surface font-inter text-sm focus:outline-none focus:ring-2 focus:ring-primary/30" />
+                <app-date-picker [value]="editMemberBirthDate()" (valueChange)="editMemberBirthDate.set($event)" />
               </div>
               <div>
                 <label class="block font-inter text-xs text-on-surface-variant mb-1.5">Luogo di nascita</label>
-                <input type="text" [value]="editMemberBirthPlace()" (input)="editMemberBirthPlace.set($any($event.target).value)"
-                       class="w-full px-4 py-2.5 rounded-xl border border-outline-variant bg-surface font-inter text-sm focus:outline-none focus:ring-2 focus:ring-primary/30" />
+                <app-place-autocomplete [initialValue]="editMemberBirthPlace()" (placeSelected)="editMemberBirthPlace.set($event)" />
               </div>
             </div>
 
@@ -249,8 +247,7 @@
               </div>
               <div>
                 <label class="block font-inter text-xs text-on-surface-variant mb-1.5">Scadenza</label>
-                <input type="date" [value]="editMemberDocExpiry()" (input)="editMemberDocExpiry.set($any($event.target).value)"
-                       class="w-full px-4 py-2.5 rounded-xl border border-outline-variant bg-surface font-inter text-sm focus:outline-none focus:ring-2 focus:ring-primary/30" />
+                <app-date-picker [value]="editMemberDocExpiry()" (valueChange)="editMemberDocExpiry.set($event)" />
               </div>
             </div>
 
@@ -261,6 +258,10 @@
                   <label class="block font-inter text-xs text-on-surface-variant mb-1.5">Telefono</label>
                   <input type="text" [value]="editMemberPhone()" (input)="editMemberPhone.set($any($event.target).value)"
                          class="w-full px-4 py-2.5 rounded-xl border border-outline-variant bg-surface font-inter text-sm focus:outline-none focus:ring-2 focus:ring-primary/30" />
+                </div>
+                <div>
+                  <label class="block font-inter text-xs text-on-surface-variant mb-1.5">Cerca indirizzo</label>
+                  <app-address-autocomplete (addressSelected)="onAddressSelected($event)" />
                 </div>
                 <div>
                   <label class="block font-inter text-xs text-on-surface-variant mb-1.5">Via / Indirizzo</label>

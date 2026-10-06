@@ -112,11 +112,11 @@
               </div>
               <div>
                 <label class="form-label">Data di nascita</label>
-                <input type="date" [(ngModel)]="editBirthDate" name="eBirthDate" class="form-input" />
+                <app-date-picker [(value)]="editBirthDate" />
               </div>
               <div>
                 <label class="form-label">Luogo di nascita</label>
-                <input type="text" [(ngModel)]="editBirthPlace" name="eBirthPlace" class="form-input" />
+                <app-place-autocomplete [initialValue]="editBirthPlace" (placeSelected)="editBirthPlace = $event" />
               </div>
               <div class="col-span-2">
                 <label class="form-label">Sesso</label>
@@ -146,7 +146,7 @@
               </div>
               <div>
                 <label class="form-label">Scadenza</label>
-                <input type="date" [(ngModel)]="editDocExpiry" name="eDocExpiry" class="form-input" />
+                <app-date-picker [(value)]="editDocExpiry" />
               </div>
             </div>
           </div>
@@ -161,6 +161,10 @@
               <div class="col-span-2">
                 <label class="form-label">Telefono</label>
                 <input type="tel" [(ngModel)]="editPhone" name="ePhone" class="form-input" />
+              </div>
+              <div class="col-span-2">
+                <label class="form-label">Cerca indirizzo</label>
+                <app-address-autocomplete (addressSelected)="onAddressSelected($event)" />
               </div>
               <div class="col-span-2">
                 <label class="form-label">Via e civico</label>

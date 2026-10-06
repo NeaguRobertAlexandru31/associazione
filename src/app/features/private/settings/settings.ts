@@ -5,12 +5,16 @@ import { AuthService } from '../../../core/services/auth/auth';
 import { LucideAngularModule } from 'lucide-angular';
 import { SiteSettingsService, SITE_IMAGE_KEYS, PLACEHOLDER_KEYS } from '../../../core/services/site-settings/site-settings';
 import { MemberDetail } from '../../../core/models/member.model';
+import { AddressAutocomplete } from '../../../shared/components/address-autocomplete/address-autocomplete';
+import { PlaceAutocomplete } from '../../../shared/components/place-autocomplete/place-autocomplete';
+import { AddressFields } from '../../../core/services/nominatim/nominatim';
+import { DatePicker } from '../../../shared/components/private/date-picker/date-picker';
 
 type SettingsView = 'member' | 'edit-member' | 'change-password' | 'delete' | 'images' | 'placeholders';
 
 @Component({
   selector: 'app-settings',
-  imports: [FormsModule, LucideAngularModule, DatePipe],
+  imports: [FormsModule, LucideAngularModule, DatePipe, AddressAutocomplete, DatePicker, PlaceAutocomplete],
   templateUrl: './settings.html',
   styleUrl: './settings.css',
 })
@@ -110,6 +114,13 @@ export class Settings implements OnInit {
     this.editMemberError.set(null);
     this.editMemberSuccess.set(false);
     this.view.set('edit-member');
+  }
+
+  onAddressSelected(f: AddressFields): void {
+    this.editMemberStreet.set(f.street);
+    this.editMemberZip.set(f.zip);
+    this.editMemberCity.set(f.city);
+    this.editMemberProvince.set(f.province.toUpperCase());
   }
 
   saveMyMember(): void {

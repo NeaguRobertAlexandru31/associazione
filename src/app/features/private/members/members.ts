@@ -4,6 +4,10 @@ import { Router } from '@angular/router';
 import { AuthService } from '../../../core/services/auth/auth';
 import { CreateMemberRequest, MemberListItem, MembersResponse } from '../../../core/models/member.model';
 import { MembersService } from '../../../core/services/members/members';
+import { AddressAutocomplete } from '../../../shared/components/address-autocomplete/address-autocomplete';
+import { PlaceAutocomplete } from '../../../shared/components/place-autocomplete/place-autocomplete';
+import { AddressFields } from '../../../core/services/nominatim/nominatim';
+import { DatePicker } from '../../../shared/components/private/date-picker/date-picker';
 
 interface CreateForm {
   isMinor: boolean;
@@ -36,7 +40,7 @@ function emptyForm(): CreateForm {
 
 @Component({
   selector: 'app-members',
-  imports: [FormsModule],
+  imports: [FormsModule, AddressAutocomplete, DatePicker, PlaceAutocomplete],
   templateUrl: './members.html',
   styleUrl: './members.css',
 })
@@ -66,6 +70,13 @@ export class Members implements OnInit {
   readonly docTypeOptions   = [{ value: 'ci', label: "Carta d'identità" }, { value: 'passaporto', label: 'Passaporto' }, { value: 'patente', label: 'Patente' }];
   readonly paymentOptions   = [{ value: 'contanti', label: 'Contanti' }, { value: 'online', label: 'Online' }];
   readonly relationOptions  = [{ value: 'genitore', label: 'Genitore' }, { value: 'tutore_legale', label: 'Tutore legale' }];
+
+  onAddressSelected(f: AddressFields): void {
+    this.form.addressStreet   = f.street;
+    this.form.addressZip      = f.zip;
+    this.form.addressCity     = f.city;
+    this.form.addressProvince = f.province;
+  }
 
   ngOnInit(): void { this.load(); }
 
