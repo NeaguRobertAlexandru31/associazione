@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
+import { AuthService } from '../../../core/services/auth/auth';
 import { PermissionsService } from '../../../core/services/permissions/permissions';
 import { UnreadCountService } from '../../../core/services/contact/unread-count';
 
@@ -31,6 +32,8 @@ const PAGE_COLORS: Record<string, { bg: string; icon: string; border: string }> 
 export class Menu {
   private perms  = inject(PermissionsService);
   private unread = inject(UnreadCountService);
+  private auth   = inject(AuthService);
+  private router = inject(Router);
 
   readonly items = computed(() =>
     this.perms.getNavItems({ messages: this.unread.count() }).map(item => ({
@@ -38,4 +41,9 @@ export class Menu {
       colors: PAGE_COLORS[item.page] ?? { bg: 'hover:bg-surface-container', icon: 'text-primary', border: 'hover:border-outline-variant' },
     }))
   );
+
+  logout(): void {
+    this.auth.logout();
+    this.router.navigate(['/login']);
+  }
 }

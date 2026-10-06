@@ -431,7 +431,7 @@
 
 <!-- Lightbox -->
 @if (lightboxIndex() !== null && event(); as ev) {
-  <div class="fixed inset-0 z-50 bg-black/90 flex items-center justify-center"
+  <div class="fixed inset-0 z-[70] bg-black/90 flex items-center justify-center"
        (click)="closeLightbox()">
 
     <!-- Close -->
@@ -471,7 +471,7 @@
 
 <!-- Lightbox foto partecipanti -->
 @if (participantLightboxIndex() !== null) {
-  <div class="fixed inset-0 z-50 bg-black/90 flex items-center justify-center"
+  <div class="fixed inset-0 z-[70] bg-black/90 flex items-center justify-center"
        (click)="closeParticipantLightbox()">
 
     <button (click)="closeParticipantLightbox()"

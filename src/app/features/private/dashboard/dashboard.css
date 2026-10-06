@@ -1,6 +1,17 @@
 .dash-content {
   animation: dashIn 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
+
+.dash-fullpage {
+  margin: -1.5rem;
+  margin-top: -1.5rem;
+}
+@media (min-width: 768px) {
+  .dash-fullpage {
+    margin: -2.5rem;
+    margin-top: -2.5rem;
+  }
+}
 @keyframes dashIn {
   from { opacity: 0; transform: translateY(12px); }
   to   { opacity: 1; transform: translateY(0);    }
