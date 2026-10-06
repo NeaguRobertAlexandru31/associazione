@@ -1,6 +1,7 @@
-import { ApplicationConfig, provideBrowserGlobalErrorListeners } from '@angular/core';
+import { ApplicationConfig, provideBrowserGlobalErrorListeners, isDevMode } from '@angular/core';
 import { provideRouter, withInMemoryScrolling } from '@angular/router';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
+import { provideServiceWorker } from '@angular/service-worker';
 import { LUCIDE_ICONS, LucideIconProvider } from 'lucide-angular';
 
 import { routes } from './app.routes';
@@ -16,5 +17,9 @@ export const appConfig: ApplicationConfig = {
     })),
     provideHttpClient(withInterceptors([authInterceptor])),
     { provide: LUCIDE_ICONS, useValue: new LucideIconProvider(ICONS) },
+    provideServiceWorker('ngsw-worker.js', {
+      enabled: !isDevMode(),
+      registrationStrategy: 'registerWhenStable:30000',
+    }),
   ],
 };
