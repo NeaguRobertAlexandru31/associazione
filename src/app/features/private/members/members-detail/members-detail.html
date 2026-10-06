@@ -29,11 +29,18 @@
       <div class="flex-1 min-w-0">
         <h1 class="font-romania font-bold text-on-surface text-2xl">{{ member()!.firstName }} {{ member()!.lastName }}</h1>
         <div class="flex flex-wrap items-center gap-2 mt-1">
-          <!-- Ruolo -->
-          <span class="font-inter text-[11px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full"
-                [class]="member()!.role === 'SUPERADMIN' ? 'bg-primary/10 text-primary' : member()!.role === 'ADMIN' ? 'bg-blue-100 text-blue-700' : 'bg-surface-container text-on-surface-variant'">
-            {{ roleLabel(member()!.role) }}
-          </span>
+          <!-- Ruolo associazione (boardRole principale) o ruolo tecnico come fallback -->
+          @if (member()!.boardRoles?.length) {
+            <span class="font-inter text-[11px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full"
+                  [class]="member()!.role === 'SUPERADMIN' ? 'bg-primary/10 text-primary' : 'bg-blue-100 text-blue-700'">
+              {{ boardRoleLabel(member()!.boardRoles[0]) }}
+            </span>
+          } @else if (member()!.role !== 'MEMBER') {
+            <span class="font-inter text-[11px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full"
+                  [class]="member()!.role === 'SUPERADMIN' ? 'bg-primary/10 text-primary' : 'bg-blue-100 text-blue-700'">
+              {{ roleLabel(member()!.role) }}
+            </span>
+          }
           <!-- Stato iscrizione (solo MEMBER) -->
           @if (member()!.role === 'MEMBER') {
             <span class="font-inter text-[11px] font-semibold px-2.5 py-1 rounded-full inline-flex items-center gap-1.5"
@@ -86,7 +93,7 @@
           <select [(ngModel)]="promoteRole" name="role" class="form-input">
             <option value="MEMBER">Socio</option>
             <option value="ADMIN">Direttivo (Admin)</option>
-            <option value="SUPERADMIN">Presidente (Superadmin)</option>
+            <option value="SUPERADMIN">Superadmin</option>
           </select>
         </div>
 
@@ -429,7 +436,7 @@
 </div>
 
 @if (confirmDelete()) {
-  <div class="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-4" (click)="cancelDeleteConfirm()">
+  <div class="fixed inset-0 z-[70] bg-black/40 flex items-center justify-center p-4" (click)="cancelDeleteConfirm()">
     <div class="bg-surface-container-lowest rounded-2xl shadow-xl p-6 w-full max-w-xs" (click)="$event.stopPropagation()">
       <div class="flex items-center gap-3 mb-4">
         <div class="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center flex-shrink-0">

@@ -214,7 +214,7 @@ export class MembersDetail implements OnInit {
   }
 
   roleLabel(r: string): string {
-    return r === 'SUPERADMIN' ? 'Presidente' : r === 'ADMIN' ? 'Direttivo' : 'Socio';
+    return r === 'SUPERADMIN' ? 'Superadmin' : r === 'ADMIN' ? 'Admin' : 'Socio';
   }
 
   categoryLabel(c: string): string {

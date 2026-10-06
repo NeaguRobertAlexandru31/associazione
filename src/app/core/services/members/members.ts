@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from '../../../../environments/environment';
-import { MemberDetail, MembersResponse, UpdateMemberRequest } from '../../models/member.model';
+import { CreateMemberRequest, MemberDetail, MembersResponse, UpdateMemberRequest } from '../../models/member.model';
 
 export interface DonationStats {
   count: number;
@@ -16,6 +16,10 @@ const API = environment.apiUrl;
 @Injectable({ providedIn: 'root' })
 export class MembersService {
   private http = inject(HttpClient);
+
+  createMember(dto: CreateMemberRequest): Observable<MemberDetail> {
+    return this.http.post<MemberDetail>(`${API}/members`, dto);
+  }
 
   getAll(): Observable<MembersResponse> {
     return this.http.get<MembersResponse>(`${API}/members`);

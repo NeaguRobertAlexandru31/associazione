@@ -1,5 +1,4 @@
 .dash-content {
-  animation: dashIn 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
 .dash-fullpage {
@@ -13,8 +12,8 @@
   }
 }
 @keyframes dashIn {
-  from { opacity: 0; transform: translateY(12px); }
-  to   { opacity: 1; transform: translateY(0);    }
+  from { opacity: 0; }
+  to   { opacity: 1; }
 }
 
 /* ── Menu fullpage ──────────────────────────────────────────── */

@@ -126,3 +126,24 @@ export interface UpdateMemberRequest {
   category?: MemberCategory; status?: MemberStatus; paymentMethod?: string; isMinor?: boolean;
   privacyNewsletter?: boolean; privacyThirdParties?: boolean;
 }
+
+export interface CreateMemberGuardian {
+  firstName: string; lastName: string; fiscalCode: string;
+  relation: string; docType: string; docNumber: string; docExpiry: string;
+}
+
+export interface CreateMemberRequest {
+  isMinor: boolean;
+  category: MemberCategory;
+  status: MemberStatus;
+  firstName: string; lastName: string; fiscalCode: string;
+  birthDate: string; birthPlace: string; gender: string;
+  docType: string; docNumber: string; docExpiry: string;
+  email: string; phone: string;
+  addressStreet: string; addressZip: string; addressCity: string; addressProvince: string;
+  paymentMethod: string;
+  privacyBase: boolean;
+  privacyNewsletter: boolean;
+  privacyThirdParties: boolean;
+  guardian?: CreateMemberGuardian;
+}

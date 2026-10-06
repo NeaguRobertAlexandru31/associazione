@@ -1,7 +1,16 @@
 <div class="dash-content">
-  <div class="mb-8">
-    <h1 class="text-2xl font-bold text-[#002068]">Soci</h1>
-    <p class="text-sm text-[#444653] mt-1">Direttivo e soci dell'associazione.</p>
+  <div class="mb-8 flex items-start justify-between gap-4">
+    <div>
+      <h1 class="text-2xl font-bold text-[#002068]">Soci</h1>
+      <p class="text-sm text-[#444653] mt-1">Direttivo e soci dell'associazione.</p>
+    </div>
+    @if (isSuperAdmin()) {
+      <button (click)="openCreate()"
+              class="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-primary text-on-primary font-inter font-semibold text-sm hover:bg-primary/90 transition-colors flex-shrink-0">
+        <span class="material-symbols-outlined text-base">person_add</span>
+        Nuovo socio
+      </button>
+    }
   </div>
 
   @if (membersLoading()) {
@@ -41,7 +50,7 @@
             <div class="flex flex-col items-end gap-1 flex-shrink-0">
               <span class="font-inter text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full"
                     [class]="m.role === 'SUPERADMIN' ? 'bg-primary/10 text-primary' : 'bg-surface-container text-on-surface-variant'">
-                {{ m.role === 'SUPERADMIN' ? 'Presidente' : 'Admin' }}
+                {{ m.role === 'SUPERADMIN' ? 'Superadmin' : 'Admin' }}
               </span>
               @if (m.boardRoles.length) {
                 <span class="flex flex-wrap gap-1 justify-end max-w-[140px]">
@@ -156,12 +165,18 @@
                    s.status === 'attivo'              ? 'Attivo' : 'Rifiutato' }}
               </span>
 
-              <!-- Delete (superadmin) o chevron -->
+              <!-- Azioni (superadmin) o chevron -->
               @if (isSuperAdmin()) {
-                <button (click)="askDelete(s.id, $event)"
-                        class="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-on-surface-variant/40 hover:bg-red-50 hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100">
-                  <span class="material-symbols-outlined text-base">delete</span>
-                </button>
+                <div class="flex items-center gap-1 flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <button (click)="goToMember(s.id)"
+                          class="w-8 h-8 rounded-full flex items-center justify-center text-on-surface-variant/40 hover:bg-primary/10 hover:text-primary transition-colors">
+                    <span class="material-symbols-outlined text-base">edit</span>
+                  </button>
+                  <button (click)="askDelete(s.id, $event)"
+                          class="w-8 h-8 rounded-full flex items-center justify-center text-on-surface-variant/40 hover:bg-red-50 hover:text-red-500 transition-colors">
+                    <span class="material-symbols-outlined text-base">delete</span>
+                  </button>
+                </div>
               } @else {
                 <span class="material-symbols-outlined text-on-surface-variant/40 text-base w-4 flex-shrink-0">chevron_right</span>
               }
@@ -174,9 +189,257 @@
   }
 </div>
 
+<!-- ── Create member dialog ──────────────────────────────────────────────── -->
+@if (showCreate()) {
+  <div class="fixed inset-0 z-[70] bg-black/40 flex items-end sm:items-center justify-center p-0 sm:p-4" (click)="closeCreate()">
+    <div class="bg-surface-container-lowest rounded-t-3xl sm:rounded-2xl shadow-xl w-full sm:max-w-2xl max-h-[90dvh] flex flex-col" (click)="$event.stopPropagation()">
+
+      <!-- Header -->
+      <div class="flex items-center gap-3 px-6 pt-5 pb-4 border-b border-outline-variant/20 flex-shrink-0">
+        <div class="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+          <span class="material-symbols-outlined text-primary text-lg">person_add</span>
+        </div>
+        <div class="flex-1 min-w-0">
+          <p class="font-inter font-bold text-on-surface text-base">Nuovo socio</p>
+          <p class="font-inter text-on-surface-variant text-xs mt-0.5">Crea manualmente un profilo socio.</p>
+        </div>
+        <button (click)="closeCreate()" class="w-8 h-8 rounded-full flex items-center justify-center text-on-surface-variant hover:bg-surface-container transition-colors">
+          <span class="material-symbols-outlined text-lg">close</span>
+        </button>
+      </div>
+
+      <!-- Body scrollable -->
+      <div class="overflow-y-auto flex-1 min-h-0 px-6 py-5 space-y-6">
+
+        <!-- Anagrafica -->
+        <div>
+          <p class="font-inter font-semibold text-[11px] text-on-surface-variant uppercase tracking-widest mb-3">Anagrafica</p>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label class="font-inter text-xs text-on-surface-variant mb-1 block">Nome *</label>
+              <input [(ngModel)]="form.firstName" name="firstName" type="text" placeholder="Mario"
+                     class="w-full rounded-xl border border-outline-variant bg-surface-container px-3 py-2.5 font-inter text-sm text-on-surface focus:outline-none focus:border-primary transition-colors" />
+            </div>
+            <div>
+              <label class="font-inter text-xs text-on-surface-variant mb-1 block">Cognome *</label>
+              <input [(ngModel)]="form.lastName" name="lastName" type="text" placeholder="Rossi"
+                     class="w-full rounded-xl border border-outline-variant bg-surface-container px-3 py-2.5 font-inter text-sm text-on-surface focus:outline-none focus:border-primary transition-colors" />
+            </div>
+            <div>
+              <label class="font-inter text-xs text-on-surface-variant mb-1 block">Codice fiscale *</label>
+              <input [(ngModel)]="form.fiscalCode" name="fiscalCode" type="text" placeholder="RSSMRA80A01H501Z"
+                     class="w-full rounded-xl border border-outline-variant bg-surface-container px-3 py-2.5 font-inter text-sm text-on-surface uppercase focus:outline-none focus:border-primary transition-colors" />
+            </div>
+            <div>
+              <label class="font-inter text-xs text-on-surface-variant mb-1 block">Email *</label>
+              <input [(ngModel)]="form.email" name="email" type="email" placeholder="mario@esempio.it"
+                     class="w-full rounded-xl border border-outline-variant bg-surface-container px-3 py-2.5 font-inter text-sm text-on-surface focus:outline-none focus:border-primary transition-colors" />
+            </div>
+            <div>
+              <label class="font-inter text-xs text-on-surface-variant mb-1 block">Data di nascita *</label>
+              <input [(ngModel)]="form.birthDate" name="birthDate" type="date"
+                     class="w-full rounded-xl border border-outline-variant bg-surface-container px-3 py-2.5 font-inter text-sm text-on-surface focus:outline-none focus:border-primary transition-colors" />
+            </div>
+            <div>
+              <label class="font-inter text-xs text-on-surface-variant mb-1 block">Luogo di nascita *</label>
+              <input [(ngModel)]="form.birthPlace" name="birthPlace" type="text" placeholder="Roma"
+                     class="w-full rounded-xl border border-outline-variant bg-surface-container px-3 py-2.5 font-inter text-sm text-on-surface focus:outline-none focus:border-primary transition-colors" />
+            </div>
+            <div>
+              <label class="font-inter text-xs text-on-surface-variant mb-1 block">Sesso *</label>
+              <select [(ngModel)]="form.gender" name="gender"
+                      class="w-full rounded-xl border border-outline-variant bg-surface-container px-3 py-2.5 font-inter text-sm text-on-surface focus:outline-none focus:border-primary transition-colors">
+                @for (o of genderOptions; track o.value) { <option [value]="o.value">{{ o.label }}</option> }
+              </select>
+            </div>
+            <div>
+              <label class="font-inter text-xs text-on-surface-variant mb-1 block">Telefono *</label>
+              <input [(ngModel)]="form.phone" name="phone" type="tel" placeholder="+39 333 1234567"
+                     class="w-full rounded-xl border border-outline-variant bg-surface-container px-3 py-2.5 font-inter text-sm text-on-surface focus:outline-none focus:border-primary transition-colors" />
+            </div>
+            <div class="sm:col-span-2 flex items-center gap-2">
+              <input [(ngModel)]="form.isMinor" name="isMinor" type="checkbox" id="isMinor"
+                     class="w-4 h-4 rounded accent-primary" />
+              <label for="isMinor" class="font-inter text-sm text-on-surface cursor-pointer">Minorenne</label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Documento -->
+        <div>
+          <p class="font-inter font-semibold text-[11px] text-on-surface-variant uppercase tracking-widest mb-3">Documento</p>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div>
+              <label class="font-inter text-xs text-on-surface-variant mb-1 block">Tipo *</label>
+              <select [(ngModel)]="form.docType" name="docType"
+                      class="w-full rounded-xl border border-outline-variant bg-surface-container px-3 py-2.5 font-inter text-sm text-on-surface focus:outline-none focus:border-primary transition-colors">
+                @for (o of docTypeOptions; track o.value) { <option [value]="o.value">{{ o.label }}</option> }
+              </select>
+            </div>
+            <div>
+              <label class="font-inter text-xs text-on-surface-variant mb-1 block">Numero *</label>
+              <input [(ngModel)]="form.docNumber" name="docNumber" type="text" placeholder="AB1234567"
+                     class="w-full rounded-xl border border-outline-variant bg-surface-container px-3 py-2.5 font-inter text-sm text-on-surface focus:outline-none focus:border-primary transition-colors" />
+            </div>
+            <div>
+              <label class="font-inter text-xs text-on-surface-variant mb-1 block">Scadenza *</label>
+              <input [(ngModel)]="form.docExpiry" name="docExpiry" type="date"
+                     class="w-full rounded-xl border border-outline-variant bg-surface-container px-3 py-2.5 font-inter text-sm text-on-surface focus:outline-none focus:border-primary transition-colors" />
+            </div>
+          </div>
+        </div>
+
+        <!-- Indirizzo -->
+        <div>
+          <p class="font-inter font-semibold text-[11px] text-on-surface-variant uppercase tracking-widest mb-3">Residenza</p>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div class="sm:col-span-2">
+              <label class="font-inter text-xs text-on-surface-variant mb-1 block">Via / Indirizzo *</label>
+              <input [(ngModel)]="form.addressStreet" name="addressStreet" type="text" placeholder="Via Roma 1"
+                     class="w-full rounded-xl border border-outline-variant bg-surface-container px-3 py-2.5 font-inter text-sm text-on-surface focus:outline-none focus:border-primary transition-colors" />
+            </div>
+            <div>
+              <label class="font-inter text-xs text-on-surface-variant mb-1 block">CAP *</label>
+              <input [(ngModel)]="form.addressZip" name="addressZip" type="text" placeholder="00100"
+                     class="w-full rounded-xl border border-outline-variant bg-surface-container px-3 py-2.5 font-inter text-sm text-on-surface focus:outline-none focus:border-primary transition-colors" />
+            </div>
+            <div>
+              <label class="font-inter text-xs text-on-surface-variant mb-1 block">Città *</label>
+              <input [(ngModel)]="form.addressCity" name="addressCity" type="text" placeholder="Roma"
+                     class="w-full rounded-xl border border-outline-variant bg-surface-container px-3 py-2.5 font-inter text-sm text-on-surface focus:outline-none focus:border-primary transition-colors" />
+            </div>
+            <div>
+              <label class="font-inter text-xs text-on-surface-variant mb-1 block">Provincia *</label>
+              <input [(ngModel)]="form.addressProvince" name="addressProvince" type="text" placeholder="RM" maxlength="2"
+                     class="w-full rounded-xl border border-outline-variant bg-surface-container px-3 py-2.5 font-inter text-sm text-on-surface uppercase focus:outline-none focus:border-primary transition-colors" />
+            </div>
+          </div>
+        </div>
+
+        <!-- Iscrizione -->
+        <div>
+          <p class="font-inter font-semibold text-[11px] text-on-surface-variant uppercase tracking-widest mb-3">Iscrizione</p>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div>
+              <label class="font-inter text-xs text-on-surface-variant mb-1 block">Categoria *</label>
+              <select [(ngModel)]="form.category" name="category"
+                      class="w-full rounded-xl border border-outline-variant bg-surface-container px-3 py-2.5 font-inter text-sm text-on-surface focus:outline-none focus:border-primary transition-colors">
+                @for (o of categoryOptions; track o.value) { <option [value]="o.value">{{ o.label }}</option> }
+              </select>
+            </div>
+            <div>
+              <label class="font-inter text-xs text-on-surface-variant mb-1 block">Stato *</label>
+              <select [(ngModel)]="form.status" name="status"
+                      class="w-full rounded-xl border border-outline-variant bg-surface-container px-3 py-2.5 font-inter text-sm text-on-surface focus:outline-none focus:border-primary transition-colors">
+                @for (o of statusOptions; track o.value) { <option [value]="o.value">{{ o.label }}</option> }
+              </select>
+            </div>
+            <div>
+              <label class="font-inter text-xs text-on-surface-variant mb-1 block">Metodo pagamento *</label>
+              <select [(ngModel)]="form.paymentMethod" name="paymentMethod"
+                      class="w-full rounded-xl border border-outline-variant bg-surface-container px-3 py-2.5 font-inter text-sm text-on-surface focus:outline-none focus:border-primary transition-colors">
+                @for (o of paymentOptions; track o.value) { <option [value]="o.value">{{ o.label }}</option> }
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Privacy -->
+        <div>
+          <p class="font-inter font-semibold text-[11px] text-on-surface-variant uppercase tracking-widest mb-3">Privacy</p>
+          <div class="space-y-2">
+            <label class="flex items-center gap-2 cursor-pointer">
+              <input [(ngModel)]="form.privacyBase" name="privacyBase" type="checkbox" class="w-4 h-4 rounded accent-primary" />
+              <span class="font-inter text-sm text-on-surface">Privacy base (obbligatoria) *</span>
+            </label>
+            <label class="flex items-center gap-2 cursor-pointer">
+              <input [(ngModel)]="form.privacyNewsletter" name="privacyNewsletter" type="checkbox" class="w-4 h-4 rounded accent-primary" />
+              <span class="font-inter text-sm text-on-surface-variant">Newsletter e comunicazioni</span>
+            </label>
+            <label class="flex items-center gap-2 cursor-pointer">
+              <input [(ngModel)]="form.privacyThirdParties" name="privacyThirdParties" type="checkbox" class="w-4 h-4 rounded accent-primary" />
+              <span class="font-inter text-sm text-on-surface-variant">Condivisione con terze parti</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Tutore (solo se minorenne) -->
+        @if (form.isMinor) {
+          <div>
+            <p class="font-inter font-semibold text-[11px] text-on-surface-variant uppercase tracking-widest mb-3">Tutore legale</p>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label class="font-inter text-xs text-on-surface-variant mb-1 block">Nome tutore *</label>
+                <input [(ngModel)]="form.guardianFirstName" name="guardianFirstName" type="text"
+                       class="w-full rounded-xl border border-outline-variant bg-surface-container px-3 py-2.5 font-inter text-sm text-on-surface focus:outline-none focus:border-primary transition-colors" />
+              </div>
+              <div>
+                <label class="font-inter text-xs text-on-surface-variant mb-1 block">Cognome tutore *</label>
+                <input [(ngModel)]="form.guardianLastName" name="guardianLastName" type="text"
+                       class="w-full rounded-xl border border-outline-variant bg-surface-container px-3 py-2.5 font-inter text-sm text-on-surface focus:outline-none focus:border-primary transition-colors" />
+              </div>
+              <div>
+                <label class="font-inter text-xs text-on-surface-variant mb-1 block">CF tutore *</label>
+                <input [(ngModel)]="form.guardianFiscalCode" name="guardianFiscalCode" type="text"
+                       class="w-full rounded-xl border border-outline-variant bg-surface-container px-3 py-2.5 font-inter text-sm text-on-surface uppercase focus:outline-none focus:border-primary transition-colors" />
+              </div>
+              <div>
+                <label class="font-inter text-xs text-on-surface-variant mb-1 block">Relazione *</label>
+                <select [(ngModel)]="form.guardianRelation" name="guardianRelation"
+                        class="w-full rounded-xl border border-outline-variant bg-surface-container px-3 py-2.5 font-inter text-sm text-on-surface focus:outline-none focus:border-primary transition-colors">
+                  @for (o of relationOptions; track o.value) { <option [value]="o.value">{{ o.label }}</option> }
+                </select>
+              </div>
+              <div>
+                <label class="font-inter text-xs text-on-surface-variant mb-1 block">Tipo documento *</label>
+                <select [(ngModel)]="form.guardianDocType" name="guardianDocType"
+                        class="w-full rounded-xl border border-outline-variant bg-surface-container px-3 py-2.5 font-inter text-sm text-on-surface focus:outline-none focus:border-primary transition-colors">
+                  @for (o of docTypeOptions; track o.value) { <option [value]="o.value">{{ o.label }}</option> }
+                </select>
+              </div>
+              <div>
+                <label class="font-inter text-xs text-on-surface-variant mb-1 block">Numero documento *</label>
+                <input [(ngModel)]="form.guardianDocNumber" name="guardianDocNumber" type="text"
+                       class="w-full rounded-xl border border-outline-variant bg-surface-container px-3 py-2.5 font-inter text-sm text-on-surface focus:outline-none focus:border-primary transition-colors" />
+              </div>
+              <div>
+                <label class="font-inter text-xs text-on-surface-variant mb-1 block">Scadenza documento *</label>
+                <input [(ngModel)]="form.guardianDocExpiry" name="guardianDocExpiry" type="date"
+                       class="w-full rounded-xl border border-outline-variant bg-surface-container px-3 py-2.5 font-inter text-sm text-on-surface focus:outline-none focus:border-primary transition-colors" />
+              </div>
+            </div>
+          </div>
+        }
+
+        @if (createError()) {
+          <div class="flex items-center gap-2 p-3 rounded-xl bg-red-50 text-red-700">
+            <span class="material-symbols-outlined text-base flex-shrink-0">error</span>
+            <p class="font-inter text-sm">{{ createError() }}</p>
+          </div>
+        }
+      </div>
+
+      <!-- Footer -->
+      <div class="flex gap-3 px-6 py-4 border-t border-outline-variant/20 flex-shrink-0">
+        <button (click)="closeCreate()" class="flex-1 py-2.5 rounded-xl border border-outline-variant font-inter font-semibold text-sm text-on-surface-variant hover:bg-surface-container transition-colors">
+          Annulla
+        </button>
+        <button (click)="submitCreate()" [disabled]="creating()"
+                class="flex-1 py-2.5 rounded-xl bg-primary text-on-primary font-inter font-bold text-sm hover:bg-primary/90 transition-colors disabled:opacity-60 flex items-center justify-center gap-2">
+          @if (creating()) {
+            <span class="material-symbols-outlined text-base spin">progress_activity</span>
+          } @else {
+            Crea socio
+          }
+        </button>
+      </div>
+    </div>
+  </div>
+}
+
 <!-- ── Confirm delete dialog ─────────────────────────────────────────────── -->
 @if (confirmDeleteId()) {
-  <div class="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-4" (click)="cancelDelete()">
+  <div class="fixed inset-0 z-[70] bg-black/40 flex items-center justify-center p-4" (click)="cancelDelete()">
     <div class="bg-surface-container-lowest rounded-2xl shadow-xl p-6 w-full max-w-xs" (click)="$event.stopPropagation()">
       <div class="flex items-center gap-3 mb-4">
         <div class="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center flex-shrink-0">
