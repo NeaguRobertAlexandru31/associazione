@@ -1,4 +1,4 @@
-import { Component, OnInit, computed, inject, signal } from '@angular/core';
+import { Component, OnInit, OnDestroy, computed, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { TranslatePipe } from '../../../i18n/translate.pipe';
 import { CalendarEvent } from '../../../core/models/event.model';
@@ -18,13 +18,18 @@ const ACCENTS = ['border-secondary', 'border-[#f8bd2a]', 'border-primary/40'];
   templateUrl: './home.html',
   styleUrl: './home.css',
 })
-export class Home implements OnInit {
+export class Home implements OnInit, OnDestroy {
   private eventsService   = inject(EventsService);
   private articlesService = inject(ArticlesService);
   readonly siteSettings   = inject(SiteSettingsService);
 
   allEvents = signal<CalendarEvent[] | null>(null);
   allNews   = signal<Article[] | null>(null);
+
+  eventBannerVisible = signal(false);
+  eventBannerDismissed = signal(false);
+
+  private bannerTimer: ReturnType<typeof setTimeout> | null = null;
 
   readonly upcoming = computed(() => {
     const events = this.allEvents();
@@ -55,11 +60,32 @@ export class Home implements OnInit {
   ngOnInit(): void {
     this.siteSettings.load();
     this.eventsService.getAll().subscribe({
-      next: evts => this.allEvents.set(evts),
+      next: evts => {
+        this.allEvents.set(evts);
+        this.scheduleBanner();
+      },
     });
     this.articlesService.getAll().subscribe({
       next: arts => this.allNews.set(arts),
     });
+  }
+
+  ngOnDestroy(): void {
+    if (this.bannerTimer) clearTimeout(this.bannerTimer);
+  }
+
+  private scheduleBanner(): void {
+    if (this.nextEvent() === null) return;
+    this.bannerTimer = setTimeout(() => {
+      if (!this.eventBannerDismissed()) this.eventBannerVisible.set(true);
+    }, 2000);
+  }
+
+  dismissBanner(event: MouseEvent): void {
+    event.preventDefault();
+    event.stopPropagation();
+    this.eventBannerVisible.set(false);
+    this.eventBannerDismissed.set(true);
   }
 
   accent(index: number): string {

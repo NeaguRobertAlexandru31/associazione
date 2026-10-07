@@ -1,0 +1,3 @@
+/* Event banner slide-up */
+.banner-hidden  { transform: translateY(120%); opacity: 0; }
+.banner-visible { transform: translateY(0);    opacity: 1; }
