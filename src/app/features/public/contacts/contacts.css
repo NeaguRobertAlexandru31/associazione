@@ -1,3 +1,18 @@
 .hero-badge { animation-delay: 0.1s; }
 .hero-title { animation-delay: 0.25s; }
 .hero-sub   { animation-delay: 0.4s; }
+
+.telegram-btn {
+  background: linear-gradient(270deg, #2AABEE, #229ED9, #1a7fc4, #2AABEE);
+  background-size: 300% 100%;
+  animation: telegram-gradient 4s ease infinite;
+  border: none;
+  color: #fff;
+}
+.telegram-btn:hover { filter: brightness(1.1); }
+
+@keyframes telegram-gradient {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}

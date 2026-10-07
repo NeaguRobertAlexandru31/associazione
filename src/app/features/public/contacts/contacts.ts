@@ -4,10 +4,11 @@ import { TranslatePipe } from '../../../i18n/translate.pipe';
 import { ContactService } from '../../../core/services/contact/contact';
 import { SiteSettingsService } from '../../../core/services/site-settings/site-settings';
 import { Analytics } from '../../../core/services/analytics/analytics';
+import { LucideAngularModule } from 'lucide-angular';
 
 @Component({
   selector: 'app-contacts',
-  imports: [FormsModule, TranslatePipe],
+  imports: [FormsModule, TranslatePipe, LucideAngularModule],
   templateUrl: './contacts.html',
   styleUrl: './contacts.css',
 })

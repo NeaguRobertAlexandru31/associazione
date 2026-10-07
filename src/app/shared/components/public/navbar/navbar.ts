@@ -31,6 +31,7 @@ export class Navbar implements AfterViewInit {
     { route: '/events',   labelKey: 'nav.events'    },
     { route: '/news',     labelKey: 'nav.news'       },
     { route: '/projects', labelKey: 'nav.projects'  },
+    { route: '/contacts', labelKey: 'nav.contacts'  },
   ];
 
   readonly langs: LangOption[] = [

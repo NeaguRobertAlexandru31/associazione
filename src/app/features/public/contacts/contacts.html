@@ -41,7 +41,7 @@
 
       <form (ngSubmit)="submitForm()" class="flex flex-col gap-5">
 
-        <div class="grid grid-cols-2 gap-4">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
             <label class="font-inter font-semibold text-[10px] text-on-surface-variant uppercase tracking-widest block mb-2">
               {{ 'contacts.form_name' | translate }}
@@ -138,17 +138,29 @@
         <p class="font-inter text-on-primary/80 text-sm leading-relaxed mb-5">
           {{ 'contacts.social_subtitle' | translate }}
         </p>
-        <div class="flex gap-3">
-          <a href="#" class="w-10 h-10 rounded-full bg-on-primary/10 flex items-center justify-center text-on-primary hover:bg-on-primary/20 transition-all">
-            <span class="material-symbols-outlined text-xl">public</span>
+        <div class="flex justify-between mb-5">
+          <a href="#" target="_blank" rel="noopener noreferrer"
+             class="w-12 h-12 rounded-full bg-on-primary/10 flex items-center justify-center text-on-primary hover:bg-on-primary/20 transition-all">
+            <lucide-icon name="instagram" [size]="22" />
           </a>
-          <a href="#" class="w-10 h-10 rounded-full bg-on-primary/10 flex items-center justify-center text-on-primary hover:bg-on-primary/20 transition-all">
-            <span class="material-symbols-outlined text-xl">share</span>
+          <a href="#" target="_blank" rel="noopener noreferrer"
+             class="w-12 h-12 rounded-full bg-on-primary/10 flex items-center justify-center text-on-primary hover:bg-on-primary/20 transition-all">
+            <lucide-icon name="facebook" [size]="22" />
           </a>
-          <a href="#" class="w-10 h-10 rounded-full bg-on-primary/10 flex items-center justify-center text-on-primary hover:bg-on-primary/20 transition-all">
-            <span class="material-symbols-outlined text-xl">photo_camera</span>
+          <a href="#" target="_blank" rel="noopener noreferrer"
+             class="w-12 h-12 rounded-full bg-on-primary/10 flex items-center justify-center text-on-primary hover:bg-on-primary/20 transition-all">
+            <lucide-icon name="linkedin" [size]="22" />
+          </a>
+          <a href="#" target="_blank" rel="noopener noreferrer"
+             class="w-12 h-12 rounded-full bg-on-primary/10 flex items-center justify-center text-on-primary hover:bg-on-primary/20 transition-all">
+            <span class="w-7 h-7 bg-current inline-block" style="-webkit-mask: url('/icons8-tic-toc-50.png') center/contain no-repeat; mask: url('/icons8-tic-toc-50.png') center/contain no-repeat;"></span>
           </a>
         </div>
+        <a href="#" target="_blank" rel="noopener noreferrer"
+           class="telegram-btn inline-flex items-center justify-center gap-2 w-full px-4 py-3 font-inter font-semibold text-sm rounded-xl transition-all">
+          <lucide-icon name="send" [size]="16" />
+          {{ 'footer.telegram_cta' | translate }}
+        </a>
       </div>
 
     </div>
