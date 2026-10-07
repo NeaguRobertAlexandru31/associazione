@@ -40,6 +40,9 @@ export const SITE_IMAGE_KEYS = [
   { key: 'img_about_member_2',   label: 'Chi siamo — foto membro 2',         placeholderKey: 'placeholder_member'    },
   { key: 'img_about_member_3',   label: 'Chi siamo — foto membro 3',         placeholderKey: 'placeholder_member'    },
   { key: 'img_about_member_4',   label: 'Chi siamo — foto membro 4',         placeholderKey: 'placeholder_member'    },
+  { key: 'img_about_member_5',   label: 'Chi siamo — foto membro 5',         placeholderKey: 'placeholder_member'    },
+  { key: 'img_about_member_6',   label: 'Chi siamo — foto membro 6',         placeholderKey: 'placeholder_member'    },
+  { key: 'img_about_member_7',   label: 'Chi siamo — foto membro 7',         placeholderKey: 'placeholder_member'    },
 ] as const;
 
 export type SiteImageKey = typeof SITE_IMAGE_KEYS[number]['key'];

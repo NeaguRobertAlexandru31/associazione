@@ -35,6 +35,9 @@ export class AboutUs implements OnInit {
     { img: this.siteSettings.img('img_about_member_2'), nameKey: 'about-us.member_2_name', roleKey: 'about-us.member_2_role', descKey: 'about-us.member_2_desc' },
     { img: this.siteSettings.img('img_about_member_3'), nameKey: 'about-us.member_3_name', roleKey: 'about-us.member_3_role', descKey: 'about-us.member_3_desc' },
     { img: this.siteSettings.img('img_about_member_4'), nameKey: 'about-us.member_4_name', roleKey: 'about-us.member_4_role', descKey: 'about-us.member_4_desc' },
+    { img: this.siteSettings.img('img_about_member_5'), nameKey: 'about-us.member_5_name', roleKey: 'about-us.member_5_role', descKey: 'about-us.member_5_desc' },
+    { img: '/foto-membri/robert.jpg', nameKey: 'about-us.member_6_name', roleKey: 'about-us.member_6_role', descKey: 'about-us.member_6_desc' },
+    { img: this.siteSettings.img('img_about_member_7'), nameKey: 'about-us.member_7_name', roleKey: 'about-us.member_7_role', descKey: 'about-us.member_7_desc' },
   ]);
 
   ngOnInit(): void { this.siteSettings.load(); }
