@@ -5,28 +5,40 @@
    style="background-size: cover; background-position: center">
   <div class="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent"></div>
 
-  <!-- Badge data / in corso in alto a sinistra -->
-  @if (isOngoing()) {
-    <div class="absolute top-3 left-3 bg-secondary text-white font-inter font-bold text-xs px-2.5 py-1 rounded-full flex items-center gap-1">
-      <span class="w-1.5 h-1.5 rounded-full bg-white animate-pulse inline-block"></span>
-      In corso
-    </div>
-  } @else {
-    <div class="absolute top-3 left-3 bg-secondary text-white font-romania font-bold text-xs px-2.5 py-1 rounded-full">
-      {{ day() }} {{ month() }}
-    </div>
-  }
+  <!-- Badge data (sx) -->
+  <div class="absolute top-3 left-3">
+    @if (isOngoing()) {
+      <div class="bg-secondary text-white font-inter font-bold text-xs px-2.5 py-1 rounded-full flex items-center gap-1">
+        <span class="w-1.5 h-1.5 rounded-full bg-white animate-pulse inline-block"></span>
+        In corso
+      </div>
+    } @else {
+      <div class="bg-secondary text-white font-romania font-bold text-xs px-2.5 py-1 rounded-full">
+        {{ day() }} {{ month() }}
+      </div>
+    }
+  </div>
+
+  <!-- Badge accesso (dx) -->
+  <div class="absolute top-3 right-3 flex flex-col items-end gap-1">
+    @if (isMembersOnly()) {
+      <span class="inline-flex items-center gap-1 px-2 py-1 bg-secondary text-white font-inter font-bold text-[10px] uppercase tracking-wider rounded-full">
+        <span class="material-symbols-outlined text-[10px]">star</span>
+        Solo soci
+      </span>
+    }
+    @if (isLimited()) {
+      <span class="inline-flex items-center gap-1 px-2 py-1 bg-black/40 backdrop-blur-sm text-white font-inter font-bold text-[10px] uppercase tracking-wider rounded-full">
+        <span class="material-symbols-outlined text-[10px]">group</span>
+        {{ event().capacity }} posti
+      </span>
+    }
+  </div>
 
   <!-- Contenuto in basso -->
   <div class="absolute inset-x-0 bottom-0 p-4">
     <div class="flex items-end justify-between gap-3">
       <div>
-        @if (isMembersOnly()) {
-          <span class="inline-flex items-center gap-1 mb-1.5 px-2 py-0.5 bg-secondary text-white font-inter font-bold text-[10px] uppercase tracking-wider rounded-full">
-            <span class="material-symbols-outlined text-[10px]">star</span>
-            Solo soci
-          </span>
-        }
         <h3 class="font-romania font-bold text-white text-lg leading-tight">{{ event().name }}</h3>
         <div class="flex flex-wrap items-center gap-x-3 gap-y-0.5 mt-1 text-white/90 font-inter text-xs">
           <span class="flex items-center gap-1">
@@ -37,15 +49,9 @@
             <span class="material-symbols-outlined text-xs">schedule</span>
             {{ event().time }}
           </span>
-          @if (isLimited()) {
-            <span class="flex items-center gap-1">
-              <span class="material-symbols-outlined text-xs">group</span>
-              {{ event().capacity }} posti
-            </span>
-          }
         </div>
       </div>
-      <span class="flex-shrink-0 flex items-center text-white">
+      <span class="flex-shrink-0 text-white">
         <span class="material-symbols-outlined text-base">arrow_forward</span>
       </span>
     </div>

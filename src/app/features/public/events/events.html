@@ -67,10 +67,10 @@
 <!-- ── UPCOMING MOBILE: scroll orizzontale ───────────────────────────── -->
 @if (!loading() && upcoming().length > 0) {
   <section class="md:hidden pt-10 pb-12 bg-surface">
-    <div class="flex gap-4 overflow-x-auto pb-2"
-         style="scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; padding-left: 2rem; padding-right: 2rem; scroll-padding-left: 2rem;">
+    <div class="flex gap-3 overflow-x-auto pb-2 px-8"
+         style="scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; scroll-padding-left: 2rem;">
       @for (ev of upcoming(); track ev.id) {
-        <div class="flex-none w-[80vw] max-w-sm" style="scroll-snap-align: start;">
+        <div class="flex-none w-[85vw]" style="scroll-snap-align: start;">
           <app-event [event]="ev" />
         </div>
       }
@@ -206,11 +206,11 @@
       </h2>
 
       <!-- Mobile scroll -->
-      <div class="flex gap-4 overflow-x-auto pb-2 md:hidden"
+      <div class="-mx-8 flex gap-3 overflow-x-auto pb-2 md:hidden"
            style="scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; padding-left: 2rem; padding-right: 2rem; scroll-padding-left: 2rem;">
         @for (a of archived(); track a.id) {
           <a [routerLink]="a.slug ? ['/events', a.slug] : null"
-             class="relative flex-none w-[75vw] max-w-xs rounded-2xl overflow-hidden aspect-[16/9] shadow-sm grayscale hover:grayscale-0 transition-all duration-500"
+             class="relative flex-none w-[85vw] rounded-2xl overflow-hidden aspect-[16/9] shadow-sm grayscale hover:grayscale-0 transition-all duration-500"
              [style.background-image]="'url(' + resolveImg(a.cover ?? a.images[0]) + ')'"
              style="scroll-snap-align: start; background-size: cover; background-position: center">
             <div class="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent"></div>

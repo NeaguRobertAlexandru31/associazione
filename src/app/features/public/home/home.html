@@ -197,15 +197,13 @@
 		<p class="font-inter text-on-surface-variant text-sm">Nessun evento in programma al momento.</p>
 		} @else {
 		<!-- Mobile scroll -->
-		<div class="md:hidden overflow-hidden">
-			<div class="flex gap-4 overflow-x-auto pb-4"
-			     style="scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch;">
-				@for (ev of upcoming()!; track ev.id; let i = $index) {
-					<div class="flex-none w-[80vw] max-w-sm" style="scroll-snap-align: start;">
-						<app-event-short [event]="ev" [accentClass]="accent(i)" />
-					</div>
-				}
-			</div>
+		<div class="-mx-8 flex gap-3 overflow-x-auto pb-4"
+		     style="scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; padding-left: 2rem; padding-right: 2rem; scroll-padding-left: 2rem;">
+			@for (ev of upcoming()!; track ev.id; let i = $index) {
+				<div class="flex-none w-[85vw]" style="scroll-snap-align: start;">
+					<app-event-short [event]="ev" [accentClass]="accent(i)" />
+				</div>
+			}
 		</div>
 		<!-- Desktop list -->
 		<div class="hidden md:flex md:flex-col gap-4">
