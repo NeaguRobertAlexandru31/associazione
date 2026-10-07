@@ -131,6 +131,12 @@ export class Register implements OnInit {
         if (!this.firstName || !this.lastName) { this.error.set('Nome e cognome obbligatori'); return false; }
         if (!this.fiscalCode)                   { this.error.set('Codice fiscale obbligatorio'); return false; }
         if (!this.birthDate || !this.birthPlace) { this.error.set('Data e luogo di nascita obbligatori'); return false; }
+        if (!this.isMinor) {
+          const birth = new Date(this.birthDate);
+          const min18 = new Date();
+          min18.setFullYear(min18.getFullYear() - 18);
+          if (birth > min18) { this.error.set('Il socio deve avere almeno 18 anni per essere registrato come maggiorenne'); return false; }
+        }
         return true;
       case 3:
         if (!this.docNumber || !this.docExpiry)  { this.error.set('Dati documento obbligatori'); return false; }
