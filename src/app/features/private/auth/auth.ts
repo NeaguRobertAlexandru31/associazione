@@ -2,7 +2,6 @@ import { Component, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../../core/services/auth/auth';
-import { PermissionsService } from '../../../core/services/permissions/permissions';
 
 type Phase = 'email' | 'password' | 'set-password';
 
@@ -14,7 +13,6 @@ type Phase = 'email' | 'password' | 'set-password';
 })
 export class Auth {
   private auth  = inject(AuthService);
-  private perms = inject(PermissionsService);
   private router = inject(Router);
   private route  = inject(ActivatedRoute);
 
@@ -92,8 +90,7 @@ export class Auth {
   }
 
   private defaultUrl(): string {
-    const first = this.perms.visiblePages()[0];
-    return first ? `/dashboard/${first}` : '/dashboard/settings';
+    return '/dashboard/menu';
   }
 
   backToEmail(): void {
