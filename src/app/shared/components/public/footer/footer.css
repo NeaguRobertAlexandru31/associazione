@@ -1,3 +1,30 @@
+.footer-social-btn {
+  background-size: 300% 300%;
+  animation: footer-social-gradient 5s ease infinite;
+}
+
+.footer-instagram-btn {
+  background-image: linear-gradient(135deg, #c97a3a, #b85680, #6e4a9a, #4a5ab8, #b85680, #c97a3a);
+}
+
+.footer-facebook-btn {
+  background-image: linear-gradient(135deg, #4a90d9, #2a5fa8, #6aaff0, #4a90d9);
+}
+
+.footer-linkedin-btn {
+  background-image: linear-gradient(135deg, #3a85c0, #1a5490, #5aaad8, #3a85c0);
+}
+
+.footer-tiktok-btn {
+  background-image: linear-gradient(135deg, #1a1a1a, #4ab8bf, #c44a6a, #1a1a1a, #4ab8bf);
+}
+
+@keyframes footer-social-gradient {
+  0%   { background-position: 0% 0%; }
+  50%  { background-position: 100% 100%; }
+  100% { background-position: 0% 0%; }
+}
+
 .footer-telegram-btn {
   background: linear-gradient(270deg, #2AABEE, #229ED9, #1a7fc4, #2AABEE);
   background-size: 300% 100%;
