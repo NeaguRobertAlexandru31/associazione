@@ -36,10 +36,13 @@ export class EventShort {
   readonly isLimited     = computed(() => this.event().hasCapacity && this.event().capacity != null);
   readonly isPublicOpen  = computed(() => this.event().accessType === 'public' && !this.event().hasCapacity);
   readonly isOngoing     = computed(() => {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const d = new Date(this.event().date);
-    d.setHours(0, 0, 0, 0);
-    return d.getTime() === today.getTime();
+    const now   = new Date();
+    const ev    = this.event();
+    const d     = new Date(ev.date);
+    if (d.toDateString() !== now.toDateString()) return false;
+    const [h, m] = (ev.time ?? '00:00').split(':').map(Number);
+    const start  = new Date(d);
+    start.setHours(h, m, 0, 0);
+    return now >= start;
   });
 }
