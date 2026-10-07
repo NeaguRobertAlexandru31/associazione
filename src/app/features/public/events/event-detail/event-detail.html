@@ -59,8 +59,8 @@
           <p class="font-inter text-on-surface text-base leading-relaxed mb-10 max-w-2xl">{{ ev.description }}</p>
         }
 
-        <!-- Prenotazione (eventi a numero chiuso o solo soci) -->
-        @if (ev.accessType === 'limited' || ev.accessType === 'members_only' || ev.hasCapacity) {
+        <!-- Prenotazione (eventi a numero chiuso o solo soci, non archiviati) -->
+        @if ((ev.accessType === 'limited' || ev.accessType === 'members_only' || ev.hasCapacity) && !isArchived()) {
           <div #bookingSection class="mb-10 bg-surface-container-lowest rounded-2xl p-6 shadow-sm">
             <div class="flex items-start gap-3 mb-4">
               <div class="w-10 h-10 rounded-xl bg-primary/8 flex items-center justify-center flex-shrink-0">
@@ -204,8 +204,8 @@
           </div>
         }
 
-        <!-- RSVP section (solo eventi pubblici) -->
-        @if (ev.accessType === 'public' || (!ev.accessType && !ev.hasCapacity)) {
+        <!-- RSVP section (solo eventi pubblici non archiviati) -->
+        @if ((ev.accessType === 'public' || (!ev.accessType && !ev.hasCapacity)) && !isArchived()) {
           <div #rsvpSection class="mb-10 bg-surface-container-lowest rounded-2xl p-6 shadow-sm">
             <h2 class="font-romania font-bold text-primary text-xl mb-1">Parteciperai?</h2>
             <p class="font-inter text-sm text-on-surface-variant mb-5">Facci sapere se verrai, così potremo organizzarci meglio.</p>
@@ -325,7 +325,7 @@
       </div>
 
       <!-- Right: info card -->
-      <div class="bg-surface-container-lowest rounded-2xl shadow-sm p-6 flex flex-col gap-4 sticky top-6">
+      <div class="bg-surface-container-lowest rounded-2xl shadow-sm p-6 flex flex-col gap-4 sticky top-20 overflow-y-auto" style="max-height: calc(100vh - 5rem)">
 
         <!-- Badge tipo accesso -->
         @if (ev.accessType === 'members_only') {
@@ -370,16 +370,18 @@
           </div>
         </div>
 
-        <!-- Calendar buttons -->
-        <div class="border-t border-outline-variant/20 pt-4 mt-2">
-          <p class="font-inter text-xs text-on-surface-variant uppercase tracking-wider font-semibold mb-2">Aggiungi al calendario</p>
+        <!-- Calendar buttons (solo eventi futuri) -->
+        @if (!isArchived()) {
+          <div class="border-t border-outline-variant/20 pt-4 mt-2">
+            <p class="font-inter text-xs text-on-surface-variant uppercase tracking-wider font-semibold mb-2">Aggiungi al calendario</p>
 
-          <a [href]="googleCalendarUrl(ev)" target="_blank" rel="noopener"
-             class="flex items-center justify-center gap-2.5 w-full py-2.5 px-4 rounded-xl bg-[#e8f0fe] text-[#1a73e8] font-inter font-semibold text-sm hover:bg-[#d2e3fc] transition-all">
-            <img src="/icons8-google-calendar-48.png" alt="Google Calendar" class="w-5 h-5 flex-shrink-0" />
-            Google Calendar
-          </a>
-        </div>
+            <a [href]="googleCalendarUrl(ev)" target="_blank" rel="noopener"
+               class="flex items-center justify-center gap-2.5 w-full py-2.5 px-4 rounded-xl bg-[#e8f0fe] text-[#1a73e8] font-inter font-semibold text-sm hover:bg-[#d2e3fc] transition-all">
+              <img src="/icons8-google-calendar-48.png" alt="Google Calendar" class="w-5 h-5 flex-shrink-0" />
+              Google Calendar
+            </a>
+          </div>
+        }
 
         <div class="border-t border-outline-variant/20 pt-4">
           <p class="font-inter text-xs text-on-surface-variant uppercase tracking-wider font-semibold mb-2">Condividi le tue foto</p>
@@ -405,7 +407,7 @@
 
 <!-- FAB sticky "Prenota ora" — solo mobile, solo se prenotazione richiesta e sezione non visibile -->
 @if (event(); as ev) {
-  @if ((ev.accessType === 'limited' || ev.accessType === 'members_only' || ev.hasCapacity) && bookingStep() === 'idle' && !bookingSectionVisible()) {
+  @if ((ev.accessType === 'limited' || ev.accessType === 'members_only' || ev.hasCapacity) && !isArchived() && bookingStep() === 'idle' && !bookingSectionVisible()) {
     <div class="fixed bottom-0 left-0 right-0 z-40 flex justify-center px-4 pt-12 pb-5" style="background: linear-gradient(to top, var(--color-surface) 40%, transparent)">
       <button (click)="scrollToBooking()"
               class="flex items-center justify-center gap-2 w-full md:max-w-xs py-3.5 rounded-xl bg-primary text-white font-inter font-semibold text-base hover:bg-primary/90 transition-colors shadow-lg">
@@ -418,7 +420,7 @@
 
 <!-- FAB sticky RSVP — solo mobile, solo eventi pubblici, solo se sezione non visibile e step idle -->
 @if (event(); as ev) {
-  @if ((ev.accessType === 'public' || (!ev.accessType && !ev.hasCapacity)) && rsvpStep() === 'idle' && !rsvpSectionVisible()) {
+  @if ((ev.accessType === 'public' || (!ev.accessType && !ev.hasCapacity)) && !isArchived() && rsvpStep() === 'idle' && !rsvpSectionVisible()) {
     <div class="fixed bottom-0 left-0 right-0 z-40 flex justify-center px-4 pt-12 pb-5" style="background: linear-gradient(to top, var(--color-surface) 40%, transparent)">
       <button (click)="scrollToRsvp()"
               class="flex items-center justify-center gap-2 w-full md:max-w-xs py-3.5 rounded-xl bg-primary text-white font-inter font-semibold text-base hover:bg-primary/90 transition-colors shadow-lg">

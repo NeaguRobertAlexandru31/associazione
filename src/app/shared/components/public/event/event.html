@@ -1,22 +1,52 @@
-<div class="bg-surface-container-lowest rounded-2xl p-6 shadow-sm flex flex-col gap-3 h-full"
+<div class="relative rounded-2xl overflow-hidden aspect-[16/9] shadow-sm"
      [routerLink]="event().slug ? ['/events', event().slug] : null"
-     [class.cursor-pointer]="event().slug">
-  <div class="aspect-[16/9] rounded-xl overflow-hidden bg-surface-container -mx-2 -mt-2 mb-3">
-    <img [src]="img()" [alt]="event().name" class="w-full h-full object-cover" />
+     [class.cursor-pointer]="event().slug"
+     [style.background-image]="'url(' + img() + ')'"
+     style="background-size: cover; background-position: center">
+
+  <div class="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent"></div>
+
+  <!-- Badge data (sx) e badge accesso (dx) -->
+  <div class="absolute top-3 left-3">
+    <div class="bg-secondary text-white font-romania font-bold text-xs px-2.5 py-1 rounded-full">
+      {{ day() }} {{ month() }}
+    </div>
   </div>
-  <div>
-    <div class="font-romania font-extrabold text-primary text-3xl leading-none">{{ day() }}</div>
-    <div class="font-inter text-on-surface-variant text-xs uppercase tracking-wider">{{ month() }}</div>
+  <div class="absolute top-3 right-3 flex flex-col items-end gap-1">
+    @if (isMembersOnly()) {
+      <span class="inline-flex items-center gap-1 px-2 py-1 bg-secondary text-white font-inter font-bold text-[10px] uppercase tracking-wider rounded-full">
+        <span class="material-symbols-outlined text-[10px]">star</span>
+        Solo soci
+      </span>
+    }
+    @if (isLimited()) {
+      <span class="inline-flex items-center gap-1 px-2 py-1 bg-black/40 backdrop-blur-sm text-white font-inter font-bold text-[10px] uppercase tracking-wider rounded-full">
+        <span class="material-symbols-outlined text-[10px]">group</span>
+        {{ event().capacity }} posti
+      </span>
+    }
   </div>
-  <h3 class="font-romania font-bold text-primary text-lg">{{ event().name }}</h3>
-  @if (event().description) {
-    <p class="font-inter text-on-surface-variant text-sm leading-relaxed line-clamp-3">{{ event().description }}</p>
-  }
-  <div class="flex items-center justify-between pt-2 border-t border-outline-variant/20">
-    <span class="font-inter text-xs text-on-surface-variant flex items-center gap-1">
-      <span class="material-symbols-outlined text-xs" style="font-variation-settings:'FILL' 1">location_on</span>
-      {{ event().location }}
-    </span>
-    <span class="font-inter text-xs text-on-surface-variant">{{ event().time }}</span>
+
+  <!-- Info in basso -->
+  <div class="absolute inset-x-0 bottom-0 p-4">
+    <div class="flex items-end justify-between gap-3">
+      <div>
+        <h3 class="font-romania font-bold text-white text-lg leading-tight">{{ event().name }}</h3>
+        <div class="flex flex-wrap items-center gap-x-3 gap-y-0.5 mt-1 text-white/90 font-inter text-xs">
+          <span class="flex items-center gap-1">
+            <span class="material-symbols-outlined text-xs">location_on</span>
+            {{ event().location }}
+          </span>
+          <span class="flex items-center gap-1">
+            <span class="material-symbols-outlined text-xs">schedule</span>
+            {{ event().time }}
+          </span>
+        </div>
+      </div>
+      <span class="flex-shrink-0 text-white">
+        <span class="material-symbols-outlined text-base">arrow_forward</span>
+      </span>
+    </div>
   </div>
+
 </div>

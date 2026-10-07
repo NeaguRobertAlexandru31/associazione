@@ -23,7 +23,7 @@
 
 <!-- ── CONTENT ──────────────────────────────────────────────────────────── -->
 <section class="py-10 bg-surface" style="scroll-snap-align: start">
-  <div class="container mx-auto px-8">
+  <div class="container mx-auto px-8 overflow-hidden md:overflow-visible">
 
     <!-- Filter pills -->
     <div class="flex flex-wrap gap-2 mb-8">
@@ -78,8 +78,20 @@
         </a>
       }
 
-      <!-- Grid -->
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <!-- Grid mobile: scroll orizzontale -->
+      <div class="md:hidden overflow-hidden">
+        <div class="flex gap-6 overflow-x-auto pb-4"
+             style="scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch;">
+          @for (a of grid(); track a.id) {
+            <div class="flex-none w-[75vw] max-w-xs" style="scroll-snap-align: start;">
+              <app-article [article]="a" />
+            </div>
+          }
+        </div>
+      </div>
+
+      <!-- Grid desktop -->
+      <div class="hidden md:grid md:grid-cols-3 gap-6">
         @for (a of grid(); track a.id) {
           <app-article [article]="a" />
         }

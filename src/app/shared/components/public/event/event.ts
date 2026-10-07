@@ -22,6 +22,9 @@ export class EventCard {
     new Date(this.event().date).toLocaleDateString('it-IT', { month: 'short' }).toUpperCase()
   );
 
+  readonly isMembersOnly = computed(() => this.event().accessType === 'members_only');
+  readonly isLimited     = computed(() => this.event().accessType === 'limited' && !!this.event().capacity);
+
   readonly img = computed(() => {
     const path = this.event().cover ?? this.event().images[0];
     if (!path) return this.siteSettings.placeholder('placeholder_page_hero');
