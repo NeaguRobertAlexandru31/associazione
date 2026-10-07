@@ -14,6 +14,7 @@ export class Footer implements OnInit {
   private statsService = inject(StatsService);
 
   stats = signal<PublicStats | null>(null);
+  readonly currentYear = new Date().getFullYear();
 
   readonly navLinks = [
     { labelKey: 'nav.about-us',   route: '/about-us'  },
