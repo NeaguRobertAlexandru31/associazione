@@ -1,8 +1,10 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { TranslatePipe } from '../../../i18n/translate.pipe';
 import { SiteSettingsService } from '../../../core/services/site-settings/site-settings';
+import { environment } from '../../../../environments/environment';
 
 export interface Plan {
   nameKey: string;
@@ -20,6 +22,7 @@ export interface Plan {
 })
 export class Membership implements OnInit {
   private router        = inject(Router);
+  private http          = inject(HttpClient);
   readonly siteSettings = inject(SiteSettingsService);
   ngOnInit(): void { this.siteSettings.load(); }
 
@@ -28,35 +31,22 @@ export class Membership implements OnInit {
     {
       nameKey: 'membership.plan_1_name',
       priceKey: 'membership.plan_1_price',
-      benefitKeys: ['membership.plan_1_b1', 'membership.plan_1_b2', 'membership.plan_1_b3'],
-      featured: false,
-      stripeProductId: 'price_simpatizzante',
-    },
-    {
-      nameKey: 'membership.plan_2_name',
-      priceKey: 'membership.plan_2_price',
-      benefitKeys: ['membership.plan_2_b1', 'membership.plan_2_b2', 'membership.plan_2_b3', 'membership.plan_2_b4'],
+      benefitKeys: [
+        'membership.plan_1_b1',
+        'membership.plan_1_b2',
+        'membership.plan_1_b3',
+        'membership.plan_1_b4',
+        'membership.plan_1_b5',
+        'membership.plan_1_b6',
+        'membership.plan_1_b7',
+      ],
       featured: true,
-      stripeProductId: 'price_sostenitore',
-    },
-    {
-      nameKey: 'membership.plan_3_name',
-      priceKey: 'membership.plan_3_price',
-      benefitKeys: ['membership.plan_3_b1', 'membership.plan_3_b2', 'membership.plan_3_b3'],
-      featured: false,
-      stripeProductId: 'price_benemerito',
+      stripeProductId: 'price_socio',
     },
   ];
 
-  private readonly planCategoryMap: Record<string, string> = {
-    price_simpatizzante: 'ordinario',
-    price_sostenitore:   'sostenitore',
-    price_benemerito:    'sostenitore',
-  };
-
   selectPlan(plan: Plan): void {
-    const category = this.planCategoryMap[plan.stripeProductId] ?? 'ordinario';
-    this.router.navigate(['/unisciti'], { queryParams: { category } });
+    this.router.navigate(['/unisciti'], { queryParams: { category: 'ordinario' } });
   }
 
   // ── 5×1000 ───────────────────────────────────────────────────────────
@@ -88,11 +78,20 @@ export class Membership implements OnInit {
     this.selectedAmount.set(null);
   }
 
+  loadingDonation = signal(false);
+
   submitDonation(): void {
     const amount = this.selectedAmount() ?? Number(this.customAmount());
     if (!amount || !this.privacyAccepted) return;
-    // TODO: stripeService.redirectToCheckout({ amount, name: this.donorName, email: this.donorEmail })
-    console.log('Donation:', { amount, name: this.donorName, email: this.donorEmail });
+    this.loadingDonation.set(true);
+    this.http.post<{ url: string }>(`${environment.apiUrl}/stripe/donation-checkout`, {
+      amount,
+      frequency: 'once',
+      email: this.donorEmail || undefined,
+    }).subscribe({
+      next:  ({ url }) => { window.location.href = url; },
+      error: () => this.loadingDonation.set(false),
+    });
   }
 
 }

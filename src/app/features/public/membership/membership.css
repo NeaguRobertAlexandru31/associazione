@@ -2,3 +2,16 @@
 .hero-title  { animation-delay: 0.3s; }
 .hero-sub    { animation-delay: 0.5s; }
 .hero-image  { animation-delay: 0.35s; }
+
+.membership-badge,
+.membership-cta {
+  background-image: linear-gradient(135deg, #52b788, #2d6a4f, #74c69d, #1b4332, #52b788);
+  background-size: 300% 300%;
+  animation: membership-gradient 5s ease infinite;
+}
+
+@keyframes membership-gradient {
+  0%   { background-position: 0% 0%; }
+  50%  { background-position: 100% 100%; }
+  100% { background-position: 0% 0%; }
+}

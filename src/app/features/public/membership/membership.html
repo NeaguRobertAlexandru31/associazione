@@ -54,61 +54,47 @@
       </p>
     </div>
 
-    <!-- Cards -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 items-center">
+    <!-- Card unica centrata -->
+    <div class="max-w-lg mx-auto">
       @for (plan of plans; track plan.stripeProductId) {
-        <div class="relative rounded-3xl flex flex-col transition-shadow duration-300"
-             [class]="plan.featured
-               ? 'bg-primary text-on-primary shadow-2xl scale-105 z-10 p-8'
-               : 'bg-surface-container-lowest shadow-sm hover:shadow-md p-8'">
+        <div class="relative bg-surface-container-lowest rounded-3xl shadow-xl border border-outline-variant/30 p-8 flex flex-col">
 
-          <!-- Most popular ribbon -->
-          @if (plan.featured) {
-            <div class="absolute top-5 right-5 bg-secondary text-on-primary font-inter font-bold text-[10px] uppercase tracking-widest px-3 py-1 rounded-full">
-              {{ 'membership.most_popular' | translate }}
+          <!-- Header: nome + prezzo -->
+          <div class="flex items-start justify-between mb-8">
+            <div>
+              <h3 class="font-romania font-bold text-primary text-2xl mb-1">
+                {{ plan.nameKey | translate }}
+              </h3>
+              <div class="flex items-end gap-1">
+                <span class="font-romania font-extrabold text-primary text-5xl">
+                  €{{ plan.priceKey | translate }}
+                </span>
+                <span class="font-inter text-on-surface-variant text-sm mb-2">
+                  {{ 'membership.per_year' | translate }}
+                </span>
+              </div>
             </div>
-          }
-
-          <!-- Name -->
-          <h3 class="font-romania font-bold text-xl mb-4"
-              [class]="plan.featured ? 'text-on-primary' : 'text-primary'">
-            {{ plan.nameKey | translate }}
-          </h3>
-
-          <!-- Price -->
-          <div class="flex items-end gap-1 mb-8">
-            <span class="font-romania font-extrabold text-5xl"
-                  [class]="plan.featured ? 'text-on-primary' : 'text-primary'">
-              €{{ plan.priceKey | translate }}
-            </span>
-            <span class="font-inter text-sm mb-2"
-                  [class]="plan.featured ? 'text-on-primary/60' : 'text-on-surface-variant'">
-              {{ 'membership.per_year' | translate }}
+            <span class="membership-badge font-inter font-bold text-[10px] uppercase tracking-widest px-3 py-1 rounded-full whitespace-nowrap mt-1 text-white">
+              {{ 'membership.most_popular' | translate }}
             </span>
           </div>
 
           <!-- Benefits -->
-          <ul class="flex flex-col gap-3 mb-10 flex-1">
+          <ul class="flex flex-col gap-4 mb-10">
             @for (b of plan.benefitKeys; track b) {
               <li class="flex items-start gap-3 font-inter text-sm">
-                <span class="material-symbols-outlined text-base mt-0.5 flex-none"
-                      [class]="plan.featured ? 'text-[#f8bd2a]' : 'text-secondary'"
+                <span class="material-symbols-outlined text-base mt-0.5 flex-none text-[#2d6a4f]"
                       style="font-variation-settings: 'FILL' 1">
                   check_circle
                 </span>
-                <span [class]="plan.featured ? 'text-on-primary/80' : 'text-on-surface-variant'">
-                  {{ b | translate }}
-                </span>
+                <span class="text-on-surface-variant">{{ b | translate }}</span>
               </li>
             }
           </ul>
 
           <!-- CTA -->
           <button (click)="selectPlan(plan)"
-                  class="w-full py-3 rounded-xl font-inter font-semibold text-sm transition-all"
-                  [class]="plan.featured
-                    ? 'bg-secondary text-on-primary hover:opacity-90'
-                    : 'bg-surface-container text-primary hover:bg-surface-container-high'">
+                  class="membership-cta w-full py-4 text-white font-inter font-bold text-sm rounded-xl hover:brightness-110 transition-all uppercase tracking-wide">
             {{ 'membership.cta' | translate }}
           </button>
 
@@ -133,7 +119,7 @@
       </p>
 
       <!-- Codice fiscale box -->
-      <div class="flex items-center gap-4 bg-surface-container-lowest rounded-2xl border-l-4 border-secondary px-6 py-5 shadow-sm">
+      <div class="flex flex-col sm:flex-row sm:items-center gap-4 bg-surface-container-lowest rounded-2xl border-l-4 border-secondary px-6 py-5 shadow-sm">
         <div class="flex-1">
           <p class="font-inter font-semibold text-on-surface-variant text-xs uppercase tracking-widest mb-1">
             {{ 'membership.fivex1000_cf_label' | translate }}
@@ -143,7 +129,7 @@
           </p>
         </div>
         <button (click)="copyCode()"
-                class="flex items-center gap-2 px-4 py-2 rounded-xl border border-outline-variant font-inter font-semibold text-sm text-primary hover:bg-surface-container transition-all whitespace-nowrap">
+                class="flex items-center justify-center gap-2 px-4 py-2 rounded-xl border border-outline-variant font-inter font-semibold text-sm text-primary hover:bg-surface-container transition-all whitespace-nowrap">
           <span class="material-symbols-outlined text-base">
             {{ copied() ? 'check_circle' : 'content_copy' }}
           </span>
@@ -171,7 +157,7 @@
 <!-- ── DONAZIONE LIBERA ───────────────────────────────────────────────── -->
 <section class="py-24 bg-surface-container-low" style="scroll-snap-align: start">
   <div class="container mx-auto px-8 max-w-2xl">
-    <div class="bg-surface-container-lowest rounded-3xl shadow-lg p-10">
+    <div class="md:bg-surface-container-lowest md:rounded-3xl md:shadow-lg md:p-10">
 
       <!-- Icon + title -->
       <div class="text-center mb-8">
@@ -190,7 +176,7 @@
       <form (ngSubmit)="submitDonation()" #donationForm="ngForm" class="flex flex-col gap-6">
 
         <!-- Name + Email -->
-        <div class="grid grid-cols-2 gap-4">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
             <label class="font-inter font-semibold text-xs text-on-surface-variant uppercase tracking-wide block mb-2">
               {{ 'membership.free_donation_name' | translate }}
@@ -246,10 +232,14 @@
 
         <!-- Submit -->
         <button type="submit"
-                [disabled]="!privacyAccepted || (!selectedAmount() && !customAmount())"
+                [disabled]="!privacyAccepted || (!selectedAmount() && !customAmount()) || loadingDonation()"
                 class="w-full py-4 bg-primary text-on-primary font-inter font-semibold rounded-xl flex items-center justify-center gap-2 hover:opacity-90 transition-all disabled:opacity-40 disabled:cursor-not-allowed">
-          {{ 'membership.free_donation_cta' | translate }}
-          <span class="material-symbols-outlined text-xl">arrow_forward</span>
+          @if (loadingDonation()) {
+            <span class="material-symbols-outlined text-xl animate-spin">progress_activity</span>
+          } @else {
+            {{ 'membership.free_donation_cta' | translate }}
+            <span class="material-symbols-outlined text-xl">arrow_forward</span>
+          }
         </button>
 
         <!-- Payment icons -->
