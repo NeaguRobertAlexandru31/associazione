@@ -202,26 +202,27 @@
 </section>
 
 <!-- ── 5×1000 ─────────────────────────────────────────────────────────── -->
-<section class="py-20 bg-surface-container-low" style="scroll-snap-align: start">
+<section class="py-20 bg-primary" style="scroll-snap-align: start">
   <div class="container mx-auto px-8">
-    <div class="bg-primary rounded-3xl overflow-hidden grid md:grid-cols-[1fr_auto] items-center gap-0">
+    <div class="grid md:grid-cols-[1fr_auto] items-center gap-0">
 
-      <div class="p-10">
+      <div class="max-w-2xl">
         <span class="inline-block font-inter font-bold text-[#f8bd2a] text-xs tracking-widest uppercase mb-4">5×1000</span>
-        <h2 class="font-romania font-extrabold text-on-primary text-3xl leading-tight mb-4">
+        <h2 class="font-romania font-extrabold text-on-primary leading-tight mb-4"
+            style="font-size: clamp(1.75rem, 5vw, 2.5rem)">
           {{ 'donations.fivepermille_title' | translate }}
         </h2>
-        <p class="font-inter text-on-primary/80 text-sm leading-relaxed mb-6 max-w-xl">
+        <p class="font-inter text-on-primary/80 text-sm leading-relaxed mb-8 max-w-xl">
           {{ 'donations.fivepermille_desc' | translate }}
         </p>
 
-        <div class="bg-on-primary/10 rounded-2xl p-5 mb-6 flex items-center justify-between gap-4">
+        <div class="bg-on-primary/10 rounded-2xl p-5 mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
             <p class="font-inter text-on-primary/60 text-xs uppercase tracking-widest mb-1">{{ 'donations.fivepermille_cf_label' | translate }}</p>
             <p class="font-romania font-extrabold text-on-primary text-2xl tracking-widest">{{ 'donations.fivepermille_cf' | translate }}</p>
           </div>
           <button (click)="copyCf()"
-                  class="flex items-center gap-1.5 px-4 py-2 bg-[#f8bd2a] text-[#261a00] font-inter font-bold text-xs rounded-xl hover:brightness-105 transition-all uppercase tracking-wide flex-shrink-0">
+                  class="flex items-center justify-center gap-1.5 px-4 py-3 bg-[#f8bd2a] text-[#261a00] font-inter font-bold text-xs rounded-xl hover:brightness-105 transition-all uppercase tracking-wide sm:flex-shrink-0">
             <span class="material-symbols-outlined text-sm">{{ cfCopied() ? 'check' : 'content_copy' }}</span>
             {{ (cfCopied() ? 'donations.bank_copied' : 'donations.bank_copy') | translate }}
           </button>
