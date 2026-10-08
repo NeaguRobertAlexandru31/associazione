@@ -57,13 +57,15 @@ export class EventDetail implements OnInit, OnDestroy {
 
   scrollToBooking(): void {
     this.openBookingForm();
-    this.bookingEl?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    setTimeout(() => this.bookingEl?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 50);
   }
 
   event         = signal<CalendarEvent | null>(null);
   loading       = signal(true);
   notFound      = signal(false);
   lightboxIndex = signal<number | null>(null);
+  toastDismissed = signal(false);
+  toastVisible   = signal(false);
 
   rsvpStep      = signal<RsvpStep>('idle');
   rsvpStatus    = signal<RsvpStatus>('attending');
@@ -132,6 +134,7 @@ export class EventDetail implements OnInit, OnDestroy {
       next: ev => {
         this.event.set(ev);
         this.loading.set(false);
+        setTimeout(() => this.toastVisible.set(true), 1000);
         this.svc.getRsvpStats(ev.id).subscribe({ next: s => this.rsvpStats.set(s), error: () => {} });
         this.svc.getPublicPhotos(slug).subscribe({ next: photos => this.participantPhotos.set(photos), error: () => {} });
         this.svc.getShareLink(slug).subscribe({
