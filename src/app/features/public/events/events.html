@@ -31,38 +31,46 @@
 <!-- ── FILTRI ACCESSO ─────────────────────────────────────────────────── -->
 @if (!loading()) {
   <section class="pt-8 pb-0 bg-surface">
-    <div class="flex gap-2 overflow-x-auto pb-3 md:flex-wrap md:overflow-visible md:pb-0 md:container md:mx-auto md:px-8"
-         style="scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; padding-left: 2rem; padding-right: 2rem; scroll-padding-left: 2rem;">
-      @for (f of filters; track f.value) {
-        <button (click)="setFilter(f.value)"
-                style="scroll-snap-align: start;"
-                class="flex-none px-4 py-1.5 rounded-full font-inter font-semibold text-sm transition-all"
-                [class]="activeFilter() === f.value
-                  ? 'bg-primary text-on-primary'
-                  : 'bg-surface-container text-on-surface-variant hover:bg-surface-container-high'">
-          {{ f.label }}
-        </button>
-      }
+    <div class="container mx-auto">
+      <div class="flex gap-2 overflow-x-auto pb-3 md:flex-wrap md:overflow-visible md:pb-0"
+           style="scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; padding-left: 2rem; padding-right: 2rem; scroll-padding-left: 2rem;">
+        @for (f of filters; track f.value) {
+          <button (click)="setFilter(f.value)"
+                  style="scroll-snap-align: start;"
+                  class="flex-none px-4 py-1.5 rounded-full font-inter font-semibold text-sm transition-all"
+                  [class]="activeFilter() === f.value
+                    ? 'bg-primary text-on-primary'
+                    : 'bg-surface-container text-on-surface-variant hover:bg-surface-container-high'">
+            {{ f.label }}
+          </button>
+        }
+      </div>
     </div>
   </section>
 }
 <!-- ── EVENTI (mobile + desktop): scroll orizzontale unico ───────────── -->
-@if (!loading() && (ongoing().length > 0 || upcoming().length > 0)) {
-  <section class="pt-10 pb-4 bg-surface">
-    <!-- unico div scroll, padding simmetrico = allineamento identico a mobile -->
-    <div class="flex gap-3 md:gap-4 overflow-x-auto pb-4"
-         style="scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; padding-left: var(--container-px); padding-right: var(--container-px); scroll-padding-left: var(--container-px);">
-      @for (ev of ongoing(); track ev.id) {
-        <div class="flex-none w-[85vw] md:w-[420px]" style="scroll-snap-align: start;">
-          <app-event-short [event]="ev" />
-        </div>
-      }
-      @for (ev of upcoming(); track ev.id) {
-        <div class="flex-none w-[85vw] md:w-[420px]" style="scroll-snap-align: start;">
-          <app-event-short [event]="ev" />
-        </div>
-      }
-    </div>
+@if (!loading()) {
+  <section class="pt-10 pb-10 bg-surface">
+    @if (ongoing().length > 0 || upcoming().length > 0) {
+      <div class="flex gap-3 md:gap-4 overflow-x-auto pb-4"
+           style="scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; padding-left: var(--container-px); padding-right: var(--container-px); scroll-padding-left: var(--container-px);">
+        @for (ev of ongoing(); track ev.id) {
+          <div class="flex-none w-[85vw] md:w-[420px]" style="scroll-snap-align: start;">
+            <app-event-short [event]="ev" />
+          </div>
+        }
+        @for (ev of upcoming(); track ev.id) {
+          <div class="flex-none w-[85vw] md:w-[420px]" style="scroll-snap-align: start;">
+            <app-event-short [event]="ev" />
+          </div>
+        }
+      </div>
+    } @else {
+      <div class="flex flex-col items-center gap-3 py-10 text-center">
+        <span class="material-symbols-outlined text-on-surface-variant/40 text-5xl">event_busy</span>
+        <p class="font-inter text-on-surface-variant text-sm">Nessun evento disponibile per questa categoria.</p>
+      </div>
+    }
   </section>
 }
 
