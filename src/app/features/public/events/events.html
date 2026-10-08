@@ -28,6 +28,24 @@
   </div>
 </section>
 
+<!-- ── FILTRI ACCESSO ─────────────────────────────────────────────────── -->
+@if (!loading()) {
+  <section class="pt-8 pb-0 bg-surface">
+    <div class="flex gap-2 overflow-x-auto pb-3 md:flex-wrap md:overflow-visible md:pb-0 md:container md:mx-auto md:px-8"
+         style="scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; padding-left: 2rem; padding-right: 2rem; scroll-padding-left: 2rem;">
+      @for (f of filters; track f.value) {
+        <button (click)="setFilter(f.value)"
+                style="scroll-snap-align: start;"
+                class="flex-none px-4 py-1.5 rounded-full font-inter font-semibold text-sm transition-all"
+                [class]="activeFilter() === f.value
+                  ? 'bg-primary text-on-primary'
+                  : 'bg-surface-container text-on-surface-variant hover:bg-surface-container-high'">
+          {{ f.label }}
+        </button>
+      }
+    </div>
+  </section>
+}
 <!-- ── EVENTI (mobile + desktop): scroll orizzontale unico ───────────── -->
 @if (!loading() && (ongoing().length > 0 || upcoming().length > 0)) {
   <section class="pt-10 pb-4 bg-surface">

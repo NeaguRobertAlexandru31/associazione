@@ -20,25 +20,43 @@ export class Events implements OnInit {
 
   events  = signal<CalendarEvent[]>([]);
   loading = signal(true);
+  activeFilter = signal<string>('all');
+
+  readonly filters = [
+    { value: 'all',          label: 'Tutti'          },
+    { value: 'public',       label: 'Pubblico'       },
+    { value: 'members_only', label: 'Soci'           },
+    { value: 'limited',      label: 'Numero chiuso'  },
+  ];
+
+  setFilter(value: string): void { this.activeFilter.set(value); }
+
+  private readonly futureEvents = computed(() => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const f = this.activeFilter();
+    return this.events().filter(e => {
+      const d = new Date(e.date);
+      d.setHours(0, 0, 0, 0);
+      if (d < today) return false;
+      return f === 'all' || e.accessType === f;
+    });
+  });
 
   readonly ongoing = computed(() => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-    const tomorrow = new Date(today);
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    return this.events().filter(e => {
+    return this.futureEvents().filter(e => {
       const d = new Date(e.date);
       d.setHours(0, 0, 0, 0);
-      return d >= today && d <= today;
+      return d.getTime() === today.getTime();
     });
   });
 
   readonly upcoming = computed(() => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-    const tomorrow = new Date(today);
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    return this.events()
+    return this.futureEvents()
       .filter(e => {
         const d = new Date(e.date);
         d.setHours(0, 0, 0, 0);
@@ -52,8 +70,6 @@ export class Events implements OnInit {
   readonly archived = computed(() => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-    const yesterday = new Date(today);
-    yesterday.setDate(yesterday.getDate() - 1);
     return this.events()
       .filter(e => {
         const d = new Date(e.date);

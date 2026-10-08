@@ -26,9 +26,12 @@
   <div class="container mx-auto px-8 overflow-hidden md:overflow-visible">
 
     <!-- Filter pills -->
-    <div class="flex flex-wrap gap-2 mb-8">
+    <div class="-mx-8 flex gap-2 overflow-x-auto pb-3 mb-8 md:mx-0 md:flex-wrap md:overflow-visible md:pb-0"
+         style="scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; padding-left: 2rem; padding-right: 2rem; scroll-padding-left: 2rem;">
       @for (f of filters; track f.value) {
         <button (click)="setFilter(f.value)"
+                style="scroll-snap-align: start;"
+                class="flex-none"
                 [class]="activeFilter() === f.value
                   ? 'px-4 py-1.5 rounded-full font-inter font-semibold text-sm bg-primary text-on-primary transition-all'
                   : 'px-4 py-1.5 rounded-full font-inter font-semibold text-sm bg-surface-container text-on-surface-variant hover:bg-surface-container-high transition-all'">
