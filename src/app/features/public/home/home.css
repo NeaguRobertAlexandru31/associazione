@@ -1,3 +1,8 @@
+.hero-badge { animation-delay: 0.1s; }
+.hero-title { animation-delay: 0.25s; }
+.hero-sub   { animation-delay: 0.45s; }
+.hero-cta   { animation-delay: 0.6s; }
+
 /* Event banner slide-up */
 .banner-hidden  { transform: translateY(120%); opacity: 0; }
 .banner-visible { transform: translateY(0);    opacity: 1; }
