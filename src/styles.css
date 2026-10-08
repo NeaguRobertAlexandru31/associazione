@@ -10,6 +10,8 @@
 
 :root {
   --navbar-height: 64px;
+  /* Padding orizzontale allineato al container Tailwind (max-w = 80rem, px-8 = 2rem) */
+  --container-px: max(2rem, calc((100vw - 80rem) / 2 + 2rem));
 }
 
 @theme {
@@ -50,6 +52,26 @@ app-root {
 
 html {
   scroll-padding-top: var(--navbar-height, 64px);
+}
+
+section[style*="scroll-snap-align"] {
+  scroll-margin-top: var(--navbar-height, 64px);
+}
+
+.ongoing-card { position: relative; }
+
+.ongoing-border {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  pointer-events: none;
+  border: 2px solid #b6171e;
+  animation: border-pulse 1.8s ease-in-out infinite;
+}
+
+@keyframes border-pulse {
+  0%, 100% { border-color: #b6171e; box-shadow: 0 0 0 0 rgba(182,23,30,0.3); }
+  50%       { border-color: #e0353d; box-shadow: 0 0 0 6px rgba(182,23,30,0); }
 }
 
 @keyframes fadeInUp {

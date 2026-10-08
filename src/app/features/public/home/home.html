@@ -156,29 +156,28 @@
 
 <!-- ── EVENTI ─────────────────────────────────────────────────────────────── -->
 <section class="py-20 bg-surface" style="scroll-snap-align: start">
-	<div class="container mx-auto px-8 overflow-hidden md:overflow-visible">
-
-		<div class="mb-10">
-			<div class="flex items-center justify-between mb-1">
-				<h2 class="font-romania font-extrabold text-primary text-4xl tracking-tight">
-					{{ 'home.section_events_title' | translate }}
-				</h2>
-				<a routerLink="/events" class="md:hidden text-secondary">
-					<span class="material-symbols-outlined text-2xl">arrow_outward</span>
-				</a>
-			</div>
-			<div class="flex items-center justify-between">
-				<p class="font-inter text-on-surface-variant">
-					{{ 'home.section_events_subtitle' | translate }}
-				</p>
-				<a routerLink="/events"
-					class="hidden md:inline font-inter font-semibold text-sm text-secondary hover:underline underline-offset-4 transition-all whitespace-nowrap">
-					{{ 'home.section_events_all' | translate }} →
-				</a>
-			</div>
+	<div class="container mx-auto px-8 mb-10">
+		<div class="flex items-center justify-between mb-1">
+			<h2 class="font-romania font-extrabold text-primary text-4xl tracking-tight">
+				{{ 'home.section_events_title' | translate }}
+			</h2>
+			<a routerLink="/events" class="md:hidden text-secondary">
+				<span class="material-symbols-outlined text-2xl">arrow_outward</span>
+			</a>
 		</div>
+		<div class="flex items-center justify-between">
+			<p class="font-inter text-on-surface-variant">
+				{{ 'home.section_events_subtitle' | translate }}
+			</p>
+			<a routerLink="/events"
+				class="hidden md:inline font-inter font-semibold text-sm text-secondary hover:underline underline-offset-4 transition-all whitespace-nowrap">
+				{{ 'home.section_events_all' | translate }} →
+			</a>
+		</div>
+	</div>
 
-		@if (upcoming() === null) {
+	@if (upcoming() === null) {
+	<div class="container mx-auto px-8">
 		<div class="flex flex-col gap-4">
 			@for (i of [1,2,3]; track i) {
 				<div class="flex items-center gap-4 bg-surface-container-lowest rounded-2xl px-5 py-5 shadow-sm border-l-4 border-outline-variant animate-pulse">
@@ -193,27 +192,24 @@
 				</div>
 			}
 		</div>
-		} @else if (upcoming()!.length === 0) {
-		<p class="font-inter text-on-surface-variant text-sm">Nessun evento in programma al momento.</p>
-		} @else {
-		<!-- Mobile scroll -->
-		<div class="-mx-8 flex gap-3 overflow-x-auto pb-4"
-		     style="scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; padding-left: 2rem; padding-right: 2rem; scroll-padding-left: 2rem;">
-			@for (ev of upcoming()!; track ev.id; let i = $index) {
-				<div class="flex-none w-[85vw]" style="scroll-snap-align: start;">
-					<app-event-short [event]="ev" [accentClass]="accent(i)" />
-				</div>
-			}
-		</div>
-		<!-- Desktop list -->
-		<div class="hidden md:flex md:flex-col gap-4">
-			@for (ev of upcoming()!; track ev.id; let i = $index) {
-				<app-event-short [event]="ev" [accentClass]="accent(i)" />
-			}
-		</div>
-		}
-
 	</div>
+	} @else if (upcoming()!.length === 0) {
+	<div class="container mx-auto px-8">
+		<p class="font-inter text-on-surface-variant text-sm">Nessun evento in programma al momento.</p>
+	</div>
+	}
+
+	@if (upcoming() !== null && upcoming()!.length > 0) {
+	<div class="flex gap-4 overflow-x-auto pb-4"
+	     style="scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; padding-left: var(--container-px); padding-right: var(--container-px); scroll-padding-left: var(--container-px);">
+		@for (ev of upcoming()!; track ev.id; let i = $index) {
+			<div class="flex-none w-[85vw] md:w-[420px]" style="scroll-snap-align: start;">
+				<app-event-short [event]="ev" [accentClass]="accent(i)" />
+			</div>
+		}
+	</div>
+	}
+
 </section>
 
 <!-- ── DONAZIONI ──────────────────────────────────────────────────────────── -->

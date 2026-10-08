@@ -6,10 +6,11 @@ import { EventsService } from '../../../core/services/events/events';
 import { SiteSettingsService } from '../../../core/services/site-settings/site-settings';
 import { environment } from '../../../../environments/environment';
 import { EventCard } from '../../../shared/components/public/event/event';
+import { EventShort } from '../../../shared/components/public/event-short/event-short';
 
 @Component({
   selector: 'app-events',
-  imports: [RouterLink, TranslatePipe, EventCard],
+  imports: [RouterLink, TranslatePipe, EventCard, EventShort],
   templateUrl: './events.html',
   styleUrl: './events.css',
 })

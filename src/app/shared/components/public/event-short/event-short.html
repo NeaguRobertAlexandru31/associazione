@@ -1,11 +1,16 @@
-<!-- Mobile: card con sfondo immagine e gradiente -->
 <a [routerLink]="event().slug ? ['/events', event().slug] : ['/events']"
-   class="block sm:hidden relative rounded-2xl overflow-hidden aspect-[16/9] shadow-sm"
+   class="relative block rounded-2xl overflow-hidden aspect-[16/9] shadow-sm"
+   [class]="isOngoing() ? 'ongoing-card' : ''"
    [style.background-image]="'url(' + coverImg() + ')'"
    style="background-size: cover; background-position: center">
+
+  @if (isOngoing()) {
+    <span class="ongoing-border rounded-2xl"></span>
+  }
+
   <div class="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent"></div>
 
-  <!-- Badge data (sx) -->
+  <!-- Badge sx -->
   <div class="absolute top-3 left-3">
     @if (isOngoing()) {
       <div class="bg-secondary text-white font-inter font-bold text-xs px-2.5 py-1 rounded-full flex items-center gap-1">
@@ -19,7 +24,7 @@
     }
   </div>
 
-  <!-- Badge accesso (dx) -->
+  <!-- Badge dx -->
   <div class="absolute top-3 right-3 flex flex-col items-end gap-1">
     @if (isMembersOnly()) {
       <span class="inline-flex items-center gap-1 px-2 py-1 bg-secondary text-white font-inter font-bold text-[10px] uppercase tracking-wider rounded-full">
@@ -56,67 +61,4 @@
       </span>
     </div>
   </div>
-</a>
-
-<!-- Desktop: layout metà foto / metà info -->
-<a [routerLink]="event().slug ? ['/events', event().slug] : ['/events']"
-   class="hidden sm:grid sm:grid-cols-2 bg-surface-container-lowest rounded-2xl overflow-hidden shadow-sm border-l-4 hover:shadow-md transition-shadow"
-   [class]="accentClass()">
-
-  <!-- Sinistra: foto -->
-  <div class="relative aspect-[16/9] sm:aspect-auto overflow-hidden">
-    <img [src]="coverImg()" [alt]="event().name"
-         class="w-full h-full object-cover hover:scale-105 transition-transform duration-500" />
-    @if (isOngoing()) {
-      <div class="absolute top-3 left-3 bg-secondary text-white font-inter font-bold text-xs px-2.5 py-1 rounded-full flex items-center gap-1">
-        <span class="w-1.5 h-1.5 rounded-full bg-white animate-pulse inline-block"></span>
-        In corso
-      </div>
-    } @else {
-      <div class="absolute top-3 left-3 bg-secondary text-white font-romania font-bold text-xs px-2.5 py-1 rounded-full">
-        {{ day() }} {{ month() }}
-      </div>
-    }
-  </div>
-
-  <!-- Destra: info -->
-  <div class="flex flex-col justify-between p-6">
-    <div>
-      @if (isMembersOnly()) {
-        <span class="inline-flex items-center gap-1 mb-2 px-2.5 py-0.5 bg-secondary text-white font-inter font-bold text-[10px] uppercase tracking-wider rounded-full">
-          <span class="material-symbols-outlined text-[10px]">star</span>
-          Solo soci
-        </span>
-      }
-      <h3 class="font-romania font-bold text-primary text-xl leading-tight mb-3">{{ event().name }}</h3>
-      <div class="flex flex-col gap-2 text-on-surface-variant font-inter text-sm">
-        <span class="flex items-center gap-1.5">
-          <span class="material-symbols-outlined text-sm">location_on</span>
-          {{ event().location }}
-        </span>
-        <span class="flex items-center gap-1.5">
-          <span class="material-symbols-outlined text-sm">schedule</span>
-          {{ event().time }}
-        </span>
-        @if (isLimited()) {
-          <span class="flex items-center gap-1.5">
-            <span class="material-symbols-outlined text-sm">group</span>
-            {{ event().capacity }} posti disponibili
-          </span>
-        }
-      </div>
-    </div>
-    @if (isPublicOpen()) {
-      <span class="mt-4 self-end inline-flex items-center gap-1.5 px-4 py-2 bg-primary text-on-primary font-inter font-semibold text-xs rounded-full">
-        {{ 'home.event_discover_btn' | translate }}
-        <span class="material-symbols-outlined text-sm">arrow_forward</span>
-      </span>
-    } @else {
-      <span class="mt-4 self-end inline-flex items-center gap-1.5 px-4 py-2 bg-primary text-on-primary font-inter font-semibold text-xs rounded-full">
-        {{ 'home.event_1_btn' | translate }}
-        <span class="material-symbols-outlined text-sm">arrow_forward</span>
-      </span>
-    }
-  </div>
-
 </a>
