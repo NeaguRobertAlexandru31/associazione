@@ -1,16 +1,14 @@
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
-import { RouterLink } from '@angular/router';
 import { TranslatePipe } from '../../../i18n/translate.pipe';
 import { Article } from '../../../core/models/article.model';
 import { ArticlesService } from '../../../core/services/articles/articles';
 import { SiteSettingsService } from '../../../core/services/site-settings/site-settings';
-import { environment } from '../../../../environments/environment';
 import { ArticleCard } from '../../../shared/components/public/article/article';
 
 
 @Component({
   selector: 'app-news',
-  imports: [RouterLink, TranslatePipe, ArticleCard],
+  imports: [TranslatePipe, ArticleCard],
   templateUrl: './news.html',
   styleUrl: './news.css',
 })
@@ -39,8 +37,7 @@ export class News implements OnInit {
     return this.articles().filter(a => a.categories.includes(f));
   });
 
-  readonly featured = computed(() => this.filtered()[0] ?? null);
-  readonly grid     = computed(() => this.filtered().slice(1));
+  readonly grid = computed(() => this.filtered());
 
   ngOnInit(): void {
     this.siteSettings.load();
@@ -51,26 +48,4 @@ export class News implements OnInit {
   }
 
   setFilter(value: string): void { this.activeFilter.set(value); }
-
-  coverImage(a: Article): string {
-    const img = a.cover ?? a.blocks?.[0]?.image ?? null;
-    if (!img) return this.siteSettings.placeholder('placeholder_page_hero');
-    return img.startsWith('http') ? img : `${environment.apiUrl}${img}`;
-  }
-
-  previewText(a: Article): string {
-    return a.blocks?.[0]?.paragraph ?? '';
-  }
-
-  formatDate(iso: string): string {
-    return new Date(iso).toLocaleDateString('it-IT', {
-      day: 'numeric', month: 'long', year: 'numeric',
-    });
-  }
-
-  firstCategory(a: Article): string {
-    return a.categories[0] ?? '';
-  }
-
-  apiBase = environment.apiUrl.replace('/api', '');
 }
