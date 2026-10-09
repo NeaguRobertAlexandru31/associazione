@@ -387,6 +387,23 @@ export class EventDetail implements OnInit {
     });
   }
 
+  regenerateQr(): void {
+    const ev = this.event();
+    if (!ev?.slug) return;
+    this.qrLoading.set(true);
+    this.event.update(e => e ? { ...e, uploadUrl: null, uploadToken: null } : e);
+    this.svc.getUploadToken(ev.slug, true).subscribe({
+      next: ({ uploadUrl }) => {
+        const url = `${window.location.origin}${uploadUrl}`;
+        this.qrUploadUrl.set(url);
+        this.event.update(e => e ? { ...e, uploadUrl } : e);
+        this.qrLoading.set(false);
+        setTimeout(() => this.drawBrandedQr(url, ev.name), 50);
+      },
+      error: () => this.qrLoading.set(false),
+    });
+  }
+
   async drawBrandedQr(url: string, _name: string): Promise<void> {
     const canvas = this.qrCanvas?.nativeElement;
     if (!canvas) return;

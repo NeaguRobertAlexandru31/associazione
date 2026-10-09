@@ -644,6 +644,11 @@
                     <span class="material-symbols-outlined text-base">download</span>
                     Scarica QR
                   </button>
+                  <button (click)="regenerateQr()" [disabled]="qrLoading()"
+                          class="flex items-center gap-1.5 font-inter text-xs font-medium text-on-surface-variant hover:text-red-500 disabled:opacity-50 transition-colors">
+                    <span class="material-symbols-outlined text-base">refresh</span>
+                    Rigenera link
+                  </button>
                 </div>
               }
             </div>

@@ -111,8 +111,9 @@ export class EventsService {
     return this.http.delete<void>(`${environment.apiUrl}/events/${slug}/photos/${photoId}`);
   }
 
-  getUploadToken(slug: string): Observable<{ token: string; uploadUrl: string }> {
-    return this.http.get<{ token: string; uploadUrl: string }>(`${environment.apiUrl}/events/${slug}/photos/upload-token`);
+  getUploadToken(slug: string, force = false): Observable<{ token: string; uploadUrl: string }> {
+    const params = force ? '?force=true' : '';
+    return this.http.get<{ token: string; uploadUrl: string }>(`${environment.apiUrl}/events/${slug}/photos/upload-token${params}`);
   }
 
   getShareLink(slug: string): Observable<{ token: string; uploadUrl: string }> {
