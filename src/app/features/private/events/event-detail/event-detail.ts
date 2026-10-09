@@ -14,6 +14,7 @@ import { environment } from '../../../../../environments/environment';
 type DetailTab = 'rsvp' | 'photos' | 'bookings';
 type EditField = 'name' | 'date' | 'time' | 'location' | 'description' | 'accessType' | 'cover' | 'images' | null;
 
+
 @Component({
   selector: 'app-event-detail',
   imports: [FormsModule, DatePipe, BookingScanner, DatePicker, TimePicker, LocationAutocomplete],
@@ -78,6 +79,17 @@ export class EventDetail implements OnInit {
   // ── Lightbox ──────────────────────────────────────────────────────────────
   lightboxIndex = signal<number | null>(null);
 
+  // ── Modalità creazione ────────────────────────────────────────────────────
+  isCreateMode = signal(false);
+  createSaving = signal(false);
+  newForm: CreateEventDto & { description: string; accessType: 'public' | 'limited' | 'members_only'; images: string[] } = { name: '', date: '', time: '', location: '', description: '', accessType: 'public', capacity: undefined, cover: undefined, images: [] };
+  newCoverPreview  = signal<ImagePreview | null>(null);
+  newImagePreviews = signal<ImagePreview[]>([]);
+  readonly newAllUploaded = computed(() =>
+    this.newImagePreviews().every(p => p.url !== null || p.error) &&
+    (this.newCoverPreview() === null || this.newCoverPreview()!.url !== null || this.newCoverPreview()!.error),
+  );
+
   readonly isPast = computed(() => {
     const ev = this.event();
     return ev ? new Date(ev.date) < new Date(new Date().toDateString()) : false;
@@ -85,6 +97,11 @@ export class EventDetail implements OnInit {
 
   ngOnInit(): void {
     const slug = this.route.snapshot.paramMap.get('slug')!;
+    if (slug === 'new') {
+      this.isCreateMode.set(true);
+      this.loading.set(false);
+      return;
+    }
     this.svc.getBySlug(slug).subscribe({
       next: ev => {
         this.event.set(ev);
@@ -98,6 +115,102 @@ export class EventDetail implements OnInit {
   }
 
   goBack(): void { this.router.navigate(['/dashboard/events']); }
+
+  // ── Creazione nuovo evento ─────────────────────────────────────────────────
+  onNewCoverSelected(e: Event): void {
+    const input = e.target as HTMLInputElement;
+    if (!input.files?.length) return;
+    const file = input.files[0];
+    input.value = '';
+    const preview: ImagePreview = { file, preview: URL.createObjectURL(file), uploading: true, url: null, error: false };
+    const old = this.newCoverPreview();
+    if (old) URL.revokeObjectURL(old.preview);
+    this.newCoverPreview.set(preview);
+    this.svc.uploadImages([file]).subscribe({
+      next: ({ urls }) => {
+        this.newCoverPreview.update(cp => cp ? { ...cp, uploading: false, url: urls[0] ?? null } : cp);
+        this.newForm.cover = urls[0] ?? undefined;
+      },
+      error: () => this.newCoverPreview.update(cp => cp ? { ...cp, uploading: false, error: true } : cp),
+    });
+  }
+
+  onNewCoverDrop(e: DragEvent): void {
+    e.preventDefault();
+    const file = Array.from(e.dataTransfer?.files ?? []).find(f => f.type.startsWith('image/'));
+    if (!file) return;
+    const input = { files: [file] } as unknown as HTMLInputElement;
+    this.onNewCoverSelected({ target: input } as unknown as Event);
+  }
+
+  removeNewCover(): void {
+    const cp = this.newCoverPreview();
+    if (cp) URL.revokeObjectURL(cp.preview);
+    this.newCoverPreview.set(null);
+    this.newForm.cover = undefined;
+  }
+
+  onNewImagesSelected(e: Event): void {
+    const input = e.target as HTMLInputElement;
+    if (!input.files?.length) return;
+    const files = Array.from(input.files);
+    input.value = '';
+    const newPreviews: ImagePreview[] = files.map(f => ({ file: f, preview: URL.createObjectURL(f), uploading: true, url: null, error: false }));
+    this.newImagePreviews.update(list => [...list, ...newPreviews]);
+    this.svc.uploadImages(files).subscribe({
+      next: ({ urls }) => {
+        this.newImagePreviews.update(list => {
+          const updated = [...list];
+          newPreviews.forEach((p, i) => {
+            const idx = updated.indexOf(p);
+            if (idx !== -1) updated[idx] = { ...updated[idx], uploading: false, url: urls[i] ?? null };
+          });
+          return updated;
+        });
+        this.newForm.images = this.newImagePreviews().filter(p => p.url).map(p => p.url!);
+      },
+      error: () => this.newImagePreviews.update(list => list.map(p => newPreviews.includes(p) ? { ...p, uploading: false, error: true } : p)),
+    });
+  }
+
+  onNewImagesDrop(e: DragEvent): void {
+    e.preventDefault();
+    const files = Array.from(e.dataTransfer?.files ?? []).filter(f => f.type.startsWith('image/'));
+    if (!files.length) return;
+    const syntheticEvent = { target: { files, value: '' } } as unknown as Event;
+    this.onNewImagesSelected(syntheticEvent);
+  }
+
+  removeNewPreview(index: number): void {
+    this.newImagePreviews.update(list => {
+      const updated = [...list];
+      URL.revokeObjectURL(updated[index].preview);
+      updated.splice(index, 1);
+      return updated;
+    });
+    this.newForm.images = this.newImagePreviews().filter(p => p.url).map(p => p.url!);
+  }
+
+  submitNew(): void {
+    const f = this.newForm;
+    if (!f.name || !f.date || !f.time || !f.location) return;
+    this.createSaving.set(true);
+    const dto: CreateEventDto = {
+      name: f.name.trim(),
+      date: f.date,
+      time: f.time,
+      location: f.location.trim(),
+      description: f.description.trim() || undefined,
+      accessType: f.accessType as CreateEventDto['accessType'],
+      capacity: f.accessType === 'limited' ? f.capacity : undefined,
+      cover: f.cover,
+      images: f.images,
+    };
+    this.svc.create(dto).subscribe({
+      next: evt => this.router.navigate(['/dashboard/events', evt.slug]),
+      error: () => this.createSaving.set(false),
+    });
+  }
 
   // ── Modifica inline ───────────────────────────────────────────────────────
   startEdit(field: EditField): void {

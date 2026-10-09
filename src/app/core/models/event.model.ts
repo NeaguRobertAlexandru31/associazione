@@ -68,5 +68,6 @@ export interface EventPhoto {
   approved: boolean;
   isMember: boolean;
   uploaderName?: string;
+  uploaderEmail?: string;
   createdAt: string;
 }

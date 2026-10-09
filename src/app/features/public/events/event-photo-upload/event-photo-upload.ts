@@ -29,7 +29,15 @@ export class EventPhotoUpload implements OnInit {
   previews       = signal<PhotoPreview[]>([]);
   sending        = signal(false);
   errorMsg       = signal('');
-  existingPhotos = signal<EventPhoto[]>([]);
+  allPhotos      = signal<EventPhoto[]>([]);
+  existingPhotos = computed(() => {
+    const name  = this.uploaderName().trim().toLowerCase();
+    const email = this.uploaderEmail().trim().toLowerCase();
+    return this.allPhotos().filter(p => {
+      if (email && p.uploaderEmail?.toLowerCase() === email) return true;
+      return p.uploaderName?.toLowerCase() === name;
+    });
+  });
   lightboxUrls   = signal<string[]>([]);
   lightboxIndex  = signal<number | null>(null);
 
@@ -54,7 +62,7 @@ export class EventPhotoUpload implements OnInit {
         this.event.set(ev);
         this.pageState.set('identify');
         this.svc.getPublicPhotos(slug).subscribe({
-          next: photos => this.existingPhotos.set(photos),
+          next: photos => this.allPhotos.set(photos),
           error: () => {},
         });
       },
@@ -147,7 +155,7 @@ export class EventPhotoUpload implements OnInit {
               this.previews.set([]);
               this.sending.set(false);
               this.svc.getPublicPhotos(slug).subscribe({
-                next: photos => this.existingPhotos.set(photos),
+                next: photos => this.allPhotos.set(photos),
                 error: () => {},
               });
               this.pageState.set('done');
