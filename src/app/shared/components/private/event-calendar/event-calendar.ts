@@ -512,6 +512,16 @@ export class EventCalendar implements OnInit {
         );
         this.saving.set(false);
         this.closeCreate();
+
+        if (evt.uploadUrl) {
+          const origin = this.lanUrl() ?? window.location.origin;
+          const fullUrl = `${origin}${evt.uploadUrl}`;
+          this.qrUploadUrl.set(fullUrl);
+          this.detailEvent.set(evt);
+          this.detailTab.set('photos');
+          this.loadPhotos(evt.slug ?? '');
+          setTimeout(() => this.drawBrandedQr(fullUrl, evt.name), 50);
+        }
       },
       error: () => this.saving.set(false),
     });
