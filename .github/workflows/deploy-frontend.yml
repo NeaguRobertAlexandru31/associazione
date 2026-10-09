@@ -31,11 +31,11 @@ jobs:
 
       - name: Crea .env.prod
         run: |
-          cat > .env.prod <<EOF
-          API_URL=${{ secrets.PROD_API_URL }}
-          CDN_URL=${{ secrets.PROD_CDN_URL }}
-          APTABASE_KEY=${{ secrets.PROD_APTABASE_KEY }}
-          EOF
+          printf 'API_URL=%s\nCDN_URL=%s\nAPTABASE_KEY=%s\n' \
+            '${{ secrets.PROD_API_URL }}' \
+            '${{ secrets.CDN_URL }}' \
+            '${{ secrets.PROD_APTABASE_KEY }}' \
+            > .env.prod
 
       - name: Genera environment.prod.ts
         run: npm run env:prod
