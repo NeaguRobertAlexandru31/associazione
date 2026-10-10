@@ -127,7 +127,8 @@
                 <input [(ngModel)]="bookingEmail" [ngModelOptions]="{standalone:true}"
                        placeholder="Email *"
                        type="email"
-                       class="w-full px-4 py-2.5 rounded-xl border border-outline-variant font-inter text-sm text-on-surface bg-surface focus:outline-none focus:ring-2 focus:ring-primary/30" />
+                       class="w-full px-4 py-2.5 rounded-xl border font-inter text-sm text-on-surface bg-surface focus:outline-none focus:ring-2 transition-colors"
+                       [class]="bookingError() === 'Inserisci un indirizzo email valido' ? 'border-red-400 focus:ring-red-300' : 'border-outline-variant focus:ring-primary/30'" />
                 <input [(ngModel)]="bookingPhone" [ngModelOptions]="{standalone:true}"
                        placeholder="Telefono (opzionale)"
                        type="tel"
@@ -135,13 +136,36 @@
                 <div>
                   <label class="font-inter text-xs text-on-surface-variant mb-1.5 block">Numero di posti (max 4)</label>
                   <div class="flex items-center justify-between gap-3">
-                    <button type="button" (click)="bookingSeats.set(bookingSeats() - 1)" [disabled]="bookingSeats() <= 1"
+                    <button type="button" (click)="updateSeats(bookingSeats() - 1)" [disabled]="bookingSeats() <= 1"
                             class="flex-1 h-11 rounded-xl border border-outline-variant font-inter font-bold text-on-surface hover:bg-surface-container disabled:opacity-30 transition-colors">−</button>
                     <span class="font-inter font-semibold text-on-surface text-lg w-10 text-center flex-shrink-0">{{ bookingSeats() }}</span>
-                    <button type="button" (click)="bookingSeats.set(bookingSeats() + 1)" [disabled]="bookingSeats() >= 4"
+                    <button type="button" (click)="updateSeats(bookingSeats() + 1)" [disabled]="bookingSeats() >= 4"
                             class="flex-1 h-11 rounded-xl border border-outline-variant font-inter font-bold text-on-surface hover:bg-surface-container disabled:opacity-30 transition-colors">+</button>
                   </div>
                 </div>
+
+                <!-- Box accompagnatori -->
+                @for (guest of bookingGuests(); track $index) {
+                  <div class="flex flex-col gap-2 pt-3 border-t border-outline-variant/30">
+                    <p class="font-inter text-xs font-semibold text-on-surface-variant uppercase tracking-wider">
+                      Accompagnatore {{ $index + 1 }}
+                    </p>
+                    <input [value]="guest.name"
+                           (input)="updateGuest($index, 'name', $any($event.target).value)"
+                           placeholder="Nome e cognome *"
+                           class="w-full px-4 py-2.5 rounded-xl border border-outline-variant font-inter text-sm text-on-surface bg-surface focus:outline-none focus:ring-2 focus:ring-primary/30" />
+                    <input [value]="guest.email"
+                           (input)="updateGuest($index, 'email', $any($event.target).value)"
+                           placeholder="Email (opzionale)"
+                           type="email"
+                           class="w-full px-4 py-2.5 rounded-xl border border-outline-variant font-inter text-sm text-on-surface bg-surface focus:outline-none focus:ring-2 focus:ring-primary/30" />
+                    <input [value]="guest.phone"
+                           (input)="updateGuest($index, 'phone', $any($event.target).value)"
+                           placeholder="Telefono (opzionale)"
+                           type="tel"
+                           class="w-full px-4 py-2.5 rounded-xl border border-outline-variant font-inter text-sm text-on-surface bg-surface focus:outline-none focus:ring-2 focus:ring-primary/30" />
+                  </div>
+                }
                 @if (bookingError()) {
                   <div class="flex items-center gap-2 text-sm font-inter text-red-700 bg-red-50 rounded-xl px-3 py-2">
                     <span class="material-symbols-outlined text-base">error</span>

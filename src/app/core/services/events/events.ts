@@ -124,7 +124,7 @@ export class EventsService {
     return this.http.get<BookingAvailability>(`${environment.apiUrl}/events/${slug}/availability`);
   }
 
-  book(slug: string, dto: { name: string; email: string; phone?: string; seats: number }): Observable<{ status: 'confirmed' | 'waitlist'; position?: number; bookingId: string }> {
+  book(slug: string, dto: { name: string; email: string; phone?: string; seats: number; guests?: { name: string; email?: string; phone?: string }[] }): Observable<{ status: 'confirmed' | 'waitlist'; position?: number; bookingId: string }> {
     return this.http.post<{ status: 'confirmed' | 'waitlist'; position?: number; bookingId: string }>(`${environment.apiUrl}/events/${slug}/book`, dto);
   }
 

@@ -207,7 +207,7 @@ export class EventDetail implements OnInit {
       images: f.images,
     };
     this.svc.create(dto).subscribe({
-      next: evt => this.router.navigate(['/dashboard/events', evt.slug]),
+      next: () => this.router.navigate(['/dashboard/events']),
       error: () => this.createSaving.set(false),
     });
   }

@@ -85,6 +85,7 @@ export class EventDetail implements OnInit, OnDestroy {
   bookingEmail    = signal('');
   bookingPhone    = signal('');
   bookingSeats    = signal(1);
+  bookingGuests   = signal<{ name: string; email: string; phone: string }[]>([]);
   bookingSending  = signal(false);
   bookingError    = signal('');
   bookingPosition = signal<number | null>(null);
@@ -154,7 +155,21 @@ export class EventDetail implements OnInit, OnDestroy {
 
   // ── Prenotazione ──────────────────────────────────────────────────────
   openBookingForm(): void { this.bookingStep.set('form'); }
-  cancelBooking(): void   { this.bookingStep.set('idle'); }
+  cancelBooking(): void   { this.bookingStep.set('idle'); this.bookingGuests.set([]); this.bookingSeats.set(1); }
+
+  updateSeats(seats: number): void {
+    this.bookingSeats.set(seats);
+    // sincronizza l'array guests: seats-1 accompagnatori (il primo è il titolare)
+    this.bookingGuests.update(list => {
+      const needed = seats - 1;
+      if (list.length < needed) return [...list, ...Array.from({ length: needed - list.length }, () => ({ name: '', email: '', phone: '' }))];
+      return list.slice(0, needed);
+    });
+  }
+
+  updateGuest(index: number, field: 'name' | 'email' | 'phone', value: string): void {
+    this.bookingGuests.update(list => list.map((g, i) => i === index ? { ...g, [field]: value } : g));
+  }
 
   submitBooking(): void {
     const name  = this.bookingName().trim();
@@ -162,7 +177,14 @@ export class EventDetail implements OnInit, OnDestroy {
     const seats = this.bookingSeats();
     const ev    = this.event();
     if (!name || !email || !ev?.slug) return;
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { this.bookingError.set('Inserisci un indirizzo email valido'); return; }
     if (seats < 1 || seats > 4) { this.bookingError.set('Puoi prenotare da 1 a 4 posti'); return; }
+
+    const guests = this.bookingGuests();
+    for (let i = 0; i < guests.length; i++) {
+      if (!guests[i].name.trim()) { this.bookingError.set(`Inserisci il nome dell'accompagnatore ${i + 1}`); return; }
+      if (guests[i].email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(guests[i].email)) { this.bookingError.set(`Email dell'accompagnatore ${i + 1} non valida`); return; }
+    }
 
     this.bookingSending.set(true);
     this.bookingError.set('');
@@ -172,6 +194,7 @@ export class EventDetail implements OnInit, OnDestroy {
       email,
       phone: this.bookingPhone().trim() || undefined,
       seats,
+      guests: guests.map(g => ({ name: g.name.trim(), email: g.email.trim() || undefined, phone: g.phone.trim() || undefined })),
     }).subscribe({
       next: res => {
         this.bookingSending.set(false);

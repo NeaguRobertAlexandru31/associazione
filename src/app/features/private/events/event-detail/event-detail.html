@@ -2,8 +2,17 @@
 @if (isCreateMode()) {
   <div class="dash-fullpage">
 
+    <!-- Row go-back -->
+    <div class="flex items-center px-6 py-3 border-b border-outline-variant/20 bg-surface">
+      <button (click)="goBack()"
+              class="flex items-center gap-1.5 font-inter text-sm font-semibold text-on-surface-variant hover:text-on-surface transition-colors">
+        <span class="material-symbols-outlined text-base">arrow_back</span>
+        Tutti gli eventi
+      </button>
+    </div>
+
     <!-- Hero placeholder -->
-    <section class="relative h-[55vh] min-h-[360px] overflow-hidden bg-surface-container">
+    <section class="relative h-[55vh] min-h-[360px] overflow-hidden bg-on-surface/10">
       @if (newCoverPreview(); as cp) {
         <img [src]="cp.preview" alt="" class="w-full h-full object-cover" />
         <div class="absolute inset-0 bg-gradient-to-t from-black/75 via-black/20 to-transparent"></div>
@@ -20,13 +29,8 @@
         </div>
       }
 
-      <!-- Controlli in alto -->
-      <div class="absolute top-0 left-0 right-0 flex items-center justify-between px-6 py-4">
-        <button (click)="goBack()"
-                class="flex items-center gap-1.5 font-inter text-sm font-semibold text-white/80 hover:text-white transition-colors backdrop-blur-sm bg-black/20 px-3 py-1.5 rounded-xl">
-          <span class="material-symbols-outlined text-base">arrow_back</span>
-          Tutti gli eventi
-        </button>
+      <!-- Aggiungi copertina sovrapposto all'immagine -->
+      <div class="absolute top-0 right-0 px-4 py-4">
         <label class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-black/30 text-white font-inter font-semibold text-xs hover:bg-black/50 transition-all cursor-pointer backdrop-blur-sm">
           <span class="material-symbols-outlined text-sm">photo_camera</span>
           @if (newCoverPreview()) { Cambia copertina } @else { Aggiungi copertina }
@@ -35,9 +39,9 @@
       </div>
 
       <!-- Titolo / input nome -->
-      <div class="absolute bottom-0 left-0 right-0 px-8 pb-8 md:px-12 md:pb-10">
+      <div class="absolute bottom-0 left-0 right-0 p-8 md:p-12">
         <input [(ngModel)]="newForm.name" type="text" placeholder="Nome dell'evento"
-               class="font-romania font-extrabold text-white leading-tight bg-transparent border-b-2 border-white/40 focus:border-white outline-none w-full placeholder:text-white/40"
+               class="font-romania font-extrabold text-white leading-tight bg-transparent border-b-2 border-white/40 focus:border-white outline-none w-full placeholder:text-white/60"
                style="font-size: clamp(1.8rem, 4vw, 3rem)" />
       </div>
     </section>
@@ -97,9 +101,9 @@
         <div class="flex flex-col gap-5 sticky top-20">
 
           <!-- Data -->
-          <div class="flex items-start gap-3">
+          <div class="flex items-center gap-3">
             <div class="w-10 h-10 rounded-xl bg-primary/8 flex items-center justify-center flex-shrink-0">
-              <span class="material-symbols-outlined text-primary" style="font-variation-settings:'FILL' 1">calendar_month</span>
+              <span class="material-symbols-outlined text-primary text-[20px]" style="font-variation-settings:'FILL' 1">today</span>
             </div>
             <div class="flex-1 min-w-0">
               <p class="font-inter text-xs text-on-surface-variant uppercase tracking-wider font-semibold mb-1">Data *</p>
@@ -108,9 +112,9 @@
           </div>
 
           <!-- Ora -->
-          <div class="flex items-start gap-3">
+          <div class="flex items-center gap-3">
             <div class="w-10 h-10 rounded-xl bg-primary/8 flex items-center justify-center flex-shrink-0">
-              <span class="material-symbols-outlined text-primary" style="font-variation-settings:'FILL' 1">schedule</span>
+              <span class="material-symbols-outlined text-primary text-[20px]" style="font-variation-settings:'FILL' 1">schedule</span>
             </div>
             <div class="flex-1 min-w-0">
               <p class="font-inter text-xs text-on-surface-variant uppercase tracking-wider font-semibold mb-1">Orario *</p>
@@ -119,9 +123,9 @@
           </div>
 
           <!-- Luogo -->
-          <div class="flex items-start gap-3">
+          <div class="flex items-center gap-3">
             <div class="w-10 h-10 rounded-xl bg-primary/8 flex items-center justify-center flex-shrink-0">
-              <span class="material-symbols-outlined text-primary" style="font-variation-settings:'FILL' 1">location_on</span>
+              <span class="material-symbols-outlined text-primary text-[20px]" style="font-variation-settings:'FILL' 1">location_on</span>
             </div>
             <div class="flex-1 min-w-0">
               <p class="font-inter text-xs text-on-surface-variant uppercase tracking-wider font-semibold mb-1">Luogo *</p>
@@ -204,11 +208,20 @@
 
   <div class="dash-fullpage">
 
+    <!-- Row go-back -->
+    <div class="flex items-center px-6 py-3 border-b border-outline-variant/20 bg-surface">
+      <button (click)="goBack()"
+              class="flex items-center gap-1.5 font-inter text-sm font-semibold text-on-surface-variant hover:text-on-surface transition-colors">
+        <span class="material-symbols-outlined text-base">arrow_back</span>
+        Tutti gli eventi
+      </button>
+    </div>
+
     <!-- Hero -->
     <section class="relative h-[55vh] min-h-[360px] overflow-hidden bg-surface-container group">
       @if (ev.cover || ev.images.length > 0) {
         <img [src]="resolveImg(ev.cover ?? ev.images[0])" [alt]="ev.name" class="w-full h-full object-cover" />
-        <div class="absolute inset-0 bg-gradient-to-t from-black/75 via-black/20 to-transparent"></div>
+        <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent"></div>
       } @else {
         <div class="absolute inset-0 flex items-center justify-center opacity-5"
              style="background-image: radial-gradient(circle at 2px 2px, #b6171e 1px, transparent 0); background-size: 28px 28px;"></div>
@@ -217,35 +230,26 @@
         </div>
       }
 
-      <!-- Controlli in alto -->
-      <div class="absolute top-0 left-0 right-0 flex items-center justify-between px-6 py-4">
-        <button (click)="goBack()"
-                class="flex items-center gap-1.5 font-inter text-sm font-semibold text-white/80 hover:text-white transition-colors backdrop-blur-sm bg-black/20 px-3 py-1.5 rounded-xl">
-          <span class="material-symbols-outlined text-base">arrow_back</span>
-          Tutti gli eventi
+      <!-- Azioni in alto a destra (sovrapposti all'immagine) -->
+      <div class="absolute top-0 right-0 flex items-center gap-2 px-4 py-4">
+        <label class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-black/30 text-white font-inter font-semibold text-xs hover:bg-black/50 transition-all cursor-pointer backdrop-blur-sm">
+          <span class="material-symbols-outlined text-sm">photo_camera</span>
+          Copertina
+          <input type="file" accept="image/*" class="hidden" (change)="onCoverSelected($event)" />
+        </label>
+        <button (click)="deleteEvent()" [disabled]="deleting()"
+                class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-black/30 text-white/80 font-inter font-semibold text-xs hover:bg-red-500/80 transition-all disabled:opacity-50 backdrop-blur-sm">
+          @if (deleting()) {
+            <span class="material-symbols-outlined text-sm spin">progress_activity</span>
+          } @else {
+            <span class="material-symbols-outlined text-sm" style="font-variation-settings:'FILL' 1">delete</span>
+          }
+          Elimina
         </button>
-
-        <div class="flex items-center gap-2">
-          <label class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-black/30 text-white font-inter font-semibold text-xs hover:bg-black/50 transition-all cursor-pointer backdrop-blur-sm">
-            <span class="material-symbols-outlined text-sm">photo_camera</span>
-            Copertina
-            <input type="file" accept="image/*" class="hidden" (change)="onCoverSelected($event)" />
-          </label>
-
-          <button (click)="deleteEvent()" [disabled]="deleting()"
-                  class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-black/30 text-white/80 font-inter font-semibold text-xs hover:bg-red-500/80 transition-all disabled:opacity-50 backdrop-blur-sm">
-            @if (deleting()) {
-              <span class="material-symbols-outlined text-sm spin">progress_activity</span>
-            } @else {
-              <span class="material-symbols-outlined text-sm" style="font-variation-settings:'FILL' 1">delete</span>
-            }
-            Elimina
-          </button>
-        </div>
       </div>
 
       <!-- Titolo in basso -->
-      <div class="absolute bottom-0 left-0 right-0 px-8 pb-8 md:px-12 md:pb-10">
+      <div class="absolute bottom-0 left-0 right-0 p-8 md:p-12">
         @if (editField() === 'name') {
           <div class="flex items-center gap-2">
             <input [(ngModel)]="editValue" [ngModelOptions]="{standalone:true}"
@@ -266,12 +270,12 @@
             </button>
           </div>
         } @else {
-          <div class="flex items-end gap-3 group/title">
+          <div class="flex items-end gap-3">
             <h1 class="font-romania font-extrabold text-white leading-tight"
                 style="font-size: clamp(1.8rem, 4vw, 3rem)">{{ ev.name }}</h1>
             <button (click)="startEdit('name')"
-                    class="mb-1 w-7 h-7 rounded-full bg-white/20 flex items-center justify-center hover:bg-white/40 transition-all opacity-0 group-hover/title:opacity-100 flex-shrink-0">
-              <span class="material-symbols-outlined text-white text-sm">edit</span>
+                    class="mb-1 w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center hover:bg-white/40 transition-all flex-shrink-0 backdrop-blur-sm">
+              <span class="material-symbols-outlined text-white" style="font-size:18px">edit</span>
             </button>
           </div>
         }
@@ -286,13 +290,13 @@
         <div class="flex flex-col gap-8">
 
           <!-- Descrizione -->
-          <div class="group/desc">
+          <div>
             <div class="flex items-center gap-2 mb-3">
               <h2 class="font-romania font-bold text-primary text-lg">Descrizione</h2>
               @if (editField() !== 'description') {
                 <button (click)="startEdit('description')"
-                        class="w-6 h-6 rounded-full bg-surface-container flex items-center justify-center hover:bg-surface-container-high transition-colors opacity-0 group-hover/desc:opacity-100">
-                  <span class="material-symbols-outlined text-on-surface-variant text-sm">edit</span>
+                        class="w-8 h-8 rounded-lg bg-surface-container flex items-center justify-center hover:bg-surface-container-high transition-colors">
+                  <span class="material-symbols-outlined text-on-surface-variant" style="font-size:16px">edit</span>
                 </button>
               }
             </div>
@@ -362,9 +366,9 @@
         <div class="flex flex-col gap-5 sticky top-20">
 
           <!-- Data -->
-          <div class="group/date flex items-start gap-3">
+          <div class="flex items-center gap-3">
             <div class="w-10 h-10 rounded-xl bg-primary/8 flex items-center justify-center flex-shrink-0">
-              <span class="material-symbols-outlined text-primary" style="font-variation-settings:'FILL' 1">calendar_month</span>
+              <span class="material-symbols-outlined text-primary text-[20px]" style="font-variation-settings:'FILL' 1">today</span>
             </div>
             <div class="flex-1 min-w-0">
               <p class="font-inter text-xs text-on-surface-variant uppercase tracking-wider font-semibold">Data</p>
@@ -383,8 +387,8 @@
                 <div class="flex items-center gap-2 mt-0.5">
                   <p class="font-inter text-on-surface text-sm capitalize">{{ formatDate(ev.date) }}</p>
                   <button (click)="startEdit('date')"
-                          class="w-5 h-5 rounded-full bg-surface-container flex items-center justify-center hover:bg-surface-container-high transition-colors opacity-0 group-hover/date:opacity-100">
-                    <span class="material-symbols-outlined text-on-surface-variant" style="font-size:12px">edit</span>
+                          class="w-8 h-8 rounded-lg bg-surface-container flex items-center justify-center hover:bg-surface-container-high transition-colors flex-shrink-0">
+                    <span class="material-symbols-outlined text-on-surface-variant" style="font-size:16px">edit</span>
                   </button>
                 </div>
               }
@@ -392,9 +396,9 @@
           </div>
 
           <!-- Ora -->
-          <div class="group/time flex items-start gap-3">
+          <div class="flex items-center gap-3">
             <div class="w-10 h-10 rounded-xl bg-primary/8 flex items-center justify-center flex-shrink-0">
-              <span class="material-symbols-outlined text-primary" style="font-variation-settings:'FILL' 1">schedule</span>
+              <span class="material-symbols-outlined text-primary text-[20px]" style="font-variation-settings:'FILL' 1">schedule</span>
             </div>
             <div class="flex-1 min-w-0">
               <p class="font-inter text-xs text-on-surface-variant uppercase tracking-wider font-semibold">Orario</p>
@@ -413,8 +417,8 @@
                 <div class="flex items-center gap-2 mt-0.5">
                   <p class="font-inter text-on-surface text-sm">{{ ev.time }}</p>
                   <button (click)="startEdit('time')"
-                          class="w-5 h-5 rounded-full bg-surface-container flex items-center justify-center hover:bg-surface-container-high transition-colors opacity-0 group-hover/time:opacity-100">
-                    <span class="material-symbols-outlined text-on-surface-variant" style="font-size:12px">edit</span>
+                          class="w-8 h-8 rounded-lg bg-surface-container flex items-center justify-center hover:bg-surface-container-high transition-colors flex-shrink-0">
+                    <span class="material-symbols-outlined text-on-surface-variant" style="font-size:16px">edit</span>
                   </button>
                 </div>
               }
@@ -422,9 +426,9 @@
           </div>
 
           <!-- Luogo -->
-          <div class="group/loc flex items-start gap-3">
+          <div class="flex items-center gap-3">
             <div class="w-10 h-10 rounded-xl bg-primary/8 flex items-center justify-center flex-shrink-0">
-              <span class="material-symbols-outlined text-primary" style="font-variation-settings:'FILL' 1">location_on</span>
+              <span class="material-symbols-outlined text-primary text-[20px]" style="font-variation-settings:'FILL' 1">location_on</span>
             </div>
             <div class="flex-1 min-w-0">
               <p class="font-inter text-xs text-on-surface-variant uppercase tracking-wider font-semibold">Luogo</p>
@@ -443,8 +447,8 @@
                 <div class="flex items-center gap-2 mt-0.5">
                   <p class="font-inter text-on-surface text-sm">{{ ev.location }}</p>
                   <button (click)="startEdit('location')"
-                          class="w-5 h-5 rounded-full bg-surface-container flex items-center justify-center hover:bg-surface-container-high transition-colors opacity-0 group-hover/loc:opacity-100 flex-shrink-0">
-                    <span class="material-symbols-outlined text-on-surface-variant" style="font-size:12px">edit</span>
+                          class="w-8 h-8 rounded-lg bg-surface-container flex items-center justify-center hover:bg-surface-container-high transition-colors flex-shrink-0">
+                    <span class="material-symbols-outlined text-on-surface-variant" style="font-size:16px">edit</span>
                   </button>
                 </div>
               }
@@ -452,13 +456,13 @@
           </div>
 
           <!-- Tipo accesso -->
-          <div class="group/access border-t border-outline-variant/20 pt-4">
+          <div class="border-t border-outline-variant/20 pt-4">
             <div class="flex items-center justify-between mb-2">
               <p class="font-inter text-xs text-on-surface-variant uppercase tracking-wider font-semibold">Tipo di accesso</p>
               @if (editField() !== 'accessType') {
                 <button (click)="startEdit('accessType')"
-                        class="w-5 h-5 rounded-full bg-surface-container flex items-center justify-center hover:bg-surface-container-high transition-colors opacity-0 group-hover/access:opacity-100">
-                  <span class="material-symbols-outlined text-on-surface-variant" style="font-size:12px">edit</span>
+                        class="w-8 h-8 rounded-lg bg-surface-container flex items-center justify-center hover:bg-surface-container-high transition-colors">
+                  <span class="material-symbols-outlined text-on-surface-variant" style="font-size:16px">edit</span>
                 </button>
               }
             </div>
@@ -539,41 +543,51 @@
       <div class="mt-12 border-t border-outline-variant/20 pt-8 max-w-6xl mx-auto">
         <p class="font-inter font-semibold text-xs text-on-surface-variant uppercase tracking-wider mb-4">Gestione admin</p>
 
-        <!-- Tab bar -->
-        <div class="flex border-b border-outline-variant/20 mb-6">
+        <!-- Chip tab scrollabili -->
+        <div class="-mx-6 md:-mx-10 flex gap-2 overflow-x-auto pb-3 mb-6"
+             style="scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; padding-left: 1.5rem; padding-right: 1.5rem; scroll-padding-left: 1.5rem;">
           <button (click)="switchTab('rsvp')"
+                  style="scroll-snap-align: start;"
+                  class="flex-none flex items-center gap-1.5 px-4 py-1.5 rounded-full font-inter font-semibold text-sm transition-all"
                   [class]="activeTab() === 'rsvp'
-                    ? 'font-inter font-semibold text-sm text-primary border-b-2 border-primary pb-3 pt-2 mr-6 flex items-center gap-1.5'
-                    : 'font-inter text-sm text-on-surface-variant pb-3 pt-2 mr-6 flex items-center gap-1.5 hover:text-on-surface transition-colors'">
+                    ? 'bg-primary text-white shadow-sm'
+                    : 'bg-surface-container text-on-surface-variant hover:bg-surface-container-high'">
             <span class="material-symbols-outlined text-sm">group</span>
             Partecipanti
             @if (rsvpStats(); as s) {
               @if (s.total > 0) {
-                <span class="text-[10px] font-inter font-bold bg-primary text-white rounded-full px-1.5 py-0.5 leading-none">{{ s.total }}</span>
+                <span class="text-[10px] font-inter font-bold rounded-full px-1.5 py-0.5 leading-none"
+                      [class]="activeTab() === 'rsvp' ? 'bg-white/25 text-white' : 'bg-primary text-white'">{{ s.total }}</span>
               }
             }
           </button>
 
           <button (click)="switchTab('photos')"
+                  style="scroll-snap-align: start;"
+                  class="flex-none flex items-center gap-1.5 px-4 py-1.5 rounded-full font-inter font-semibold text-sm transition-all"
                   [class]="activeTab() === 'photos'
-                    ? 'font-inter font-semibold text-sm text-primary border-b-2 border-primary pb-3 pt-2 mr-6 flex items-center gap-1.5'
-                    : 'font-inter text-sm text-on-surface-variant pb-3 pt-2 mr-6 flex items-center gap-1.5 hover:text-on-surface transition-colors'">
+                    ? 'bg-primary text-white shadow-sm'
+                    : 'bg-surface-container text-on-surface-variant hover:bg-surface-container-high'">
             <span class="material-symbols-outlined text-sm">photo_camera</span>
             Foto
             @if (pendingPhotos().length > 0) {
-              <span class="text-[10px] font-inter font-bold bg-amber-500 text-white rounded-full px-1.5 py-0.5 leading-none">{{ pendingPhotos().length }}</span>
+              <span class="text-[10px] font-inter font-bold rounded-full px-1.5 py-0.5 leading-none"
+                    [class]="activeTab() === 'photos' ? 'bg-white/25 text-white' : 'bg-amber-500 text-white'">{{ pendingPhotos().length }}</span>
             }
           </button>
 
           @if (ev.hasCapacity) {
             <button (click)="switchTab('bookings')"
+                    style="scroll-snap-align: start;"
+                    class="flex-none flex items-center gap-1.5 px-4 py-1.5 rounded-full font-inter font-semibold text-sm transition-all"
                     [class]="activeTab() === 'bookings'
-                      ? 'font-inter font-semibold text-sm text-primary border-b-2 border-primary pb-3 pt-2 flex items-center gap-1.5'
-                      : 'font-inter text-sm text-on-surface-variant pb-3 pt-2 flex items-center gap-1.5 hover:text-on-surface transition-colors'">
+                      ? 'bg-primary text-white shadow-sm'
+                      : 'bg-surface-container text-on-surface-variant hover:bg-surface-container-high'">
               <span class="material-symbols-outlined text-sm">confirmation_number</span>
               Prenotazioni
               @if (confirmedBookings().length > 0) {
-                <span class="text-[10px] font-inter font-bold bg-primary text-white rounded-full px-1.5 py-0.5 leading-none">{{ confirmedBookings().length }}</span>
+                <span class="text-[10px] font-inter font-bold rounded-full px-1.5 py-0.5 leading-none"
+                      [class]="activeTab() === 'bookings' ? 'bg-white/25 text-white' : 'bg-primary text-white'">{{ confirmedBookings().length }}</span>
               }
             </button>
           }
