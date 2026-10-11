@@ -183,7 +183,7 @@ export class Settings implements OnInit {
     this.deleteLoading.set(true);
     this.deleteError.set(null);
 
-    this.auth.deleteProfile(this.deletePassword()).subscribe({
+    this.auth.deleteProfile().subscribe({
       next: () => {
         this.auth.logout();
         window.location.href = '/login';

@@ -1,25 +1,23 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, computed, inject, signal } from '@angular/core';
-import { Observable, tap } from 'rxjs';
+import { Observable, from, switchMap, tap } from 'rxjs';
+import { fetchAuthSession, signIn, signOut } from 'aws-amplify/auth';
 import { environment } from '../../../../environments/environment';
 import { AuthUser, MemberDetail, TesseraInfo, UpdateMemberRequest, UserRole } from '../../models/member.model';
-import { LoginRequest, LoginResponse } from '../../models/login.model';
 import { Analytics } from '../analytics/analytics';
 
-const TOKEN_KEY = 'acr_token';
-const USER_KEY  = 'acr_user';
-const API       = environment.apiUrl;
+const USER_KEY = 'acr_user';
+const API      = environment.apiUrl;
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-  private http = inject(HttpClient);
+  private http      = inject(HttpClient);
   private analytics = inject(Analytics);
 
-  private _token = signal<string | null>(localStorage.getItem(TOKEN_KEY));
-  private _user  = signal<AuthUser | null>(this.restoreUser());
+  private _user = signal<AuthUser | null>(this.restoreUser());
 
-  readonly isLoggedIn   = computed(() => !!this._token());
   readonly user         = this._user.asReadonly();
+  readonly isLoggedIn   = computed(() => !!this._user());
   readonly isSuperAdmin = computed(() => this._user()?.role === 'SUPERADMIN');
   readonly isAdmin      = computed(() => {
     const role = this._user()?.role;
@@ -28,46 +26,49 @@ export class AuthService {
   readonly isMember = computed(() => this._user()?.role === 'MEMBER');
 
   private restoreUser(): AuthUser | null {
-    const raw = localStorage.getItem(USER_KEY);
-    return raw ? JSON.parse(raw) : null;
+    try {
+      const raw = sessionStorage.getItem(USER_KEY);
+      return raw ? JSON.parse(raw) : null;
+    } catch {
+      return null;
+    }
   }
-
-  getToken(): string | null { return this._token(); }
 
   // ── Auth ──────────────────────────────────────────────────────────────────
 
-  login(dto: LoginRequest): Observable<LoginResponse> {
-    return this.http.post<LoginResponse>(`${API}/auth/login`, dto, { withCredentials: true }).pipe(
-      tap(res => {
-        this.persist(res);
-        this.analytics.identify(res.user.id, { role: res.user.role });
+  login(email: string, password: string): Observable<AuthUser> {
+    // Amplify stabilisce la sessione (salva token in sessionStorage)
+    // poi il BE recupera il profilo dal DB tramite il token Cognito
+    return from(signIn({ username: email, password, options: { authFlowType: 'USER_PASSWORD_AUTH' } })).pipe(
+      switchMap(() => this.getProfile()),
+      tap(user => {
+        this.persistUser(user);
+        this.analytics.identify(user.id, { role: user.role });
         this.analytics.capture('login');
       }),
     );
   }
 
-  refresh(): Observable<{ access_token: string }> {
-    return this.http.post<{ access_token: string }>(`${API}/auth/refresh`, {}, { withCredentials: true });
-  }
-
-  persistToken(token: string): void {
-    localStorage.setItem(TOKEN_KEY, token);
-    this._token.set(token);
-  }
-
-  persistUser(user: AuthUser): void {
-    localStorage.setItem(USER_KEY, JSON.stringify(user));
-    this._user.set(user);
-  }
-
   logout(): void {
-    this.http.post(`${API}/auth/logout`, {}, { withCredentials: true }).subscribe({ error: () => {} });
-    localStorage.removeItem(TOKEN_KEY);
-    localStorage.removeItem(USER_KEY);
-    this._token.set(null);
+    from(fetchAuthSession()).subscribe({
+      next: session => {
+        const accessToken = session.tokens?.accessToken?.toString();
+        if (accessToken) {
+          this.http.post(`${API}/auth/logout`, { access_token: accessToken }).subscribe({ error: () => {} });
+        }
+      },
+      error: () => {},
+    });
+    signOut().catch(() => {});
+    sessionStorage.removeItem(USER_KEY);
     this._user.set(null);
     this.analytics.capture('logout');
     this.analytics.reset();
+  }
+
+  persistUser(user: AuthUser): void {
+    sessionStorage.setItem(USER_KEY, JSON.stringify(user));
+    this._user.set(user);
   }
 
   // ── Check email / set password (primo accesso soci) ───────────────────────
@@ -76,9 +77,8 @@ export class AuthService {
     return this.http.post<{ exists: boolean; hasPassword: boolean }>(`${API}/auth/check-email`, { email });
   }
 
-
-  setPassword(email: string, password: string): Observable<{ access_token: string }> {
-    return this.http.post<{ access_token: string }>(`${API}/auth/set-password`, { email, password });
+  setPassword(email: string, password: string): Observable<{ access_token: string; refresh_token?: string }> {
+    return this.http.post<{ access_token: string; refresh_token?: string }>(`${API}/auth/set-password`, { email, password });
   }
 
   // ── Profilo account ───────────────────────────────────────────────────────
@@ -87,14 +87,14 @@ export class AuthService {
     return this.http.get<AuthUser>(`${API}/auth/me`);
   }
 
-  updateProfile(dto: { email?: string; password?: string; currentPassword?: string }): Observable<LoginResponse> {
-    return this.http.patch<LoginResponse>(`${API}/auth/me`, dto).pipe(
-      tap(res => this.persist(res)),
+  updateProfile(dto: { email?: string; password?: string; currentPassword?: string }): Observable<{ user: AuthUser }> {
+    return this.http.patch<{ user: AuthUser }>(`${API}/auth/me`, dto).pipe(
+      tap(res => this.persistUser(res.user)),
     );
   }
 
-  deleteProfile(currentPassword: string): Observable<void> {
-    return this.http.delete<void>(`${API}/auth/me`, { body: { currentPassword } });
+  deleteProfile(): Observable<void> {
+    return this.http.delete<void>(`${API}/auth/me`);
   }
 
   uploadAvatar(file: File): Observable<{ url: string }> {
@@ -103,11 +103,7 @@ export class AuthService {
     return this.http.post<{ url: string }>(`${API}/uploads/avatar`, form).pipe(
       tap(res => {
         const u = this._user();
-        if (u) {
-          const updated = { ...u, profileImage: res.url };
-          localStorage.setItem(USER_KEY, JSON.stringify(updated));
-          this._user.set(updated);
-        }
+        if (u) this.persistUser({ ...u, profileImage: res.url });
       }),
     );
   }
@@ -130,12 +126,5 @@ export class AuthService {
 
   promoteRole(memberId: string, role: UserRole, boardRoles: string[]): Observable<AuthUser> {
     return this.http.patch<AuthUser>(`${API}/auth/members/${memberId}/role`, { role, boardRoles });
-  }
-
-  private persist(res: LoginResponse): void {
-    localStorage.setItem(TOKEN_KEY, res.access_token);
-    localStorage.setItem(USER_KEY, JSON.stringify(res.user));
-    this._token.set(res.access_token);
-    this._user.set(res.user);
   }
 }

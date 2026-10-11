@@ -12,7 +12,7 @@ type Phase = 'email' | 'password' | 'set-password';
   styleUrl: './auth.css',
 })
 export class Auth {
-  private auth  = inject(AuthService);
+  private auth   = inject(AuthService);
   private router = inject(Router);
   private route  = inject(ActivatedRoute);
 
@@ -47,7 +47,7 @@ export class Auth {
     if (!this.password) return;
     this.error.set(null);
     this.loading.set(true);
-    this.auth.login({ email: this.email.trim(), password: this.password }).subscribe({
+    this.auth.login(this.email.trim(), this.password).subscribe({
       next: () => {
         this.loading.set(false);
         const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl') ?? this.defaultUrl();
@@ -65,20 +65,20 @@ export class Auth {
     if (this.password.length < 6)       { this.error.set('La password deve essere di almeno 6 caratteri.'); return; }
     this.error.set(null);
     this.loading.set(true);
+
+    // Il BE crea l'utente in Cognito e imposta la password permanente
     this.auth.setPassword(this.email.trim(), this.password).subscribe({
-      next: res => {
-        this.auth.persistToken(res.access_token);
-        this.auth.getProfile().subscribe({
-          next: user => {
-            this.auth.persistUser(user);
+      next: () => {
+        // Subito dopo, fai signIn tramite Amplify per stabilire la sessione locale
+        this.auth.login(this.email.trim(), this.password).subscribe({
+          next: () => {
             this.loading.set(false);
             const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl') ?? this.defaultUrl();
             this.router.navigateByUrl(returnUrl);
           },
           error: () => {
             this.loading.set(false);
-            const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl') ?? this.defaultUrl();
-            this.router.navigateByUrl(returnUrl);
+            this.router.navigateByUrl(this.defaultUrl());
           },
         });
       },

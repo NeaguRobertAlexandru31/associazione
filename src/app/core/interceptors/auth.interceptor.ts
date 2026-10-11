@@ -1,50 +1,28 @@
 import { HttpErrorResponse, HttpInterceptorFn } from '@angular/common/http';
 import { inject } from '@angular/core';
 import { Router } from '@angular/router';
-import { catchError, switchMap, throwError } from 'rxjs';
+import { from, switchMap, catchError, throwError } from 'rxjs';
+import { fetchAuthSession } from 'aws-amplify/auth';
 import { AuthService } from '../services/auth/auth';
 
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const auth   = inject(AuthService);
   const router = inject(Router);
-  const token  = auth.getToken();
 
-  const authReq = token
-    ? req.clone({ setHeaders: { Authorization: `Bearer ${token}` } })
-    : req;
-
-  return next(authReq).pipe(
+  return from(fetchAuthSession()).pipe(
+    switchMap(session => {
+      const token   = session.tokens?.accessToken?.toString();
+      const authReq = token
+        ? req.clone({ setHeaders: { Authorization: `Bearer ${token}` } })
+        : req;
+      return next(authReq);
+    }),
     catchError((err: HttpErrorResponse) => {
-      if (err.status !== 401) return throwError(() => err);
-
-      // Non riprovare se è già una chiamata al refresh (evita loop)
-      // Non interferire con endpoint pubblici che hanno propria autenticazione (token QR)
-      if (
-        req.url.includes('/auth/refresh') ||
-        req.url.includes('/auth/login') ||
-        req.url.includes('/photos/presign') ||
-        req.url.includes('/photos/confirm') ||
-        req.url.includes('/photos/upload')
-      ) {
-        if (req.url.includes('/auth/refresh') || req.url.includes('/auth/login')) {
-          auth.logout();
-          router.navigate(['/login']);
-        }
-        return throwError(() => err);
+      if (err.status === 401) {
+        auth.logout();
+        router.navigate(['/login']);
       }
-
-      return auth.refresh().pipe(
-        switchMap(({ access_token }) => {
-          auth.persistToken(access_token);
-          const retryReq = req.clone({ setHeaders: { Authorization: `Bearer ${access_token}` } });
-          return next(retryReq);
-        }),
-        catchError(() => {
-          auth.logout();
-          router.navigate(['/login']);
-          return throwError(() => err);
-        }),
-      );
+      return throwError(() => err);
     }),
   );
 };

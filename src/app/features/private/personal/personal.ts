@@ -146,7 +146,7 @@ export class Personal implements OnInit {
 
   doDelete(): void {
     this.deleteLoading.set(true);
-    this.auth.deleteProfile('').subscribe({
+    this.auth.deleteProfile().subscribe({
       next: () => { this.auth.logout(); this.router.navigate(['/home']); },
       error: err => {
         this.deleteLoading.set(false);

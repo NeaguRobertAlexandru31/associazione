@@ -1,13 +1,13 @@
 import { inject } from '@angular/core';
 import { CanActivateFn, Router } from '@angular/router';
-import { AuthService } from '../services/auth/auth';
+import { getCurrentUser } from 'aws-amplify/auth';
 
-export const authGuard: CanActivateFn = (_, state) => {
-  const auth   = inject(AuthService);
+export const authGuard: CanActivateFn = async (_, state) => {
   const router = inject(Router);
-
-  if (!auth.isLoggedIn())
+  try {
+    await getCurrentUser();
+    return true;
+  } catch {
     return router.createUrlTree(['/login'], { queryParams: { returnUrl: state.url } });
-
-  return true;
+  }
 };
