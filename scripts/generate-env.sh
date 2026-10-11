@@ -35,6 +35,9 @@ export const environment = {
   apiUrl: '${API_URL}',
   cdnUrl: '${CDN_URL:-}',
   aptabaseKey: '${APTABASE_KEY:-}',
+  cognitoUserPoolId: '${COGNITO_USER_POOL_ID:-}',
+  cognitoClientId: '${COGNITO_CLIENT_ID:-}',
+  cognitoRegion: '${COGNITO_REGION:-eu-central-1}',
 };
 EOF
   echo "Generato environment.prod.ts"
@@ -45,6 +48,9 @@ export const environment = {
   apiUrl: \`http://\${typeof window !== 'undefined' ? window.location.hostname : 'localhost'}:3000\`,
   cdnUrl: '${CDN_URL:-}',
   aptabaseKey: '${APTABASE_KEY:-}',
+  cognitoUserPoolId: '${COGNITO_USER_POOL_ID:-}',
+  cognitoClientId: '${COGNITO_CLIENT_ID:-}',
+  cognitoRegion: '${COGNITO_REGION:-eu-central-1}',
 };
 EOF
   echo "Generato environment.ts"

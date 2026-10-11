@@ -31,10 +31,13 @@ jobs:
 
       - name: Crea .env.prod
         run: |
-          printf 'API_URL=%s\nCDN_URL=%s\nAPTABASE_KEY=%s\n' \
+          printf 'API_URL=%s\nCDN_URL=%s\nAPTABASE_KEY=%s\nCOGNITO_USER_POOL_ID=%s\nCOGNITO_CLIENT_ID=%s\nCOGNITO_REGION=%s\n' \
             '${{ secrets.PROD_API_URL }}' \
             '${{ secrets.CDN_URL }}' \
             '${{ secrets.PROD_APTABASE_KEY }}' \
+            '${{ secrets.COGNITO_USER_POOL_ID }}' \
+            '${{ secrets.COGNITO_CLIENT_ID }}' \
+            'eu-central-1' \
             > .env.prod
 
       - name: Genera environment.prod.ts
