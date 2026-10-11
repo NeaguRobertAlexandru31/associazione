@@ -43,7 +43,77 @@
           <div class="gold-bar absolute top-0 h-[3px]" style="left:5px;right:0;"></div>
           <div class="holo"></div>
           <div class="noise"></div>
-          <div class="absolute inset-0 flex flex-col pl-9 pr-6 pt-5 pb-5">
+          <!-- FRONTE mobile: verticale -->
+          <div class="absolute inset-0 flex flex-col md:hidden pl-6 pr-5 pt-5 pb-6">
+            <!-- Top: logo + anno -->
+            <div class="flex items-center justify-between mb-5">
+              <div class="flex items-center gap-2">
+                <div class="w-8 h-8 rounded-lg flex items-center justify-center badge-pulse"
+                     style="background: linear-gradient(135deg, #f8bd2a, #e8a820);">
+                  <span class="font-romania font-bold text-[#001040] text-xs leading-none">ACR</span>
+                </div>
+                <div>
+                  <p class="font-romania text-white font-bold text-[10px] leading-tight">Associazione</p>
+                  <p class="font-romania text-white font-bold text-[10px] leading-tight">Marama</p>
+                </div>
+              </div>
+              <div class="text-right">
+                <p class="font-inter text-[7px] uppercase tracking-widest text-white/40">Validità</p>
+                <p class="font-romania text-[#f8bd2a] font-bold text-base leading-tight">{{ tessera()!.membershipYear }}</p>
+              </div>
+            </div>
+            <!-- Centro: foto + nome -->
+            <div class="flex flex-col items-center flex-1 justify-center gap-3">
+              <div class="relative">
+                <div class="w-20 h-20 rounded-full overflow-hidden"
+                     style="border: 2px solid rgba(248,189,42,0.6);">
+                  @if (tessera()!.profileImage) {
+                    <img [src]="tessera()!.profileImage" alt="" class="w-full h-full object-cover" />
+                  } @else {
+                    <div class="w-full h-full flex items-center justify-center"
+                         style="background: linear-gradient(160deg, #1a2a5e 0%, #0d1a40 100%);">
+                      <svg width="26" height="26" viewBox="0 0 24 24" fill="none">
+                        <circle cx="12" cy="8" r="4" fill="rgba(255,255,255,0.25)"/>
+                        <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" stroke="rgba(255,255,255,0.25)" stroke-width="2" stroke-linecap="round"/>
+                      </svg>
+                    </div>
+                  }
+                </div>
+                <div class="absolute -bottom-0.5 -right-0.5 w-5 h-5 rounded-full border-2 flex items-center justify-center"
+                     style="background:#f8bd2a; border-color:#002068;">
+                  <svg width="9" height="9" viewBox="0 0 10 10" fill="none">
+                    <path d="M2 5l2.5 2.5L8 3" stroke="#001040" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </div>
+              </div>
+              <div class="text-center">
+                <p class="font-inter text-[7px] uppercase tracking-[0.2em] text-white/35 mb-1">Socio</p>
+                <p class="font-romania text-white font-bold text-xl leading-tight">{{ tessera()!.firstName }} {{ tessera()!.lastName }}</p>
+                <div class="flex items-center justify-center gap-2 mt-2">
+                  <span class="font-inter text-[8px] uppercase tracking-widest px-2.5 py-0.5 rounded-full"
+                        style="background: rgba(248,189,42,0.15); color: #f8bd2a; border: 1px solid rgba(248,189,42,0.3);">
+                    {{ categoryLabel(tessera()!.category) }}
+                  </span>
+                </div>
+              </div>
+            </div>
+            <!-- Bottom: chip + numero -->
+            <div class="flex items-center gap-2.5 mt-4">
+              <div class="chip"></div>
+              <div>
+                <p class="font-inter text-[7px] uppercase tracking-[0.2em] text-white/30 mb-0.5">N° Tessera</p>
+                <p class="font-inter text-white/70 text-[10px] tracking-[0.15em] font-medium">{{ tessera()!.cardCode }}</p>
+              </div>
+              <div class="ml-auto opacity-40 flex-shrink-0" style="width:24px; height:16px; border-radius:2px; overflow:hidden; display:flex;">
+                <div style="flex:1; background:#002B7F;"></div>
+                <div style="flex:1; background:#FCD116;"></div>
+                <div style="flex:1; background:#CE1126;"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- FRONTE desktop: orizzontale (layout originale) -->
+          <div class="absolute inset-0 hidden md:flex flex-col pl-9 pr-6 pt-5 pb-5">
             <div class="flex items-start justify-between mb-4">
               <div class="flex items-center gap-2.5">
                 <div class="w-9 h-9 rounded-lg flex items-center justify-center badge-pulse"
@@ -123,25 +193,45 @@
           <div class="gold-bar absolute bottom-0 h-[3px]" style="left:0;right:5px;"></div>
           <div class="holo"></div>
           <div class="noise"></div>
-          <div class="absolute inset-0 flex items-end pb-5 pl-6 pr-8 gap-5">
+          <!-- RETRO mobile: verticale -->
+          <div class="absolute inset-0 flex flex-col md:hidden items-center justify-between px-6 pt-5 pb-6">
+            <!-- Top: nome + codice -->
+            <div class="text-center">
+              <p class="font-romania text-white font-bold text-base leading-tight">{{ tessera()!.firstName }} {{ tessera()!.lastName }}</p>
+              <p class="font-inter text-[8px] text-white/40 mt-0.5">Socio {{ categoryLabel(tessera()!.category) }} · {{ tessera()!.cardCode }}</p>
+            </div>
+            <!-- Centro: QR grande -->
+            <div class="flex flex-col items-center gap-2">
+              <div class="w-[110px] h-[110px] p-1.5 rounded-xl overflow-hidden" style="background: white;">
+                @if (qrDataUrl()) {
+                  <img [src]="qrDataUrl()!" alt="QR verifica" class="w-full h-full object-contain" />
+                }
+              </div>
+              <p class="font-inter text-[7px] text-white/25 tracking-wider">VERIFICA</p>
+            </div>
+            <!-- Bottom: info validità -->
+            <div class="text-center space-y-1">
+              <div class="flex items-center justify-center gap-1.5">
+                <div class="w-1 h-1 rounded-full flex-shrink-0" style="background:#f8bd2a;"></div>
+                <p class="font-inter text-[8px] text-white/50">01/01/{{ tessera()!.membershipYear }} – 31/12/{{ tessera()!.membershipYear }}</p>
+              </div>
+              <div class="flex items-center justify-center gap-1.5">
+                <div class="w-1 h-1 rounded-full flex-shrink-0" style="background:#f8bd2a;"></div>
+                <p class="font-inter text-[8px] text-white/50">acr-milano.it</p>
+              </div>
+              <p class="font-inter text-[7px] leading-relaxed mt-1" style="color:rgba(255,255,255,0.2);">
+                Tessera personale e non cedibile.
+              </p>
+            </div>
+          </div>
+
+          <!-- RETRO desktop: orizzontale (layout originale) -->
+          <div class="absolute inset-0 hidden md:flex items-end pb-5 pl-6 pr-8 gap-5">
             <div class="flex-shrink-0">
-              <div class="w-[80px] h-[80px] p-1.5 rounded-lg" style="background: white;">
-                <svg viewBox="0 0 21 21" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" shape-rendering="crispEdges">
-                  <rect x="0" y="0" width="7" height="7" fill="#001040"/><rect x="1" y="1" width="5" height="5" fill="white"/><rect x="2" y="2" width="3" height="3" fill="#001040"/>
-                  <rect x="14" y="0" width="7" height="7" fill="#001040"/><rect x="15" y="1" width="5" height="5" fill="white"/><rect x="16" y="2" width="3" height="3" fill="#001040"/>
-                  <rect x="0" y="14" width="7" height="7" fill="#001040"/><rect x="1" y="15" width="5" height="5" fill="white"/><rect x="2" y="16" width="3" height="3" fill="#001040"/>
-                  <rect x="8" y="0" width="1" height="1" fill="#001040"/><rect x="10" y="0" width="1" height="1" fill="#001040"/><rect x="12" y="0" width="1" height="1" fill="#001040"/>
-                  <rect x="9" y="1" width="1" height="1" fill="#001040"/><rect x="11" y="1" width="2" height="1" fill="#001040"/>
-                  <rect x="8" y="2" width="2" height="1" fill="#001040"/><rect x="12" y="2" width="1" height="1" fill="#001040"/>
-                  <rect x="9" y="3" width="3" height="1" fill="#001040"/><rect x="8" y="4" width="1" height="1" fill="#001040"/><rect x="11" y="4" width="2" height="1" fill="#001040"/>
-                  <rect x="8" y="5" width="3" height="1" fill="#001040"/><rect x="12" y="5" width="1" height="1" fill="#001040"/>
-                  <rect x="0" y="8" width="1" height="1" fill="#001040"/><rect x="2" y="8" width="3" height="1" fill="#001040"/><rect x="7" y="8" width="1" height="1" fill="#001040"/>
-                  <rect x="9" y="8" width="2" height="1" fill="#001040"/><rect x="12" y="8" width="2" height="1" fill="#001040"/><rect x="15" y="8" width="2" height="1" fill="#001040"/>
-                  <rect x="1" y="9" width="2" height="1" fill="#001040"/><rect x="8" y="9" width="1" height="1" fill="#001040"/><rect x="11" y="9" width="3" height="1" fill="#001040"/>
-                  <rect x="8" y="14" width="2" height="1" fill="#001040"/><rect x="11" y="14" width="1" height="1" fill="#001040"/><rect x="13" y="14" width="3" height="1" fill="#001040"/>
-                  <rect x="9" y="15" width="1" height="1" fill="#001040"/><rect x="12" y="15" width="2" height="1" fill="#001040"/><rect x="16" y="15" width="1" height="1" fill="#001040"/>
-                  <rect x="8" y="16" width="3" height="1" fill="#001040"/><rect x="13" y="16" width="1" height="1" fill="#001040"/><rect x="15" y="16" width="2" height="1" fill="#001040"/>
-                </svg>
+              <div class="w-[80px] h-[80px] p-1.5 rounded-lg overflow-hidden" style="background: white;">
+                @if (qrDataUrl()) {
+                  <img [src]="qrDataUrl()!" alt="QR verifica" class="w-full h-full object-contain" />
+                }
               </div>
               <p class="font-inter text-[7px] text-white/25 text-center mt-1 tracking-wider">VERIFICA</p>
             </div>

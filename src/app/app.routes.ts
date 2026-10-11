@@ -21,6 +21,7 @@ export const routes: Routes = [
 	{ path: 'doc-scan',         loadComponent: () => import('./features/public/doc-scan/doc-scan/doc-scan').then(m => m.DocScan) },
 	// { path: 'boutique', 		loadComponent: () => import('./features/public/boutique/boutique').then(m => m.Boutique) },
 	{ path: 'tessera-preview', 		loadComponent: () => import('./features/public/tessera-preview/tessera-preview').then(m => m.TesseraPreview) },
+	{ path: 'verifica/:id',         loadComponent: () => import('./features/public/member-verify/member-verify').then(m => m.MemberVerify) },
 	{ path: 'unisciti', 			loadComponent: () => import('./features/public/register/register').then(m => m.Register) },
 	{ path: 'iscrizione/successo', 	loadComponent: () => import('./features/public/iscrizione-successo/iscrizione-successo').then(m => m.IscrizioneSuccesso) },
 	{ path: 'iscrizione/annullato',	loadComponent: () => import('./features/public/iscrizione-annullato/iscrizione-annullato').then(m => m.IscrizioneAnnullato) },

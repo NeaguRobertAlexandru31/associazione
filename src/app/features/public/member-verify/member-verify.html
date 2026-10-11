@@ -1,0 +1,104 @@
+<div class="min-h-screen bg-[#0a0f1e] flex flex-col items-center justify-center px-6 py-16">
+
+  <!-- Loading -->
+  @if (loading()) {
+    <span class="material-symbols-outlined text-white/40 text-5xl animate-spin">progress_activity</span>
+  }
+
+  <!-- Errore -->
+  @if (!loading() && error()) {
+    <div class="text-center">
+      <div class="w-16 h-16 rounded-full bg-red-500/10 border border-red-500/30 flex items-center justify-center mx-auto mb-4">
+        <span class="material-symbols-outlined text-red-400 text-3xl" style="font-variation-settings:'FILL' 1">cancel</span>
+      </div>
+      <p class="font-romania text-white/60 text-xl mb-1">Tessera non valida</p>
+      <p class="font-inter text-white/30 text-sm">{{ error() }}</p>
+    </div>
+  }
+
+  <!-- Risultato -->
+  @if (!loading() && member(); as m) {
+    <div class="w-full max-w-sm">
+
+      <!-- Header verifica -->
+      <div class="text-center mb-8">
+        <p class="font-inter text-[10px] uppercase tracking-[0.3em] text-white/30 mb-2">Verifica tessera</p>
+        <div class="flex items-center justify-center gap-2">
+          <div class="w-7 h-7 rounded-md flex items-center justify-center"
+               style="background: linear-gradient(135deg, #f8bd2a, #e8a820);">
+            <span class="font-romania font-bold text-[#001040] text-[9px]">ACR</span>
+          </div>
+          <span class="font-romania text-white font-bold text-lg">APS Marama</span>
+        </div>
+      </div>
+
+      <!-- Card socio -->
+      <div class="rounded-2xl overflow-hidden border border-white/10"
+           style="background: linear-gradient(135deg, #001040 0%, #002068 60%, #003399 100%);">
+
+        <!-- Foto + nome -->
+        <div class="flex flex-col items-center pt-8 pb-6 px-6">
+          <div class="w-24 h-24 rounded-full overflow-hidden mb-4"
+               style="border: 2px solid rgba(248,189,42,0.6);">
+            @if (m.profileImage) {
+              <img [src]="m.profileImage" alt="" class="w-full h-full object-cover" />
+            } @else {
+              <div class="w-full h-full flex items-center justify-center"
+                   style="background: linear-gradient(160deg, #1a2a5e 0%, #0d1a40 100%);">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none">
+                  <circle cx="12" cy="8" r="4" fill="rgba(255,255,255,0.25)"/>
+                  <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" stroke="rgba(255,255,255,0.25)" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+              </div>
+            }
+          </div>
+
+          <p class="font-romania text-white font-bold text-2xl leading-tight text-center mb-1">
+            {{ m.firstName }} {{ m.lastName }}
+          </p>
+          <p class="font-inter text-white/40 text-xs mb-4">{{ m.cardCode }}</p>
+
+          <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border text-[11px] font-inter font-semibold"
+                [class]="statusClass">
+            <span class="w-1.5 h-1.5 rounded-full"
+                  [class]="m.status === 'attivo' ? 'bg-green-500' : m.status === 'rifiutato' ? 'bg-red-500' : 'bg-yellow-500'">
+            </span>
+            {{ statusLabel }}
+          </span>
+        </div>
+
+        <!-- Dati -->
+        <div class="border-t border-white/10 grid grid-cols-2">
+          <div class="px-5 py-4 border-r border-white/10">
+            <p class="font-inter text-[7px] uppercase tracking-widest text-white/30 mb-1">Categoria</p>
+            <p class="font-romania text-white font-bold text-sm">{{ categoryLabel(m.category) }}</p>
+          </div>
+          <div class="px-5 py-4">
+            <p class="font-inter text-[7px] uppercase tracking-widest text-white/30 mb-1">Anno</p>
+            <p class="font-romania text-white font-bold text-sm">{{ m.membershipYear }}</p>
+          </div>
+        </div>
+
+        <!-- Validità -->
+        <div class="border-t border-white/10 px-5 py-4 flex items-center gap-2">
+          @if (m.expired) {
+            <span class="material-symbols-outlined text-red-400 text-base" style="font-variation-settings:'FILL' 1">cancel</span>
+            <p class="font-inter text-red-400 text-xs">Tessera scaduta al 31/12/{{ m.membershipYear }}</p>
+          } @else {
+            <span class="material-symbols-outlined text-[#f8bd2a] text-base" style="font-variation-settings:'FILL' 1">verified</span>
+            <p class="font-inter text-white/50 text-xs">Valida fino al 31/12/{{ m.membershipYear }}</p>
+          }
+        </div>
+
+      </div>
+
+      <!-- Footer -->
+      <p class="text-center font-inter text-[9px] text-white/20 mt-6">
+        Verifica effettuata il {{ now | date:'d MMMM yyyy, HH:mm' }}<br>
+        acr-milano.it
+      </p>
+
+    </div>
+  }
+
+</div>

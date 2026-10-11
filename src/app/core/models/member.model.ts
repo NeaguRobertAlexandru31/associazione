@@ -39,6 +39,17 @@ export const BOARD_ROLE_LABELS: Record<BoardRole, string> = {
   responsabile_eventi: 'Responsabile eventi',
 };
 
+export interface MemberVerifyInfo {
+  firstName: string;
+  lastName: string;
+  category: MemberCategory;
+  status: MemberStatus;
+  membershipYear: number;
+  expired: boolean;
+  profileImage?: string | null;
+  cardCode: string;
+}
+
 export interface AuthUser {
   id: string;
   email: string;

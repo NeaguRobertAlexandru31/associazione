@@ -1,4 +1,6 @@
-import { Component, OnInit, ChangeDetectionStrategy, inject, signal } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, inject, signal, effect } from '@angular/core';
+import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
+import QRCode from 'qrcode';
 import { AuthService } from '../../../core/services/auth/auth';
 import { TesseraInfo } from '../../../core/models/member.model';
 
@@ -10,12 +12,24 @@ import { TesseraInfo } from '../../../core/models/member.model';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Tessera implements OnInit {
-  private auth = inject(AuthService);
+  private auth      = inject(AuthService);
+  private sanitizer = inject(DomSanitizer);
 
   loading     = signal(true);
   tessera     = signal<TesseraInfo | null>(null);
   cardFlipped = signal(false);
   showPayment = signal(false);
+  qrDataUrl   = signal<SafeUrl | null>(null);
+
+  constructor() {
+    effect(() => {
+      const t = this.tessera();
+      if (!t) return;
+      const url = `${window.location.origin}/verifica/${t.id}`;
+      QRCode.toDataURL(url, { width: 200, margin: 1, color: { dark: '#001040', light: '#ffffff' } })
+        .then(data => this.qrDataUrl.set(this.sanitizer.bypassSecurityTrustUrl(data)));
+    });
+  }
 
   ngOnInit(): void {
     this.auth.getMyTessera().subscribe({

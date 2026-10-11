@@ -111,8 +111,8 @@ section[style*="scroll-snap-align"] {
 .card-scene {
   perspective: 1200px;
   width: 100%;
-  max-width: 420px;
-  height: 265px;
+  max-width: 280px;
+  height: 440px;
   margin: 0 auto;
 }
 .card-inner {
@@ -123,6 +123,13 @@ section[style*="scroll-snap-align"] {
   transition: transform 0.7s cubic-bezier(0.4, 0, 0.2, 1);
 }
 .card-inner.flipped { transform: rotateY(180deg); }
+
+@media (min-width: 768px) {
+  .card-scene {
+    max-width: 420px;
+    height: 265px;
+  }
+}
 .card-face {
   position: absolute;
   inset: 0;

@@ -99,37 +99,6 @@
     <!-- Right: info -->
     <div class="flex flex-col gap-4 px-8 md:px-0">
 
-      <!-- Address -->
-      <div class="bg-surface-container-lowest rounded-3xl shadow-sm p-7">
-        <p class="font-inter font-bold text-secondary text-[10px] uppercase tracking-widest mb-4">
-          {{ 'contacts.info_sede_label' | translate }}
-        </p>
-        <div class="flex items-start gap-3 mb-6">
-          <span class="material-symbols-outlined text-primary mt-0.5" style="font-variation-settings:'FILL' 1">location_on</span>
-          <div>
-            <p class="font-romania font-bold text-primary text-lg">{{ 'contacts.info_address' | translate }}</p>
-            <p class="font-inter text-on-surface-variant text-sm">{{ 'contacts.info_city' | translate }}</p>
-            <p class="font-inter text-on-surface-variant text-sm">{{ 'contacts.info_country' | translate }}</p>
-          </div>
-        </div>
-        <div class="grid grid-cols-2 gap-4 border-t border-outline-variant/20 pt-5">
-          <div>
-            <p class="font-inter text-[10px] text-on-surface-variant uppercase tracking-widest mb-1">{{ 'contacts.info_phone_label' | translate }}</p>
-            <a [href]="'tel:' + ('contacts.info_phone' | translate)"
-               class="font-romania font-bold text-primary hover:text-secondary transition-colors">
-              {{ 'contacts.info_phone' | translate }}
-            </a>
-          </div>
-          <div>
-            <p class="font-inter text-[10px] text-on-surface-variant uppercase tracking-widest mb-1">{{ 'contacts.info_email_label' | translate }}</p>
-            <a [href]="'mailto:' + ('contacts.info_email' | translate)"
-               class="font-romania font-bold text-primary hover:text-secondary transition-colors">
-              {{ 'contacts.info_email' | translate }}
-            </a>
-          </div>
-        </div>
-      </div>
-
       <!-- Social -->
       <div class="bg-surface-container-lowest rounded-3xl p-7 shadow-sm">
         <p class="font-inter font-bold text-on-surface-variant text-[10px] uppercase tracking-widest mb-3">
@@ -162,50 +131,6 @@
           {{ 'footer.telegram_cta' | translate }}
         </a>
       </div>
-
-    </div>
-  </div>
-</section>
-
-<!-- ── MAP ────────────────────────────────────────────────────────────── -->
-<section class="py-6 bg-surface" style="scroll-snap-align: start">
-  <div class="container mx-auto px-8">
-    <div class="relative rounded-3xl overflow-hidden h-80 bg-surface-container shadow-sm">
-
-      <!-- Map placeholder styled -->
-      <div class="absolute inset-0 bg-gradient-to-br from-surface-container to-surface-container-high flex items-center justify-center">
-        <div class="text-center">
-          <span class="material-symbols-outlined text-5xl text-primary/20 mb-2 block">map</span>
-        </div>
-        <!-- Grid lines -->
-        <div class="absolute inset-0 opacity-10"
-             style="background-image: linear-gradient(#002068 1px, transparent 1px), linear-gradient(90deg, #002068 1px, transparent 1px); background-size: 40px 40px;"></div>
-      </div>
-
-      <!-- Pin -->
-      <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-full flex flex-col items-center">
-        <div class="bg-secondary text-on-primary font-inter font-semibold text-xs px-3 py-1.5 rounded-full shadow-lg mb-1 whitespace-nowrap">
-          APS Marama
-        </div>
-        <span class="material-symbols-outlined text-secondary text-3xl" style="font-variation-settings:'FILL' 1">location_on</span>
-      </div>
-
-      <!-- How to reach card -->
-      <div class="absolute bottom-4 left-4 bg-surface-container-lowest rounded-2xl px-5 py-4 shadow-md max-w-xs">
-        <p class="font-inter font-bold text-secondary text-[10px] uppercase tracking-widest mb-1">
-          {{ 'contacts.map_how_label' | translate }}
-        </p>
-        <p class="font-inter text-on-surface-variant text-xs leading-relaxed">
-          {{ 'contacts.map_how_text' | translate }}
-        </p>
-      </div>
-
-      <!-- Directions button -->
-      <a [href]="mapsUrl" target="_blank" rel="noopener"
-         class="absolute top-4 right-4 flex items-center gap-2 bg-surface-container-lowest px-4 py-2 rounded-full shadow-md font-inter font-semibold text-sm text-primary hover:bg-surface-container transition-all">
-        <span class="material-symbols-outlined text-secondary text-base" style="font-variation-settings:'FILL' 1">directions</span>
-        {{ 'contacts.map_directions' | translate }}
-      </a>
 
     </div>
   </div>
