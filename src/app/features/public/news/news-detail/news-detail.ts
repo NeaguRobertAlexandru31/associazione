@@ -1,7 +1,8 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnDestroy, OnInit, inject, signal } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { Article } from '../../../../core/models/article.model';
 import { ArticlesService } from '../../../../core/services/articles/articles';
+import { SeoService } from '../../../../core/services/seo/seo';
 import { environment } from '../../../../../environments/environment';
 
 @Component({
@@ -9,9 +10,10 @@ import { environment } from '../../../../../environments/environment';
   imports: [RouterLink],
   templateUrl: './news-detail.html',
 })
-export class NewsDetail implements OnInit {
+export class NewsDetail implements OnInit, OnDestroy {
   private route = inject(ActivatedRoute);
   private svc   = inject(ArticlesService);
+  private seoSvc = inject(SeoService);
 
   article  = signal<Article | null>(null);
   loading  = signal(true);
@@ -23,9 +25,17 @@ export class NewsDetail implements OnInit {
   ngOnInit(): void {
     const id = this.route.snapshot.paramMap.get('id')!;
     this.svc.getById(id).subscribe({
-      next: a  => { this.article.set(a); this.loading.set(false); },
+      next: a  => {
+        this.article.set(a);
+        this.loading.set(false);
+        if (a.seo) this.seoSvc.apply(a.seo, a.cover ?? undefined);
+      },
       error: () => { this.notFound.set(true); this.loading.set(false); },
     });
+  }
+
+  ngOnDestroy(): void {
+    this.seoSvc.reset();
   }
 
   resolveImg(path: string): string {

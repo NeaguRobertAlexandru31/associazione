@@ -1,7 +1,8 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnDestroy, OnInit, inject, signal } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { Project } from '../../../../core/models/project.model';
 import { ProjectsService } from '../../../../core/services/projects/projects';
+import { SeoService } from '../../../../core/services/seo/seo';
 import { environment } from '../../../../../environments/environment';
 
 @Component({
@@ -10,9 +11,10 @@ import { environment } from '../../../../../environments/environment';
   templateUrl: './project-detail.html',
   styleUrl: './project-detail.css',
 })
-export class ProjectDetail implements OnInit {
-  private route = inject(ActivatedRoute);
-  private svc   = inject(ProjectsService);
+export class ProjectDetail implements OnInit, OnDestroy {
+  private route  = inject(ActivatedRoute);
+  private svc    = inject(ProjectsService);
+  private seoSvc = inject(SeoService);
 
   project       = signal<Project | null>(null);
   loading       = signal(true);
@@ -24,9 +26,17 @@ export class ProjectDetail implements OnInit {
   ngOnInit(): void {
     const id = this.route.snapshot.paramMap.get('id')!;
     this.svc.getById(id).subscribe({
-      next: p  => { this.project.set(p); this.loading.set(false); },
+      next: p  => {
+        this.project.set(p);
+        this.loading.set(false);
+        if (p.seo) this.seoSvc.apply(p.seo, p.cover ?? undefined);
+      },
       error: () => { this.notFound.set(true); this.loading.set(false); },
     });
+  }
+
+  ngOnDestroy(): void {
+    this.seoSvc.reset();
   }
 
   resolveImg(path: string): string {

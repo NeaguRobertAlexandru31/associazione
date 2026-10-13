@@ -1,3 +1,5 @@
+import { SeoData } from './seo.model';
+
 export type ProjectCategory = 'cultura' | 'tradizione' | 'sociale' | 'educazione';
 export type ProjectStatus   = 'ongoing' | 'completed';
 
@@ -9,6 +11,7 @@ export interface Project {
   status:      ProjectStatus;
   images:      string[];
   cover?:      string;
+  seo?:        SeoData | null;
   createdAt:   string;
   updatedAt:   string;
 }

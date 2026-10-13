@@ -1,3 +1,5 @@
+import { SeoData } from './seo.model';
+
 export type EventAccessType = 'public' | 'limited' | 'members_only';
 
 export interface CalendarEvent {
@@ -15,6 +17,7 @@ export interface CalendarEvent {
   accessType?: EventAccessType;
   hasCapacity?: boolean;
   capacity?: number | null;
+  seo?: SeoData | null;
 }
 
 export interface BookingAvailability {

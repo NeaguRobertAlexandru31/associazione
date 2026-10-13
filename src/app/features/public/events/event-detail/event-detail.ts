@@ -4,6 +4,7 @@ import { ActivatedRoute, RouterLink } from '@angular/router';
 import { BookingAvailability, CalendarEvent, EventPhoto, EventAccessType } from '../../../../core/models/event.model';
 import { EventsService } from '../../../../core/services/events/events';
 import { Analytics } from '../../../../core/services/analytics/analytics';
+import { SeoService } from '../../../../core/services/seo/seo';
 import { environment } from '../../../../../environments/environment';
 
 type RsvpStatus = 'attending' | 'interested';
@@ -20,6 +21,7 @@ export class EventDetail implements OnInit, OnDestroy {
   private route     = inject(ActivatedRoute);
   private svc       = inject(EventsService);
   private analytics = inject(Analytics);
+  private seoSvc    = inject(SeoService);
 
   private bookingObserver?: IntersectionObserver;
   private bookingEl?: HTMLElement;
@@ -127,6 +129,7 @@ export class EventDetail implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.bookingObserver?.disconnect();
     this.rsvpObserver?.disconnect();
+    this.seoSvc.reset();
   }
 
   ngOnInit(): void {
@@ -135,6 +138,7 @@ export class EventDetail implements OnInit, OnDestroy {
       next: ev => {
         this.event.set(ev);
         this.loading.set(false);
+        if (ev.seo) this.seoSvc.apply(ev.seo, ev.cover ?? undefined);
         setTimeout(() => this.toastVisible.set(true), 1000);
         this.svc.getRsvpStats(ev.id).subscribe({ next: s => this.rsvpStats.set(s), error: () => {} });
         this.svc.getPublicPhotos(slug).subscribe({ next: photos => this.participantPhotos.set(photos), error: () => {} });

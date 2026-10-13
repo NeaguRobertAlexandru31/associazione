@@ -1,3 +1,5 @@
+import { SeoData } from './seo.model';
+
 export interface ArticleBlock {
   subtitle?: string;
   paragraph: string;
@@ -10,6 +12,7 @@ export interface Article {
   categories:  string[];
   blocks:      ArticleBlock[];
   cover?:      string;
+  seo?:        SeoData | null;
   createdAt:   string;
   updatedAt:   string;
 }
