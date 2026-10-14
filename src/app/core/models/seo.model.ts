@@ -3,4 +3,5 @@ export interface SeoData {
   description: string;
   keywords: string[];
   ogDescription: string;
+  imageAlts?: string[];
 }

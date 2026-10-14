@@ -28,9 +28,9 @@ export class SeoService {
   }
 
   reset(): void {
-    const defaultTitle = 'ACR Milano';
+    const defaultTitle = 'Marama APS ETS';
     this.title.setTitle(defaultTitle);
-    this.meta.updateTag({ name: 'description',        content: 'Associazione Culturale Rumena di Milano' });
+    this.meta.updateTag({ name: 'description',        content: 'Associazione di promozione sociale della cultura rumena in Italia' });
     this.meta.removeTag('name="keywords"');
     this.meta.removeTag('property="og:title"');
     this.meta.removeTag('property="og:description"');
